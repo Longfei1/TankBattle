@@ -1,0 +1,403 @@
+(function() {"use strict";var __module = CC_EDITOR ? module : {exports:{}};var __filename = 'preview-scripts/assets/scripts/app/component/game/tank/BattleTank.js';var __require = CC_EDITOR ? function (request) {return cc.require(request, require);} : function (request) {return cc.require(request, __filename);};function __define (exports, require, module) {"use strict";
+cc._RF.push(module, '9094ae+fytGzrynfFBlICUv', 'BattleTank', __filename);
+// scripts/app/component/game/tank/BattleTank.ts
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var GameDef_1 = require("../../../define/GameDef");
+var GameStruct_1 = require("../../../define/GameStruct");
+var GameDataModel_1 = require("../../../model/GameDataModel");
+var Game_1 = require("../Game");
+var Scenery_1 = require("../Scenery");
+var Bullet_1 = require("../Bullet");
+var AniDef_1 = require("../../../define/AniDef");
+var BaseTank_1 = require("./BaseTank");
+var _a = cc._decorator, ccclass = _a.ccclass, property = _a.property;
+var DirectionSuffix = {
+    0: "U",
+    1: "L",
+    2: "D",
+    3: "R"
+};
+var BattleTank = /** @class */ (function (_super) {
+    __extends(BattleTank, _super);
+    function BattleTank() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.nodePosBullet = [];
+        //属性
+        _this._tankName = "";
+        _this._tankLevel = 1;
+        _this._tankMaxLevel = 0;
+        _this._team = -1;
+        _this._speedMove = 0;
+        _this._speedBullet = 0;
+        _this._shootCooltime = 0;
+        _this._bulletType = -1;
+        //状态
+        _this._isMove = false;
+        _this._moveDirection = -1;
+        _this._isCollision = false;
+        _this._canMove = true;
+        _this._moveDiff = 0;
+        _this._lastPosition = null;
+        _this._lastShootTime = 0;
+        _this._imgLoopFrame = 0;
+        _this._imgShowFrame = 1;
+        //地图边界
+        _this._boundaryLx = 0;
+        _this._boundaryRx = 0;
+        _this._boundaryTy = 0;
+        _this._boundaryBy = 0;
+        return _this;
+    }
+    BattleTank.prototype.onLoad = function () {
+        _super.prototype.onLoad.call(this);
+        this._boundaryLx = GameDataModel_1.default.convertToScenePosition(new GameStruct_1.GameStruct.RcInfo(0, 0)).x;
+        this._boundaryRx = GameDataModel_1.default.convertToScenePosition(new GameStruct_1.GameStruct.RcInfo(GameDef_1.GameDef.GAME_MAP_COL_NUM, 0)).x;
+        this._boundaryTy = GameDataModel_1.default.convertToScenePosition(new GameStruct_1.GameStruct.RcInfo(0, GameDef_1.GameDef.GAME_MAP_ROW_NUM)).y;
+        this._boundaryBy = GameDataModel_1.default.convertToScenePosition(new GameStruct_1.GameStruct.RcInfo(0, 0)).y;
+    };
+    BattleTank.prototype.reset = function () {
+        _super.prototype.reset.call(this);
+        this._isMove = false;
+        this._isCollision = false;
+        this._canMove = true;
+        this._lastPosition = null;
+        this._lastShootTime = 0;
+        this._imgLoopFrame = 0;
+        this._imgShowFrame = 1;
+    };
+    BattleTank.prototype.setAttributes = function (attributes) {
+        this.setTankName(attributes.tankName);
+        this.setTankLevel(attributes.maxLevel);
+        this.setTankTeam(attributes.team);
+        this.setMoveSpeed(attributes.moveSpeed);
+        this.setBulletSpeed(attributes.bulletSpeed);
+        this._tankMaxLevel = attributes.maxLevel;
+        this._bulletType = attributes.bulletType;
+        this._shootCooltime = attributes.shootCooltime;
+    };
+    BattleTank.prototype.setTankTeam = function (team) {
+        this._team = team;
+    };
+    BattleTank.prototype.setTankName = function (name) {
+        this._tankName = name;
+    };
+    BattleTank.prototype.setTankLevel = function (level) {
+        if (level === void 0) { level = 0; }
+        this._tankLevel = level;
+        this.updateTankImg();
+    };
+    BattleTank.prototype.setMoveDirction = function (nDirection) {
+        if (this._moveDirection !== nDirection) {
+            this._moveDirection = nDirection;
+            this.updateTankImg();
+        }
+    };
+    BattleTank.prototype.getMoveDirection = function () {
+        return this._moveDirection;
+    };
+    BattleTank.prototype.updateTankImg = function () {
+        if (this._tankName === "") {
+            return;
+        }
+        if (!DirectionSuffix[this._moveDirection]) {
+            return;
+        }
+        var frameName = this._tankName + "_" + this._tankLevel + DirectionSuffix[this._moveDirection] + "_" + this._imgShowFrame;
+        this.setTankImg(frameName);
+    };
+    BattleTank.prototype.update = function (dt) {
+        this.updateMove(dt);
+    };
+    BattleTank.prototype.setMove = function (bMove, nDirection) {
+        if (bMove) {
+            if (this.isNeedCorrectPosition(this._moveDirection, nDirection)) {
+                this.correctPosition(nDirection);
+            }
+            this.setMoveDirction(nDirection);
+            this._isMove = true;
+        }
+        else if (!bMove) {
+            if (this._moveDirection === nDirection) {
+                this._isMove = false;
+            }
+        }
+    };
+    BattleTank.prototype.setMoveSpeed = function (nSpeed) {
+        this._speedMove = nSpeed;
+    };
+    BattleTank.prototype.setBulletSpeed = function (nSpeed) {
+        this._speedBullet = nSpeed;
+    };
+    BattleTank.prototype.updateMove = function (dt) {
+        if (!GameDataModel_1.default._gamePause) {
+            this._moveDiff = this.calcMove(this._speedMove * dt);
+            if (this._moveDiff > 0) {
+                var curPos = this.node.getPosition();
+                var nextPox = curPos;
+                switch (this._moveDirection) {
+                    case GameDef_1.GameDef.DIRECTION_UP:
+                        nextPox = cc.v2(curPos.x, curPos.y + this._moveDiff);
+                        break;
+                    case GameDef_1.GameDef.DIRECTION_LEFT:
+                        nextPox = cc.v2(curPos.x - this._moveDiff, curPos.y);
+                        break;
+                    case GameDef_1.GameDef.DIRECTION_DOWN:
+                        nextPox = cc.v2(curPos.x, curPos.y - this._moveDiff);
+                        break;
+                    case GameDef_1.GameDef.DIRECTION_RIGHT:
+                        nextPox = cc.v2(curPos.x + this._moveDiff, curPos.y);
+                        break;
+                    default:
+                        break;
+                }
+                this.node.setPosition(nextPox);
+                //this.validateMove();
+                this.addImgLoopFrame();
+                this.updateTankImg();
+            }
+        }
+    };
+    BattleTank.prototype.calcMove = function (diff) {
+        var moveDiff = 0;
+        var minMoveDiff = GameDef_1.GameDef.TANK_MOVE_MIN_VALUE;
+        //需要矫正移动时，先按当前方向矫正位置
+        // if (this._isNeedCorrectMove) {
+        //     if (this._totalMoveDiff % minMoveDiff != 0) {
+        //         this._totalMoveDiff = this._totalMoveDiff % minMoveDiff;
+        //         moveDiff = diff;
+        //         if (this._totalMoveDiff + moveDiff > minMoveDiff) {
+        //             //moveDiff = minMoveDiff - this._totalMoveDiff;
+        //             //确保静止时的坐标为整数值
+        //             let pos = this.node.getPosition();
+        //             if (pos.x % minMoveDiff != 0) {
+        //                 if (this._moveDirection === GameDef.DIRECTION_LEFT) {
+        //                     moveDiff = pos.x - (Math.floor(pos.x / minMoveDiff) * minMoveDiff);
+        //                 }
+        //                 else if (this._moveDirection === GameDef.DIRECTION_RIGHT) {
+        //                     moveDiff = (Math.ceil(pos.x / minMoveDiff) * minMoveDiff) - pos.x;
+        //                 }
+        //             }
+        //             if (pos.y % minMoveDiff != 0) {
+        //                 if (this._moveDirection === GameDef.DIRECTION_UP) {
+        //                     moveDiff = (Math.ceil(pos.y / minMoveDiff) * minMoveDiff) - pos.y;
+        //                 }
+        //                 else if (this._moveDirection === GameDef.DIRECTION_DOWN) {
+        //                     moveDiff = pos.y - (Math.floor(pos.y / minMoveDiff) * minMoveDiff);
+        //                 }
+        //             }
+        //         }
+        //         return moveDiff;
+        //     }
+        //     else {
+        //         this.cleanCorrectMoveStatus();
+        //     }
+        // }
+        if (this._isMove) {
+            moveDiff = diff;
+        }
+        return moveDiff;
+    };
+    BattleTank.prototype.validateMove = function () {
+        var pos = this.node.getPosition();
+        if (pos.x < this._boundaryLx) {
+            this.node.x = this._boundaryLx;
+        }
+        else if (pos.x > this._boundaryRx) {
+            this.node.x = this._boundaryRx;
+        }
+        else if (pos.y > this._boundaryTy) {
+            this.node.y = this._boundaryTy;
+        }
+        else if (pos.y < this._boundaryBy) {
+            this.node.y = this._boundaryBy;
+        }
+    };
+    BattleTank.prototype.setPosition = function (pos) {
+        _super.prototype.setPosition.call(this, pos);
+        if (pos) {
+            this._lastPosition = this.node.getPosition();
+        }
+    };
+    BattleTank.prototype.onCollisionEnter = function (other, self) {
+        if (other.node.group === GameDef_1.GameDef.GROUP_NAME_SCENERY) {
+            var sceneryType = other.node.getComponent(Scenery_1.default).getType();
+            if (sceneryType !== GameDef_1.GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
+        else if (other.node.group === GameDef_1.GameDef.GROUP_NAME_BOUNDARY) {
+            if (this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
+        else if (other.node.group === GameDef_1.GameDef.GROUP_NAME_BULLET) {
+            var shooterTeam = other.node.getComponent(Bullet_1.default)._team;
+            var destroyed = other.node.getComponent(Bullet_1.default)._destroyed;
+            if (!destroyed && this._team !== shooterTeam) {
+                //被击中
+                this.dead();
+            }
+        }
+    };
+    BattleTank.prototype.onCollisionStay = function (other, self) {
+        if (other.node.group === GameDef_1.GameDef.GROUP_NAME_SCENERY) {
+            var sceneryType = other.node.getComponent(Scenery_1.default).getType();
+            if (sceneryType !== GameDef_1.GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
+        else if (other.node.group === GameDef_1.GameDef.GROUP_NAME_BOUNDARY) {
+            if (this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
+    };
+    BattleTank.prototype.lateUpdate = function () {
+        if (this._moveDiff > 0) {
+            if (this._canMove) {
+                this.savePositon();
+            }
+            else {
+                if (this._lastPosition) {
+                    this.node.setPosition(this._lastPosition);
+                    this._canMove = true;
+                    //this.cleanCorrectMoveStatus();
+                }
+            }
+        }
+    };
+    BattleTank.prototype.shoot = function () {
+        var currTime = new Date().getTime();
+        if (currTime - this._shootCooltime * 1000 > this._lastShootTime) {
+            if (this._speedMove > 0 && GameDataModel_1.default.isValidDirection(this._moveDirection)) {
+                var bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
+                var shootInfo = {
+                    type: this._bulletType,
+                    shooterName: this._tankName,
+                    shooterLevel: this._tankLevel,
+                    team: this._team,
+                    pos: bulletPos,
+                    direction: this._moveDirection,
+                    speed: this._speedBullet,
+                };
+                this._lastShootTime = currTime;
+                Game_1.gameController.onTankShoot(shootInfo);
+                return true;
+            }
+        }
+        return false;
+    };
+    BattleTank.prototype.born = function () {
+        var _this = this;
+        Game_1.gameController.playUnitAniOnce(AniDef_1.AniDef.UnitAniType.BORN, this.getNodeAni(), function () {
+            _this.setTankVisible(false);
+        }, function () {
+            _this.setTankVisible(true);
+        });
+    };
+    BattleTank.prototype.dead = function () {
+        var _this = this;
+        Game_1.gameController.playUnitAniOnce(AniDef_1.AniDef.UnitAniType.BLAST, this.getNodeAni(), function () {
+            _this.setTankVisible(false);
+        }, function () {
+            _this.node.destroy();
+        });
+    };
+    BattleTank.prototype.setTankVisible = function (bVisible) {
+        _super.prototype.setTankVisible.call(this, bVisible);
+        var visible = bVisible ? true : false;
+        var colliders = this.node.getComponents(cc.Collider);
+        for (var _i = 0, colliders_1 = colliders; _i < colliders_1.length; _i++) {
+            var collider = colliders_1[_i];
+            collider.enabled = visible; //根据显隐决定碰撞组件的启用
+        }
+    };
+    BattleTank.prototype.addImgLoopFrame = function () {
+        this._imgLoopFrame++;
+        if (this._imgLoopFrame > GameDef_1.GameDef.TANK_MOVE_INTERVAL_FRAMES) {
+            //两帧移动帧
+            this._imgShowFrame++;
+            if (this._imgShowFrame > 2) {
+                this._imgShowFrame = 1;
+            }
+            this._imgLoopFrame = 0;
+        }
+    };
+    //判断两个矩形碰撞体是否产生有效碰撞(相交非相切时)
+    BattleTank.prototype.isValidCollision = function (other /*cc.Collider*/, self /*cc.Collider*/) {
+        var rect1 = self.world.aabb;
+        var rect2 = other.world.aabb;
+        var interRect = cc.rect();
+        rect1.intersection(interRect, rect2);
+        if (interRect.width > 0 && interRect.height > 0) {
+            return true;
+        }
+        return false;
+    };
+    //矫正坐标，转向时设置坐标为最近的行列坐标值
+    BattleTank.prototype.correctPosition = function (direction) {
+        var pos = this.node.getPosition();
+        if (direction === GameDef_1.GameDef.DIRECTION_UP || direction === GameDef_1.GameDef.DIRECTION_DOWN) {
+            var minValue = GameDataModel_1.default.getMapUnit().width;
+            var col = Math.floor(pos.x / minValue);
+            var diff = pos.x % minValue;
+            if (diff >= minValue / 2) {
+                col++;
+            }
+            this.node.x = col * minValue;
+            this.savePositon();
+        }
+        else if (direction === GameDef_1.GameDef.DIRECTION_LEFT || direction === GameDef_1.GameDef.DIRECTION_RIGHT) {
+            var minValue = GameDataModel_1.default.getMapUnit().height;
+            var row = Math.floor(pos.y / minValue);
+            var diff = pos.y % minValue;
+            if (diff >= minValue / 2) {
+                row++;
+            }
+            this.node.y = row * minValue;
+            this.savePositon();
+        }
+    };
+    //改变成垂直与水平方向时才需要矫正
+    BattleTank.prototype.isNeedCorrectPosition = function (oldDirection, newDirection) {
+        //let vertical = false;
+        //let horizontal = false;
+        if (oldDirection === GameDef_1.GameDef.DIRECTION_UP || oldDirection === GameDef_1.GameDef.DIRECTION_DOWN) {
+            if (newDirection === GameDef_1.GameDef.DIRECTION_LEFT || newDirection === GameDef_1.GameDef.DIRECTION_RIGHT) {
+                return true;
+            }
+        }
+        else if (oldDirection === GameDef_1.GameDef.DIRECTION_LEFT || oldDirection === GameDef_1.GameDef.DIRECTION_RIGHT) {
+            if (newDirection === GameDef_1.GameDef.DIRECTION_UP || newDirection === GameDef_1.GameDef.DIRECTION_DOWN) {
+                return true;
+            }
+        }
+        return false;
+    };
+    BattleTank.prototype.savePositon = function () {
+        this._lastPosition = this.node.getPosition();
+    };
+    __decorate([
+        property({ displayName: "子弹发射位置", type: [cc.Node], tooltip: "上左下右" })
+    ], BattleTank.prototype, "nodePosBullet", void 0);
+    BattleTank = __decorate([
+        ccclass
+    ], BattleTank);
+    return BattleTank;
+}(BaseTank_1.default));
+exports.default = BattleTank;
+
+cc._RF.pop();
+        }
+        if (CC_EDITOR) {
+            __define(__module.exports, __require, __module);
+        }
+        else {
+            cc.registerModuleFunc(__filename, function () {
+                __define(__module.exports, __require, __module);
+            });
+        }
+        })();
+        //# sourceMappingURL=BattleTank.js.map
+        

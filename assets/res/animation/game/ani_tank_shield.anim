@@ -1,0 +1,41 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "ani_tank_shield",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 1.24,
+  "sample": 25,
+  "speed": 1,
+  "wrapMode": "1",
+  "curveData": {
+    "paths": {
+      "Img_Show": {
+        "comps": {
+          "cc.Sprite": {
+            "spriteFrame": [
+              {
+                "frame": 0,
+                "value": {
+                  "__uuid__": "88081ab9-c79a-4922-ae24-159dbc26eff1"
+                }
+              },
+              {
+                "frame": 0.6,
+                "value": {
+                  "__uuid__": "8e984f1d-fe87-487f-81be-1ee6a226d497"
+                }
+              },
+              {
+                "frame": 1.2,
+                "value": {
+                  "__uuid__": "88081ab9-c79a-4922-ae24-159dbc26eff1"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "events": []
+}

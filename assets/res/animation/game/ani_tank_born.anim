@@ -1,0 +1,47 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "ani_tank_bornani",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.8,
+  "sample": 20,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "paths": {
+      "Img_Show": {
+        "comps": {
+          "cc.Sprite": {
+            "spriteFrame": [
+              {
+                "frame": 0,
+                "value": {
+                  "__uuid__": "15a4a4d0-7989-42d3-b7b0-a476c7584204"
+                }
+              },
+              {
+                "frame": 0.25,
+                "value": {
+                  "__uuid__": "b71f88cc-bac0-4e64-bab1-561ff0e3b932"
+                }
+              },
+              {
+                "frame": 0.5,
+                "value": {
+                  "__uuid__": "97b6b875-3e07-47d6-a5d2-734e7a5b557e"
+                }
+              },
+              {
+                "frame": 0.75,
+                "value": {
+                  "__uuid__": "e9edb649-f6f0-4cee-9b83-d448b8ca986a"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "events": []
+}

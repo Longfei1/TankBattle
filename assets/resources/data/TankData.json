@@ -1,0 +1,22 @@
+{
+    "player1": {
+        "name": "player1",
+        "tankName": "p1tank",
+        "team": 0,
+        "maxLevel": 2,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
+    },
+    "player2": {
+        "name": "player2",
+        "tankName": "p2tank",
+        "team": 0,
+        "maxLevel": 2,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
+    }
+}

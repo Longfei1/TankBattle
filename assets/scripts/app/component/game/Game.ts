@@ -144,6 +144,7 @@ export default class Game extends cc.Component {
             com.setType(shootInfo.type);
             com._shooterName = shootInfo.shooterName;
             com._team = shootInfo.team;
+            com._powerLevel = shootInfo.powerLevel;
             com.setMove(shootInfo.speed, shootInfo.direction);
             this.panelGame.addChild(bullet);
         }

@@ -33,6 +33,10 @@ export namespace GameDef {
     export const BORN_INVINCIBLE_TIME           = 3;  //出生无敌时间
     export const SHIELD_INVINCIBLE_TIME         = 10; //护盾无敌时间
 
+    //子弹威力
+    export const BULLET_POWER_LEVEL_COMMON      = 1; //普通威力,可击毁一层土墙
+    export const BULLET_POWER_LEVEL_STELL       = 2; //可销毁钢墙,两层土墙
+
     //其他
     export const TANK_MOVE_MIN_VALUE            = 10; //坦克最小移动量（像素）
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数

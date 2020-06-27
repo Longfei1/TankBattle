@@ -54,6 +54,29 @@ export default class Scenery extends cc.Component {
         }
     }
 
+    //隐藏布景子元素
+    destroyUnit(index: number) {
+        if (this.imgScenerys[index]) {
+            this.imgScenerys[index].node.active = false;
+        }
+        if (this._colliders[index]) {
+            this._colliders[index].enabled = false;
+        }
+
+        let haveVisible = false;
+        for (let it of this.imgScenerys) {
+            if (this.node.active === true) {
+                haveVisible = true;
+                break;
+            }
+        }
+
+        //所有unit都销毁后，销毁整个节点
+        if (!haveVisible) {
+            gameController.node.emit(EventDef.EV_MAP_DESTROY_SCENERY, this.node);
+        }
+    }
+
     setSceneryImg() {
         for (let i = 0; i < this.imgScenerys.length; i++) {
             let frame = this.getImgFrame(this._type, i + 1);
@@ -92,98 +115,51 @@ export default class Scenery extends cc.Component {
     }
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
-        if (other.node.group === GameDef.GROUP_NAME_BULLET) {
-            this.onBulletCollision(other, self);
-        }
+        // if (other.node.group === GameDef.GROUP_NAME_BULLET) {
+            
+        // }
     }
 
-    onBulletCollision(other: cc.Collider, self: cc.Collider) {
-        let bullet = other.node.getComponent(Bullet);
-
-        //同时有多个unit会产生碰撞，找出一个唯一生效的节点，然后计算出命中的所有节点。
-        let bulletCollider: any = other;
-        let bulletRect: cc.Rect = bulletCollider.world.aabb;
-        let collisionPos = cc.v2(bulletRect.x, bulletRect.y);
-        let sceneryCollider: any = other;
-        let sceneryRect: cc.Rect = sceneryCollider.world.aabb;
-        let sceneryPos = cc.v2(sceneryRect.x, sceneryRect.y);
-
-        let hit = false;
-        if (bullet._moveDirection === GameDef.DIRECTION_UP) {
-            collisionPos.addSelf(cc.v2(bulletRect.width/2, bulletRect.height));
-            if (collisionPos.x === sceneryPos.x) {
-                hit = true;
-            }
-        }
-        else if (bullet._moveDirection === GameDef.DIRECTION_LEFT) {
-            collisionPos.addSelf(cc.v2(0, bulletRect.height/2));
-            if (collisionPos.y === sceneryPos.y) {
-                hit = true;
-            }
-        }
-        else if (bullet._moveDirection === GameDef.DIRECTION_DOWN) {
-            collisionPos.addSelf(cc.v2(bulletRect.width/2, 0));
-            if (collisionPos.x === sceneryPos.x) {
-                hit = true;
-            }
-        }
-        else if (bullet._moveDirection === GameDef.DIRECTION_RIGHT) {
-            collisionPos.addSelf(cc.v2(bulletRect.width, bulletRect.height/2));
-            if (collisionPos.y === sceneryPos.y) {
-                hit = true;
-            }
+    //被子弹击中后处理函数，
+    onHited(pos: GameStruct.RcInfo, power: number) {
+        if (!pos || !power) {
+            return;
         }
 
-        if (hit) {
-            let rcInfos = [];
-
-            let index = this.getIndexByColliderTag(self.tag);
-            let scenery:cc.Sprite = this.imgScenerys[index];
-            if (scenery) {
-                let pos = scenery.node.convertToWorldSpaceAR(cc.v2(0, 0));
-                let rcInfo = GameDataModel.convertToMatrixPosition(pos.mul(2));//获取放大两倍后的矩阵坐标
-
-                let multFunc = (key, value) => {
-                    let newArray = [];
-                    for (let it of rcInfos) {
-                        newArray.push(it);
-                        let copy = CommonFunc.copyObject(it);
-                        copy.key = copy.key + value;
-                        newArray.push(copy);
-                    }
-                }  
-
-                rcInfos.push(rcInfo);
-                if (bullet._moveDirection === GameDef.DIRECTION_UP) {
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col - 2, rcInfo.row));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col - 1, rcInfo.row));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col + 1, rcInfo.row));
-                }
-                else if (bullet._moveDirection === GameDef.DIRECTION_LEFT) {
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row - 1));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row + 1));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row + 2));
-                }
-                else if (bullet._moveDirection === GameDef.DIRECTION_DOWN) {
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col - 2, rcInfo.row));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col - 1, rcInfo.row));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col + 1, rcInfo.row));
-                }
-                else if (bullet._moveDirection === GameDef.DIRECTION_RIGHT) {
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row - 1));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row + 1));
-                    rcInfos.push(new GameStruct.RcInfo(rcInfo.col, rcInfo.row + 2));
-                }
-            }
+        let sceneryType = this.getType();
+        if (sceneryType === GameDef.SceneryType.GRASS || sceneryType === GameDef.SceneryType.WATER) {//水和草暂时不能销毁
+            return;
         }
+        else if (sceneryType === GameDef.SceneryType.STEEL) {
+            if (power < GameDef.BULLET_POWER_LEVEL_STELL) {
+                return;
+            }
 
-        gameController.node.emit(EventDef.EV_GAME_HIT_SCENERY, this.node);
-    }
+            //目前只有土墙需要按细分后的unit去销毁，钢墙可直接销毁。
+            gameController.node.emit(EventDef.EV_MAP_DESTROY_SCENERY, this.node);
+        }
+        else if (sceneryType === GameDef.SceneryType.WALL) {
+            let nodeRcInfo = GameDataModel.convertToMatrixPosition(this.node.position);
+            nodeRcInfo.multiplySelf(2);//放大两倍，与射击判断坐标一致。
 
-    getIndexByColliderTag(tag) {
-        for (let index in this._colliders) {
-            if (this._colliders[index].tag === tag) {
-                return index;
+            //求出坐标对应unit的index
+            let unitIndex = null;
+            if (pos.equal(nodeRcInfo)) {
+                unitIndex = 3;
+            }
+            else if (pos.col === nodeRcInfo.col && pos.row === nodeRcInfo.row + 1) {
+                unitIndex = 1;
+            }
+            else if (pos.row === nodeRcInfo.row && pos.col === nodeRcInfo.col + 1) {
+                unitIndex = 4;
+            }
+            else if (pos.col === nodeRcInfo.col + 1 && pos.row === nodeRcInfo.row + 1) {
+                unitIndex = 2;
+            }
+
+            //销毁unit
+            if (unitIndex) {
+                this.destroyUnit(unitIndex - 1);
             }
         }
     }

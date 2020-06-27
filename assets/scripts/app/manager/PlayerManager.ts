@@ -65,7 +65,7 @@ export default class PlayerManager extends cc.Component {
                 this.panelGame.addChild(mapEditer);
                 let tankCom = mapEditer.getComponent(MapEditTank)
                 tankCom.setEditPosition(GameDef.BORN_PLACE_PLAYER1);
-                tankCom.setMoveDirction(GameDef.DIRECTION_UP);
+                //tankCom.setMoveDirction(GameDef.DIRECTION_UP);
                 this._mapEditer = tankCom;
             }
         }

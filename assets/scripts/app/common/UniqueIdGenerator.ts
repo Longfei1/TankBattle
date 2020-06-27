@@ -18,10 +18,11 @@ export default class UniqueIdGenerator {
         let id = null;
         for (let i = 0; i < this._maxSize; i++) {
             if (this._idMap[this._currID]) {
-                this.IncID();
+                this.incID();
             }
             else {
                 id = this._currID;
+                this._idMap[this._currID] = true;
                 break;
             }
         }
@@ -44,7 +45,7 @@ export default class UniqueIdGenerator {
         this._currID = this._startIndex;
     }
 
-    private IncID() {
+    private incID() {
         this._currID++;
         if (this._currID >= this._startIndex + this._maxSize) {
             this._currID -= this._maxSize;

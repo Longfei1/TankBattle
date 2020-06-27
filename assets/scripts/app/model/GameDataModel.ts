@@ -133,5 +133,22 @@ class GameDataModel extends BaseModel {
         }
         return array;
     }
+
+    addScopeByDirection(scope: GameStruct.HitScope, direction: number, value: number) {
+        if (scope && value) {
+            if (direction === GameDef.DIRECTION_UP) {
+                scope.up += value;
+            }
+            else if (direction === GameDef.DIRECTION_DOWN) {
+                scope.down += value;
+            }
+            else if (direction === GameDef.DIRECTION_LEFT) {
+                scope.left += value;
+            }
+            else if (direction === GameDef.DIRECTION_RIGHT) {
+                scope.right += value;
+            }
+        }
+    }
 }
 export default new GameDataModel();

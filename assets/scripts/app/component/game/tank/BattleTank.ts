@@ -300,21 +300,12 @@ export default class BattleTank extends BaseTank {
     shoot() {
         let currTime = new Date().getTime();
         if (currTime - this._shootCooltime * 1000 > this._lastShootTime) {
-            if (this._speedMove > 0 && GameDataModel.isValidDirection(this._moveDirection)) {
-                let bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
-                let shootInfo: GameStruct.ShootInfo = {
-                    type: this._bulletType,
-                    shooterName: this._tankName,
-                    shooterLevel: this._tankLevel,
-                    team: this._team,
-                    pos: bulletPos,
-                    direction: this._moveDirection,
-                    speed: this._speedBullet,
-                }
+            let shootInfo = this.getShootInfo();
+            if (shootInfo) {
                 this._lastShootTime = currTime;
                 gameController.onTankShoot(shootInfo);
                 return true;
-            }
+            }    
         }
         return false;
     }
@@ -418,5 +409,30 @@ export default class BattleTank extends BaseTank {
 
     savePositon() {
         this._lastPosition = this.node.getPosition();
+    }
+
+    getBulletPowerLevel(): number {
+        return GameDef.BULLET_POWER_LEVEL_COMMON; //默认子弹威力不变
+    }
+
+    getShootCoolTime() : number {
+        return this._shootCooltime;
+    }
+
+    getShootInfo(): GameStruct.ShootInfo {
+        if (this._speedMove > 0 && GameDataModel.isValidDirection(this._moveDirection)) {
+            let bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
+            let shootInfo: GameStruct.ShootInfo = {
+                type: this._bulletType,
+                shooterName: this._tankName,
+                powerLevel: this.getBulletPowerLevel(),
+                team: this._team,
+                pos: bulletPos,
+                direction: this._moveDirection,
+                speed: this._speedBullet,
+            }
+            return shootInfo;
+        }
+        return null;
     }
 }

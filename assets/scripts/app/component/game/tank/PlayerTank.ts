@@ -40,6 +40,15 @@ export default class PlayerTank extends BattleTank {
         }
     }
 
+    getBulletPowerLevel(): number {
+        if (this._tankLevel === 4) {
+            return GameDef.BULLET_POWER_LEVEL_STELL;
+        }
+        else {
+            return GameDef.BULLET_POWER_LEVEL_COMMON;
+        }
+    }
+
     // setMove(bMove: boolean, nDirection: number) {
     //     console.log("[PlayerTank]SetMove tankName:",this._tankName , ",move:", bMove, ",direction:", nDirection);
     //     super.setMove(bMove, nDirection);

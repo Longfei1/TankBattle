@@ -48,6 +48,8 @@ export default class GameMapManager extends cc.Component {
         gameController.node.on(EventDef.EV_MAP_DESTROY_SCENERY, this.evDestroyScenery, this);
         gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
 
+        gameController.node.on(EventDef.EV_GAME_HIT_SCENERY, this.evHitScenery, this);
+
         GameInputModel.addKeyDownOnceListener(() => {
             this.saveMapData();
         }, null, this, PlayerDef.KEYMAP_COMMON.SAVE);
@@ -127,20 +129,29 @@ export default class GameMapManager extends cc.Component {
         this.createGameMap(mapData);
     }
 
-    createScenery(type: number, pos: GameStruct.RcInfo) { 
-        this.destroyScenery(pos);
+    getSceneryNode(pos: GameStruct.RcInfo): cc.Node {
+        if (pos && GameDataModel.isValidMatrixPos(pos)) {
+            return this._scenerys[pos.col][pos.row];
+        }
+        return null;
+    }
 
-        if (type !== GameDef.SceneryType.NULL) {
-            let scenery = this._sceneryPool.getNode();
-            this.panelScenery.addChild(scenery);
-            scenery.getComponent(Scenery).setType(type);
-            scenery.setPosition(GameDataModel.convertToScenePosition(pos));
-            this._scenerys[pos.col][pos.row] = scenery;
+    createScenery(type: number, pos: GameStruct.RcInfo) { 
+        if (pos && GameDataModel.isValidMatrixPos(pos)) {
+            this.destroyScenery(pos);
+
+            if (type !== GameDef.SceneryType.NULL) {
+                let scenery = this._sceneryPool.getNode();
+                this.panelScenery.addChild(scenery);
+                scenery.getComponent(Scenery).setType(type);
+                scenery.setPosition(GameDataModel.convertToScenePosition(pos));
+                this._scenerys[pos.col][pos.row] = scenery;
+            }
         }
     }
 
     destroyScenery(rcInfo: GameStruct.RcInfo) {
-        if (rcInfo) {
+        if (rcInfo && GameDataModel.isValidMatrixPos(rcInfo)) {
             let node = this._scenerys[rcInfo.col][rcInfo.row];
             if (node) {
                 this._scenerys[rcInfo.col][rcInfo.row] = null;
@@ -174,8 +185,10 @@ export default class GameMapManager extends cc.Component {
 
     evDestroyScenery(node: cc.Node) {
         let rcInfo = GameDataModel.convertToMatrixPosition(node.getPosition());
-        this._scenerys[rcInfo.col][rcInfo.row] = null;
-        this._sceneryPool.putNode(node);
+        if (this._scenerys[rcInfo.col][rcInfo.row] === node) {
+            this._scenerys[rcInfo.col][rcInfo.row] = null;
+            this._sceneryPool.putNode(node);
+        }
     }
 
     saveMapData() {
@@ -276,5 +289,70 @@ export default class GameMapManager extends cc.Component {
             }
         }
         return false;
+    }
+
+    //子弹命中布景节点，根据范围处理相关布景的销毁
+    evHitScenery(hitInfos: GameStruct.HitInfo[]) {
+        if (!hitInfos) {
+            return;
+        }
+
+        //递归函数，由某一节点向四周递归判断
+        let hitFunc;
+        hitFunc = (hitInfo: GameStruct.HitInfo, hitSceneryType: number = GameDef.SceneryType.NULL) => {
+            let sceneryPos = GameStruct.RcInfo.multiply(hitInfo.pos, 0.5);
+            let sceneryNode = this.getSceneryNode(sceneryPos);
+            if (!sceneryNode) {
+                return;
+            }
+            let scenery = sceneryNode.getComponent(Scenery);
+            if (scenery) {
+                if (hitSceneryType !== GameDef.SceneryType.NULL && hitSceneryType !== scenery.getType()) {//只扩散处理相同的布景类型
+                    return;
+                }
+
+                //处理销毁动作
+                scenery.onHited(hitInfo.pos, hitInfo.power);
+
+                hitSceneryType = scenery.getType();
+                //递归判断周围节点
+                let scope = hitInfo.scope;
+                if (scope.up > 0) {
+                    scope.up--;
+                    hitInfo.pos.row++;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.row--;
+                    scope.up++;
+                }
+
+                if (scope.down > 0) {
+                    scope.down--;
+                    hitInfo.pos.row--;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.row++;
+                    scope.down++;
+                }
+
+                if (scope.left > 0) {
+                    scope.left--;
+                    hitInfo.pos.col--;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.col++;
+                    scope.left++;
+                }
+
+                if (scope.right > 0) {
+                    scope.right--;
+                    hitInfo.pos.col++;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.col--;
+                    scope.right++;
+                }
+            }
+        };
+
+        for (let info of hitInfos) {
+            hitFunc(info);
+        }
     }
 }

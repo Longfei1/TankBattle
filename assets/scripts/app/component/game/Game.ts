@@ -60,6 +60,7 @@ export default class Game extends cc.Component {
 
     initListener() {
         GameInputModel.addKeyDownIntervalListener(() => {
+            GameDataModel.resetGameData();
             this.goToMainMenu();
         }, null, this, PlayerDef.KEYMAP_COMMON.BACK);
         GameInputModel.addKeyDownIntervalListener(() => {

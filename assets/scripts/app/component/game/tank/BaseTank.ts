@@ -38,7 +38,7 @@ export default class BaseTank extends cc.Component {
                 this.node.setPosition(pos);
             }
             else if (pos.col != null && pos.row != null) {
-                this.node.setPosition(GameDataModel.convertToScenePosition(pos));
+                this.node.setPosition(GameDataModel.matrixToScenePosition(pos));
             }
         }
     }

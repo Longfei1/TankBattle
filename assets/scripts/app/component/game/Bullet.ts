@@ -97,7 +97,7 @@ export default class Bullet extends cc.Component {
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
         let canMove = false;
         if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
-            if (!this.onShootScenery(other, self)) {
+            if (!this.onHitScenery(other, self)) {
                 canMove = true;
             }
         }  
@@ -116,7 +116,7 @@ export default class Bullet extends cc.Component {
     }
 
     //返回值为true，则代表命中，需销毁子弹
-    onShootScenery(scenery: cc.Collider, bullet: cc.Collider): boolean {
+    onHitScenery(scenery: cc.Collider, bullet: cc.Collider): boolean {
         if (this._destroyed) {
             return true;
         }
@@ -136,7 +136,7 @@ export default class Bullet extends cc.Component {
         let hitInfos: GameStruct.HitInfo[] = [];
         if (this._moveDirection === GameDef.DIRECTION_UP || this._moveDirection === GameDef.DIRECTION_DOWN) {
             collisionPos = gameController.getPanelGame().convertToNodeSpace(cc.v2(collisionPos.x, SceneryRect.y));//碰撞的世界坐标转换为游戏界面的局部坐标
-            let hitRcInfo = GameDataModel.convertToMatrixPosition(collisionPos.mul(2));//命中位置
+            let hitRcInfo = GameDataModel.sceneToMatrixPosition(collisionPos);//命中位置
 
             let leftHitInfo: GameStruct.HitInfo = {
                 pos: new GameStruct.RcInfo(hitRcInfo.col - 1, hitRcInfo.row), 
@@ -164,7 +164,7 @@ export default class Bullet extends cc.Component {
         }
         else if (this._moveDirection === GameDef.DIRECTION_LEFT || this._moveDirection === GameDef.DIRECTION_RIGHT) {
             collisionPos = gameController.getPanelGame().convertToNodeSpace(cc.v2(SceneryRect.x, collisionPos.y));//碰撞的世界坐标转换为游戏界面的局部坐标
-            let hitRcInfo = GameDataModel.convertToMatrixPosition(collisionPos.mul(2));//命中位置
+            let hitRcInfo = GameDataModel.sceneToMatrixPosition(collisionPos);//命中位置，
 
             let upHitInfo: GameStruct.HitInfo = {
                 pos: hitRcInfo,
@@ -198,10 +198,75 @@ export default class Bullet extends cc.Component {
         }
 
         if (hitInfos.length > 0) {
-            //交由地图管理器判断并销毁布景
-            gameController.node.emit(EventDef.EV_GAME_HIT_SCENERY, hitInfos);//交由GameMapManager计算命中的布景节点
+            //判断并销毁布景
+            this.destroyHitedScenerys(hitInfos);//交由GameMapManager计算命中的布景节点
         }
 
         return true;
+    }
+
+    //子弹命中布景节点，根据范围处理相关布景的销毁
+    destroyHitedScenerys(hitInfos: GameStruct.HitInfo[]) {
+        if (!hitInfos) {
+            return;
+        }
+
+        //递归函数，由某一节点向四周递归判断
+        let hitFunc;
+        hitFunc = (hitInfo: GameStruct.HitInfo, hitSceneryType: number = GameDef.SceneryType.NULL) => {
+            let sceneryPos = GameDataModel.matrixToSceneryPosition(hitInfo.pos);
+            let sceneryNode = GameDataModel.getSceneryNode(sceneryPos);
+            if (!sceneryNode) {
+                return;
+            }
+            let scenery = sceneryNode.getComponent(Scenery);
+            if (scenery) {
+                if (hitSceneryType !== GameDef.SceneryType.NULL && hitSceneryType !== scenery.getType()) {//只扩散处理相同的布景类型
+                    return;
+                }
+
+                //处理销毁动作
+                scenery.onHited(hitInfo.pos, hitInfo.power);
+
+                hitSceneryType = scenery.getType();
+                //递归判断周围节点
+                let scope = hitInfo.scope;
+                if (scope.up > 0) {
+                    scope.up--;
+                    hitInfo.pos.row++;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.row--;
+                    scope.up++;
+                }
+
+                if (scope.down > 0) {
+                    scope.down--;
+                    hitInfo.pos.row--;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.row++;
+                    scope.down++;
+                }
+
+                if (scope.left > 0) {
+                    scope.left--;
+                    hitInfo.pos.col--;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.col++;
+                    scope.left++;
+                }
+
+                if (scope.right > 0) {
+                    scope.right--;
+                    hitInfo.pos.col++;
+                    hitFunc(hitInfo, hitSceneryType);
+                    hitInfo.pos.col--;
+                    scope.right++;
+                }
+            }
+        };
+
+        for (let info of hitInfos) {
+            hitFunc(info);
+        }
     }
 }

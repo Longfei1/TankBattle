@@ -84,16 +84,18 @@ export default class MapEditTank extends BaseTank {
 
         for (let i = 0; i < this.sceneryUnit.length; i++) {
             if (EditModeVisibleMap[this._editMode][i]) {
-                let rcInfo = GameStruct.RcInfo.sum(this._editPos, SceneryRcInfoDiff[i]);
-                createInfos.push({ type: this._editSceneryType, rcInfo: rcInfo });
+                let sceneryPos = GameDataModel.matrixToSceneryPosition(this._editPos);
+                let pos = GameStruct.RcInfo.sum(sceneryPos, SceneryRcInfoDiff[i]);
+                createInfos.push({ type: this._editSceneryType, sceneryPos: pos });
             }
         }
 
         if (createInfos.length === 0) {
             //沒有创建信息，清空当前所在位置的所有布景
             for (let i = 0; i < this.sceneryUnit.length; i++) {
-                let rcInfo = GameStruct.RcInfo.sum(this._editPos, SceneryRcInfoDiff[i]);
-                createInfos.push({ type: GameDef.SceneryType.NULL, rcInfo: rcInfo });
+                let sceneryPos = GameDataModel.matrixToSceneryPosition(this._editPos);
+                let pos = GameStruct.RcInfo.sum(sceneryPos, SceneryRcInfoDiff[i]);
+                createInfos.push({ type: GameDef.SceneryType.NULL, sceneryPos: pos });
             }
         }
 

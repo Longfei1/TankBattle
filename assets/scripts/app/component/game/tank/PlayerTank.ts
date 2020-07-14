@@ -18,16 +18,17 @@ export default class PlayerTank extends BattleTank {
         return false;
     }
 
-    born() {
-        //播放出生动画
-        gameController.playUnitAniOnce(AniDef.UnitAniType.BORN, this.nodeAni, () => {
-            this.nodeMain.active = false;
-        }, () => {
-            this.nodeMain.active = true;
-
-            //出生后，有几秒的护盾时间
+    born(callback: Function) {
+        //出生后，有几秒的护盾时间
+        let afterBorn = () => {
             this.onGetShieldStatus(GameDef.BORN_INVINCIBLE_TIME);
-        });
+            if (typeof callback === "function") {
+                callback();
+            }
+        }
+        
+        //播放出生动画
+        super.born(afterBorn);
     }
 
     onGetShieldStatus(time: number) {

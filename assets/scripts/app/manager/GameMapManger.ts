@@ -27,7 +27,7 @@ export default class GameMapManager extends cc.Component {
 
     _sceneryPool: NodePool = null;
     _mapUnit = null;
-    _scenerys: cc.Node[][] = [];
+    _scenerys: cc.Node[][] = null;
     _homeBase: cc.Node = null;
 
     onLoad() {
@@ -48,8 +48,6 @@ export default class GameMapManager extends cc.Component {
         gameController.node.on(EventDef.EV_MAP_DESTROY_SCENERY, this.evDestroyScenery, this);
         gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
 
-        gameController.node.on(EventDef.EV_GAME_HIT_SCENERY, this.evHitScenery, this);
-
         GameInputModel.addKeyDownOnceListener(() => {
             this.saveMapData();
         }, null, this, PlayerDef.KEYMAP_COMMON.SAVE);
@@ -57,7 +55,9 @@ export default class GameMapManager extends cc.Component {
 
     init() {
         this._sceneryPool = new NodePool(this.pfbScenery, Scenery);
+        
         this._mapUnit = GameDataModel.getMapUnit();
+        this._scenerys = GameDataModel.scenerys;
 
         this.initListenner();
 
@@ -93,9 +93,9 @@ export default class GameMapManager extends cc.Component {
     resetGameMap() {
         //GameDataModel.clearGameMapData();
 
-        for (let i = 0; i < GameDef.GAME_MAP_COL_NUM; i++) {
+        for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
             this._scenerys[i] = this._scenerys[i] ? this._scenerys[i] : [];
-            for (let j = 0; j < GameDef.GAME_MAP_ROW_NUM; j++) {
+            for (let j = 0; j < GameDef.SCENERYS_NODE_ROW_NUM; j++) {
                 if (this._scenerys[i][j]) {
                     this._sceneryPool.putNode(this._scenerys[i][j]);
                 }
@@ -111,8 +111,8 @@ export default class GameMapManager extends cc.Component {
             return;
         }
 
-        for (let x = 0; x < GameDef.GAME_MAP_COL_NUM; x++) {
-            for (let y = 0; y <GameDef.GAME_MAP_ROW_NUM; y++) {
+        for (let x = 0; x < GameDef.SCENERYS_NODE_COL_NUM; x++) {
+            for (let y = 0; y <GameDef.SCENERYS_NODE_ROW_NUM; y++) {
                 if (mapData[x][y] !== GameDef.SceneryType.NULL) {
                     this.createScenery(mapData[x][y], new GameStruct.RcInfo(x, y));
                 }
@@ -129,32 +129,29 @@ export default class GameMapManager extends cc.Component {
         this.createGameMap(mapData);
     }
 
-    getSceneryNode(pos: GameStruct.RcInfo): cc.Node {
-        if (pos && GameDataModel.isValidMatrixPos(pos)) {
-            return this._scenerys[pos.col][pos.row];
-        }
-        return null;
+    getSceneryNode(sceneryPos: GameStruct.RcInfo): cc.Node {
+        return GameDataModel.getSceneryNode(sceneryPos);
     }
 
-    createScenery(type: number, pos: GameStruct.RcInfo) { 
-        if (pos && GameDataModel.isValidMatrixPos(pos)) {
-            this.destroyScenery(pos);
+    createScenery(type: number, sceneryPos: GameStruct.RcInfo) { 
+        if (sceneryPos && GameDataModel.isValidSceneryPos(sceneryPos)) {
+            this.destroyScenery(sceneryPos);
 
             if (type !== GameDef.SceneryType.NULL) {
                 let scenery = this._sceneryPool.getNode();
                 this.panelScenery.addChild(scenery);
                 scenery.getComponent(Scenery).setType(type);
-                scenery.setPosition(GameDataModel.convertToScenePosition(pos));
-                this._scenerys[pos.col][pos.row] = scenery;
+                scenery.setPosition(GameDataModel.matrixToScenePosition(GameDataModel.sceneryToMatrixPosition(sceneryPos)));
+                this._scenerys[sceneryPos.col][sceneryPos.row] = scenery;
             }
         }
     }
 
-    destroyScenery(rcInfo: GameStruct.RcInfo) {
-        if (rcInfo && GameDataModel.isValidMatrixPos(rcInfo)) {
-            let node = this._scenerys[rcInfo.col][rcInfo.row];
+    destroyScenery(sceneryPos: GameStruct.RcInfo) {
+        if (sceneryPos && GameDataModel.isValidSceneryPos(sceneryPos)) {
+            let node = this._scenerys[sceneryPos.col][sceneryPos.row];
             if (node) {
-                this._scenerys[rcInfo.col][rcInfo.row] = null;
+                this._scenerys[sceneryPos.col][sceneryPos.row] = null;
                 this._sceneryPool.putNode(node);
             }
         }
@@ -163,8 +160,8 @@ export default class GameMapManager extends cc.Component {
     evMapEditCreateScenery(infos) {
         if (infos) {
             for (let info of infos) {
-                if (!this.isHomeBasePosition(info.rcInfo)) {
-                    this.createScenery(info.type, info.rcInfo);
+                if (!this.isHomeBasePosition(info.sceneryPos)) {
+                    this.createScenery(info.type, info.sceneryPos);
                 }
             }
         }
@@ -173,8 +170,8 @@ export default class GameMapManager extends cc.Component {
     evMapEditFinished() {
         //保存编辑的地图
         GameDataModel.clearGameMapData()
-        for (let i = 0; i < GameDef.GAME_MAP_COL_NUM; i++) {
-            for (let j = 0; j < GameDef.GAME_MAP_ROW_NUM; j++) {
+        for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
+            for (let j = 0; j < GameDef.SCENERYS_NODE_ROW_NUM; j++) {
                 if (this._scenerys[i][j]) {
                     let com = this._scenerys[i][j].getComponent(Scenery);
                     GameDataModel._gameMapData[i][j] = com.getType();
@@ -184,7 +181,7 @@ export default class GameMapManager extends cc.Component {
     }
 
     evDestroyScenery(node: cc.Node) {
-        let rcInfo = GameDataModel.convertToMatrixPosition(node.getPosition());
+        let rcInfo = GameDataModel.sceneToMatrixPosition(node.getPosition());
         if (this._scenerys[rcInfo.col][rcInfo.row] === node) {
             this._scenerys[rcInfo.col][rcInfo.row] = null;
             this._sceneryPool.putNode(node);
@@ -201,8 +198,8 @@ export default class GameMapManager extends cc.Component {
                 [GameDef.SceneryType.STEEL]: [],
             };
 
-            for (let i = 0; i < GameDef.GAME_MAP_COL_NUM; i++) {
-                for (let j = 0; j < GameDef.GAME_MAP_ROW_NUM; j++) {
+            for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
+                for (let j = 0; j < GameDef.SCENERYS_NODE_ROW_NUM; j++) {
                     if (this._scenerys[i][j]) {
                         let com = this._scenerys[i][j].getComponent(Scenery);
                         let type = com.getType();
@@ -257,15 +254,20 @@ export default class GameMapManager extends cc.Component {
     //基地所在位置，不能存在其他布景元素
     checkHomeBase() {
         if (this._homeBase) {
-            this.destorySceneryAround(GameDataModel.convertToMatrixPosition(this._homeBase.getPosition()));
+            this.destorySceneryAround(this.getHomeBaseSceneryPosition());
         }
     }
 
-    destorySceneryAround(rcInfo: GameStruct.RcInfo) {
-        if (rcInfo) {
-            let posAry = GameDataModel.getMapUnitContainRcInfo(rcInfo);
-            for (let rcInfo of posAry) {
-                this.destroyScenery(rcInfo);
+    getHomeBaseSceneryPosition():GameStruct.RcInfo {
+        let matrixPox = GameDataModel.sceneToMatrixPosition(this._homeBase.getPosition());
+        return GameDataModel.matrixToSceneryPosition(matrixPox);
+    }
+
+    destorySceneryAround(sceneryPos: GameStruct.RcInfo) {
+        if (sceneryPos) {
+            let posAry = GameDataModel.getMapUnitContainSceneryPosition(sceneryPos);
+            for (let pos of posAry) {
+                this.destroyScenery(pos);
             }
         }
     }
@@ -273,86 +275,22 @@ export default class GameMapManager extends cc.Component {
     evPlayerInitFinished(rcInfos: GameStruct.RcInfo[]) {
         if (rcInfos) {
             for(let rcInfo of rcInfos) {
-                this.destorySceneryAround(rcInfo);
+                let sceneryPos = GameDataModel.matrixToSceneryPosition(rcInfo);
+                this.destorySceneryAround(sceneryPos);
             }
         }
     }
 
-    isHomeBasePosition(rcInfo: GameStruct.RcInfo) {
-        if (rcInfo && this._homeBase) {
-            let anchorPos = GameDataModel.convertToMatrixPosition(this._homeBase.getPosition());
-            let posAry = GameDataModel.getMapUnitContainRcInfo(anchorPos);
+    isHomeBasePosition(sceneryPos: GameStruct.RcInfo) {
+        if (sceneryPos && this._homeBase) {
+            let homeBasePos = this.getHomeBaseSceneryPosition();
+            let posAry = GameDataModel.getMapUnitContainSceneryPosition(homeBasePos);
             for (let pos of posAry) {
-                if (pos.equal(rcInfo)) {
+                if (pos.equal(sceneryPos)) {
                     return true;
                 }
             }
         }
         return false;
-    }
-
-    //子弹命中布景节点，根据范围处理相关布景的销毁
-    evHitScenery(hitInfos: GameStruct.HitInfo[]) {
-        if (!hitInfos) {
-            return;
-        }
-
-        //递归函数，由某一节点向四周递归判断
-        let hitFunc;
-        hitFunc = (hitInfo: GameStruct.HitInfo, hitSceneryType: number = GameDef.SceneryType.NULL) => {
-            let sceneryPos = GameStruct.RcInfo.multiply(hitInfo.pos, 0.5);
-            let sceneryNode = this.getSceneryNode(sceneryPos);
-            if (!sceneryNode) {
-                return;
-            }
-            let scenery = sceneryNode.getComponent(Scenery);
-            if (scenery) {
-                if (hitSceneryType !== GameDef.SceneryType.NULL && hitSceneryType !== scenery.getType()) {//只扩散处理相同的布景类型
-                    return;
-                }
-
-                //处理销毁动作
-                scenery.onHited(hitInfo.pos, hitInfo.power);
-
-                hitSceneryType = scenery.getType();
-                //递归判断周围节点
-                let scope = hitInfo.scope;
-                if (scope.up > 0) {
-                    scope.up--;
-                    hitInfo.pos.row++;
-                    hitFunc(hitInfo, hitSceneryType);
-                    hitInfo.pos.row--;
-                    scope.up++;
-                }
-
-                if (scope.down > 0) {
-                    scope.down--;
-                    hitInfo.pos.row--;
-                    hitFunc(hitInfo, hitSceneryType);
-                    hitInfo.pos.row++;
-                    scope.down++;
-                }
-
-                if (scope.left > 0) {
-                    scope.left--;
-                    hitInfo.pos.col--;
-                    hitFunc(hitInfo, hitSceneryType);
-                    hitInfo.pos.col++;
-                    scope.left++;
-                }
-
-                if (scope.right > 0) {
-                    scope.right--;
-                    hitInfo.pos.col++;
-                    hitFunc(hitInfo, hitSceneryType);
-                    hitInfo.pos.col--;
-                    scope.right++;
-                }
-            }
-        };
-
-        for (let info of hitInfos) {
-            hitFunc(info);
-        }
     }
 }

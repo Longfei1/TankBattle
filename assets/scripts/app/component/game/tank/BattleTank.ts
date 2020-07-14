@@ -43,19 +43,19 @@ export default class BattleTank extends BaseTank {
     _imgLoopFrame: number = 0;
     _imgShowFrame: number = 1;
 
-    //地图边界
-    _boundaryLx: number = 0;
-    _boundaryRx: number = 0;
-    _boundaryTy: number = 0;
-    _boundaryBy: number = 0;
+     //地图边界
+     _boundaryLx: number = 0;
+     _boundaryRx: number = 0;
+     _boundaryTy: number = 0;
+     _boundaryBy: number = 0;
 
     onLoad() {
         super.onLoad();
 
-        this._boundaryLx = GameDataModel.convertToScenePosition(new GameStruct.RcInfo(0, 0)).x
-        this._boundaryRx = GameDataModel.convertToScenePosition(new GameStruct.RcInfo(GameDef.GAME_MAP_COL_NUM, 0)).x
-        this._boundaryTy = GameDataModel.convertToScenePosition(new GameStruct.RcInfo(0, GameDef.GAME_MAP_ROW_NUM)).y
-        this._boundaryBy = GameDataModel.convertToScenePosition(new GameStruct.RcInfo(0, 0)).y
+        this._boundaryLx = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, 0)).x
+        this._boundaryRx = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(GameDef.GAME_MAP_COL_NUM, 0)).x
+        this._boundaryTy = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, GameDef.GAME_MAP_ROW_NUM)).y
+        this._boundaryBy = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, 0)).y
     }
 
     reset() {
@@ -169,7 +169,7 @@ export default class BattleTank extends BaseTank {
                         break;
                 }
                 this.node.setPosition(nextPox);
-                //this.validateMove();
+                this.validateMove();
 
                 this.addImgLoopFrame();
                 this.updateTankImg();
@@ -258,12 +258,17 @@ export default class BattleTank extends BaseTank {
                 this._canMove = false;
             }
         }
+        else if (other.node.group === GameDef.GROUP_NAME_TANK) {
+            if (this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
         else if (other.node.group === GameDef.GROUP_NAME_BULLET) {
             let shooterTeam = other.node.getComponent(Bullet)._team;
             let destroyed = other.node.getComponent(Bullet)._destroyed;
             if (!destroyed && this._team !== shooterTeam) {
                 //被击中
-                this.dead();
+                this.dead(null);
             }
         }
     }
@@ -276,6 +281,11 @@ export default class BattleTank extends BaseTank {
             }
         }
         else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
+            if (this.isValidCollision(other, self)) {
+                this._canMove = false;
+            }
+        }
+        else if (other.node.group === GameDef.GROUP_NAME_TANK) {
             if (this.isValidCollision(other, self)) {
                 this._canMove = false;
             }
@@ -310,19 +320,29 @@ export default class BattleTank extends BaseTank {
         return false;
     }
 
-    born() {
+    born(callback: Function) {
         gameController.playUnitAniOnce(AniDef.UnitAniType.BORN, this.getNodeAni(), () => {
             this.setTankVisible(false);
         }, () => {
             this.setTankVisible(true);
+            
+            if (typeof callback === "function") {
+                callback();
+            }
         });
     }
 
-    dead() {
+    dead(callback: Function) {
+        this._isMove = false;
+
         gameController.playUnitAniOnce(AniDef.UnitAniType.BLAST, this.getNodeAni(), () => {
             this.setTankVisible(false);
         }, () => {
             this.node.destroy();
+
+            if (typeof callback === "function") {
+                callback();
+            }
         });
     }
 
@@ -369,20 +389,20 @@ export default class BattleTank extends BaseTank {
     correctPosition(direction: number) {
         let pos = this.node.getPosition();
         if (direction === GameDef.DIRECTION_UP || direction === GameDef.DIRECTION_DOWN) {
-            let minValue = GameDataModel.getMapUnit().width;
+            let minValue = GameDataModel.getMapUnit().width * GameDef.SCENERY_CONTAINS_RC; //保持x坐标为布景节点宽度的倍数
             let col = Math.floor(pos.x / minValue);
             let diff = pos.x % minValue;
-            if (diff >= minValue/ 2) {
+            if (diff >/*>=*/ minValue/ 2) {
                 col++;
             }
             this.node.x = col * minValue;
             this.savePositon();
         }
         else if (direction === GameDef.DIRECTION_LEFT || direction === GameDef.DIRECTION_RIGHT) {
-            let minValue = GameDataModel.getMapUnit().height;
+            let minValue = GameDataModel.getMapUnit().height * GameDef.SCENERY_CONTAINS_RC; //保持y坐标为布景节点宽度的倍数
             let row = Math.floor(pos.y / minValue);
             let diff = pos.y % minValue;
-            if (diff >= minValue/ 2) {
+            if (diff >/*>=*/ minValue/ 2) {
                 row++;
             }
             this.node.y = row * minValue;

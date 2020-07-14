@@ -14,11 +14,14 @@ export namespace GameDef {
     export const DIRECTION_RIGHT                = 3;
 
     //游戏地图
-    export const GAME_MAP_ROW_NUM               = 32; //地图矩阵 行数(y)
-    export const GAME_MAP_COL_NUM               = 52; //地图矩阵 列数(x)
-    export const BORN_PLACE_PLAYER1             = new GameStruct.RcInfo(21, 0); //玩家出生坐标
-    export const BORN_PLACE_PLAYER2             = new GameStruct.RcInfo(29, 0); //玩家出生坐标
-    export const PLACE_HOMEBASE                 = new GameStruct.RcInfo(25, 0); //基地所在坐标
+    export const GAME_MAP_ROW_NUM               = 64; //地图矩阵 行数(y)
+    export const GAME_MAP_COL_NUM               = 104; //地图矩阵 列数(x)
+    export const SCENERY_CONTAINS_RC            = 2; //一个节点占2格，两行两列
+    export const SCENERYS_NODE_ROW_NUM          = GAME_MAP_ROW_NUM/SCENERY_CONTAINS_RC; //地图布景节点行数
+    export const SCENERYS_NODE_COL_NUM          = GAME_MAP_COL_NUM/SCENERY_CONTAINS_RC; //地图布景节点列数
+    export const BORN_PLACE_PLAYER1             = new GameStruct.RcInfo(42, 0); //玩家出生坐标
+    export const BORN_PLACE_PLAYER2             = new GameStruct.RcInfo(58, 0); //玩家出生坐标
+    export const PLACE_HOMEBASE                 = new GameStruct.RcInfo(50, 0); //基地所在坐标
 
     //节点分组
     export const GROUP_NAME_TANK                = "tank";
@@ -40,6 +43,7 @@ export namespace GameDef {
     //其他
     export const TANK_MOVE_MIN_VALUE            = 10; //坦克最小移动量（像素）
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数
+    export const GAME_FPS                       = 60;
 
     export enum SceneryType {
         NULL,   //无

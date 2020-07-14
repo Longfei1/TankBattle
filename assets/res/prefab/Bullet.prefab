@@ -183,7 +183,7 @@
     "sync": false
   },
   {
-    "__type__": "cc.CircleCollider",
+    "__type__": "cc.BoxCollider",
     "_name": "",
     "_objFlags": 0,
     "node": {
@@ -196,7 +196,11 @@
       "x": 0,
       "y": 0
     },
-    "_radius": 4,
+    "_size": {
+      "__type__": "cc.Size",
+      "width": 8,
+      "height": 8
+    },
     "_id": ""
   },
   {

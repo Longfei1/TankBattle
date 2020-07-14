@@ -19,7 +19,7 @@ export default class NodePool {
     }
 
     putNode(node: cc.Node,) {
-        if (node) {
+        if (cc.isValid(node)) {
             this._pool.put(node);
         }
     }

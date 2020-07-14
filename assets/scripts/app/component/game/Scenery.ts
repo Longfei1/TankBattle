@@ -139,8 +139,7 @@ export default class Scenery extends cc.Component {
             gameController.node.emit(EventDef.EV_MAP_DESTROY_SCENERY, this.node);
         }
         else if (sceneryType === GameDef.SceneryType.WALL) {
-            let nodeRcInfo = GameDataModel.convertToMatrixPosition(this.node.position);
-            nodeRcInfo.multiplySelf(2);//放大两倍，与射击判断坐标一致。
+            let nodeRcInfo = GameDataModel.sceneToMatrixPosition(this.node.position);
 
             //求出坐标对应unit的index
             let unitIndex = null;

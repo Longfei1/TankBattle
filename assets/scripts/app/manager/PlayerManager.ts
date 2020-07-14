@@ -201,17 +201,18 @@ export default class PlayerManager extends cc.Component {
             //地图编辑模式移动一格
             if (playerNo === 0) {
                 let moveDiff;
+                let moveLength = GameDef.SCENERY_CONTAINS_RC;
                 if (nDirection == GameDef.DIRECTION_UP) {
-                    moveDiff = new GameStruct.RcInfo(0, 1);
+                    moveDiff = new GameStruct.RcInfo(0, moveLength);
                 }
                 else if (nDirection == GameDef.DIRECTION_LEFT){
-                    moveDiff = new GameStruct.RcInfo(-1, 0);
+                    moveDiff = new GameStruct.RcInfo(-moveLength, 0);
                 }
                 else if (nDirection == GameDef.DIRECTION_DOWN){
-                    moveDiff = new GameStruct.RcInfo(0, -1);
+                    moveDiff = new GameStruct.RcInfo(0, -moveLength);
                 }
                 else if (nDirection == GameDef.DIRECTION_RIGHT){
-                    moveDiff = new GameStruct.RcInfo(1, 0);
+                    moveDiff = new GameStruct.RcInfo(moveLength, 0);
                 }
                 this._mapEditer.moveBy(moveDiff);
             }

@@ -1,4 +1,5 @@
 import BattleTank from "./BattleTank";
+import { GameDef } from "../../../define/GameDef";
 
 const { ccclass, property } = cc._decorator;
 
@@ -43,14 +44,6 @@ export default class EnemyTank extends BattleTank {
     //碰撞发生
     doWhenCollision() {
 
-    }
-
-    getAvailableMoveDirections(): number[] {
-        let directions = [];
-
-        
-
-        return directions;
     }
 
     //行为控制相关

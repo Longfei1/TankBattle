@@ -27,6 +27,9 @@ export default class Game extends cc.Component {
     @property({ displayName: "子弹预制体", type: cc.Prefab })
     pfbBullet: cc.Prefab = null;
 
+    @property({ displayName: "调试信息标签", type: cc.Label })
+    textDebug: cc.Label = null;
+
     _currLevel: number = 1;
 
     _bulletPool: NodePool = null;
@@ -40,6 +43,13 @@ export default class Game extends cc.Component {
         GameDataModel.setMapUnit(this.nodeMapUnit.width, this.nodeMapUnit.height);
 
         this._bulletPool = new NodePool(this.pfbBullet, Bullet);
+
+        if (GameDataModel.isGameDebugMode()) {
+            this.textDebug.node.active = true;
+        }
+        else {
+            this.textDebug.node.active = false;
+        }
     }
 
     onDestroy() {
@@ -79,6 +89,7 @@ export default class Game extends cc.Component {
         }, null, this, cc.macro.KEY.t);
 
         this.node.on(EventDef.EV_GAME_INIT_FINISHED, this.evInitGameFinished, this)
+        this.node.on(EventDef.EV_GAME_SHOW_DEBUG_TEXT, this.onDebugTextOut, this);
     }
 
     removeListener() {
@@ -235,5 +246,15 @@ export default class Game extends cc.Component {
 
     getPanelGame() {
         return this.panelGame;
+    }
+
+    onDebugTextOut(text: string) {
+        if (GameDataModel.isGameDebugMode()) {
+            this.textDebug.string = text;
+        }
+    }
+
+    worldToGameScenePosition(pos: cc.Vec2): cc.Vec2 {
+        return this.panelGame.convertToNodeSpace(pos);
     }
 }

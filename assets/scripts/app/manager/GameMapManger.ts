@@ -56,12 +56,16 @@ export default class GameMapManager extends cc.Component {
     init() {
         this._sceneryPool = new NodePool(this.pfbScenery, Scenery);
         
-        this._mapUnit = GameDataModel.getMapUnit();
-        this._scenerys = GameDataModel.scenerys;
+        this.bindGameModeData();
 
         this.initListenner();
 
         this.initGameMap();
+    }
+
+    bindGameModeData() {
+        this._mapUnit = GameDataModel.getMapUnit();
+        this._scenerys = GameDataModel.scenerys;
     }
 
     initGameMap() {
@@ -258,6 +262,23 @@ export default class GameMapManager extends cc.Component {
         }
     }
 
+    //出生位置，不能存在其他布景元素
+    checkBornPlace() {
+        //目前固定出生位置，若出生位置可随关卡调整，需改变写法
+        let placeInfos: GameStruct.RcInfo[] = [
+            GameDef.BORN_PLACE_PLAYER1,
+            GameDef.BORN_PLACE_PLAYER2,
+            GameDef.BORN_PLACE_ENAMY1,
+            GameDef.BORN_PLACE_ENAMY2,
+            GameDef.BORN_PLACE_ENAMY3,
+        ];
+
+        for (let pos of placeInfos) {
+            let sceneryPos = GameDataModel.matrixToSceneryPosition(pos);
+            this.destorySceneryAround(sceneryPos);
+        }
+    }
+
     getHomeBaseSceneryPosition():GameStruct.RcInfo {
         let matrixPox = GameDataModel.sceneToMatrixPosition(this._homeBase.getPosition());
         return GameDataModel.matrixToSceneryPosition(matrixPox);
@@ -272,13 +293,8 @@ export default class GameMapManager extends cc.Component {
         }
     }
 
-    evPlayerInitFinished(rcInfos: GameStruct.RcInfo[]) {
-        if (rcInfos) {
-            for(let rcInfo of rcInfos) {
-                let sceneryPos = GameDataModel.matrixToSceneryPosition(rcInfo);
-                this.destorySceneryAround(sceneryPos);
-            }
-        }
+    evPlayerInitFinished() {
+        
     }
 
     isHomeBasePosition(sceneryPos: GameStruct.RcInfo) {

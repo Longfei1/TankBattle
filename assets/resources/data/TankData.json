@@ -18,5 +18,45 @@
         "bulletSpeed": 360,
         "bulletType": 0,
         "shootCooltime": 0.8
+    },
+    "enemy1": {
+        "name": "enemy1",
+        "tankName": "enemy1",
+        "team": 0,
+        "maxLevel": 4,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
+    },
+    "enemy2": {
+        "name": "enemy2",
+        "tankName": "enemy2",
+        "team": 0,
+        "maxLevel": 4,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
+    },
+    "enemy3": {
+        "name": "enemy3",
+        "tankName": "enemy3",
+        "team": 0,
+        "maxLevel": 4,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
+    },
+    "enemy4": {
+        "name": "enemy4",
+        "tankName": "enemy4",
+        "team": 0,
+        "maxLevel": 4,
+        "moveSpeed": 120,
+        "bulletSpeed": 360,
+        "bulletType": 0,
+        "shootCooltime": 0.8
     }
 }

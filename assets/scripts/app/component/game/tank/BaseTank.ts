@@ -55,6 +55,10 @@ export default class BaseTank extends cc.Component {
         }
     }
 
+    isTankVisible(): boolean {
+        return this.nodeMain.active;
+    }
+
     setTankImg(name: string) {
         if (name) {
             let frame = this.atlasTank.getSpriteFrame(name);

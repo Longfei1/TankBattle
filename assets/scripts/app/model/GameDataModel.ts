@@ -3,6 +3,8 @@ import BaseModel from "./BaseModel";
 import { PlayerDef } from "../define/PlayerDef";
 import { GameStruct } from "../define/GameStruct";
 import CommonFunc from "../common/CommonFunc";
+import Scenery from "../component/game/Scenery";
+import { GameConfig } from "../GameConfig";
 
 class GameDataModel extends BaseModel {
     _playMode: number = -1;
@@ -84,7 +86,7 @@ class GameDataModel extends BaseModel {
     get scenerys() {
         return this._scenerys;
     }
-    
+
     //根据行列信息获取布景节点
     getSceneryNode(sceneryPos: GameStruct.RcInfo): cc.Node {
         if (sceneryPos && this.isValidSceneryPos(sceneryPos)) {
@@ -120,6 +122,15 @@ class GameDataModel extends BaseModel {
     //布景坐标转为矩阵行列坐标
     sceneryToMatrixPosition(pos: GameStruct.RcInfo): GameStruct.RcInfo {
         let ret = GameStruct.RcInfo.multiply(pos, GameDef.SCENERY_CONTAINS_RC);
+        return ret;
+    }
+
+    //场景坐标转为布景坐标
+    sceneToSceneryPosition(pos: cc.Vec2): GameStruct.RcInfo {
+        let col = Math.floor(pos.x / this._mapUnit.width);
+        let row = Math.floor(pos.y / this._mapUnit.height);
+        let ret = new GameStruct.RcInfo(col, row);
+        ret.multiplySelf(1/GameDef.SCENERY_CONTAINS_RC);
         return ret;
     }
 
@@ -168,6 +179,35 @@ class GameDataModel extends BaseModel {
         return false;
     }
 
+    isValidRect(rect: cc.Rect) {
+        if (rect) {
+            let mapRect = cc.rect(0, 0, this._mapUnit.width * GameDef.GAME_MAP_COL_NUM, this._mapUnit.height * GameDef.GAME_MAP_ROW_NUM);
+            
+            if (mapRect.containsRect(rect)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    getHomeBaseRect(): cc.Rect {
+        let scenePos = this.matrixToScenePosition(GameDef.PLACE_HOMEBASE); 
+        let rect = cc.rect(scenePos.x, scenePos.y, this.getHomeBaseWidth(), this.getHomeBaseWidth());
+        return rect;
+    }
+
+    getSceneryWidth(): number {
+        return this._mapUnit.width * GameDef.SCENERY_CONTAINS_RC;
+    }
+
+    getHomeBaseWidth(): number {
+        return this._mapUnit.width * GameDef.SCENERY_CONTAINS_RC * 2;
+    }
+
+    getTankWidth(): number {
+        return this._mapUnit.width * GameDef.SCENERY_CONTAINS_RC * 2;
+    }
+
     //传入一个unit锚点（需要为左下角）所在的位置
     getMapUnitContainSceneryPosition(sceneryPos: GameStruct.RcInfo): GameStruct.RcInfo[]  {
         let array:GameStruct.RcInfo[] = [];
@@ -210,6 +250,34 @@ class GameDataModel extends BaseModel {
         }
 
         return -1;
+    }
+
+    getSceneryNodesInRect(rect: cc.Rect): cc.Node[] {
+        let ret: cc.Node[] = [];
+        if (rect) {
+            //布景坐标
+            let leftBottom = this.sceneToSceneryPosition(cc.v2(rect.xMin, rect.yMin));
+            let rightTop = this.sceneToSceneryPosition(cc.v2(rect.xMax, rect.yMax));
+
+            for (let col = leftBottom.col; col <= rightTop.col; col++) {
+                for (let row = leftBottom.row; row <= rightTop.row; row++) {
+                    let node = this.getSceneryNode(new GameStruct.RcInfo(col, row));
+                    if (node) {
+                        if (node.getComponent(Scenery).isOverlapWithRect(rect)) {
+                            ret.push(node);
+                        }
+                    }
+                }
+            }
+        }
+        return ret;
+    }
+
+    isGameDebugMode(): boolean {
+        if (GameConfig.debugMode > 0) {
+            return true;
+        }
+        return false;
     }
 }
 export default new GameDataModel();

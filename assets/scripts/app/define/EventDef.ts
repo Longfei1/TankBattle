@@ -4,6 +4,7 @@ export namespace EventDef {
     export const EV_GAME_INIT_FINISHED                 = "evgameinitfinished";
     export const EV_GAME_STARTED                       = "evgamestarted";
     export const EV_GAME_HIT_SCENERY                   = "evgamehitscenery";
+    export const EV_GAME_SHOW_DEBUG_TEXT               = "evgameshowdebugtext";
 
     export const EV_PLAYER_INIT_FINISHED               = "evplayerinitfinished";
 

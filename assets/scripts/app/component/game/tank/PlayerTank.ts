@@ -3,6 +3,7 @@ import AudioModel from "../../../model/AudioModel";
 import { gameController } from "../Game";
 import { AniDef } from "../../../define/AniDef";
 import { GameDef } from "../../../define/GameDef";
+import { EventDef } from "../../../define/EventDef";
 
 const { ccclass, property } = cc._decorator;
 
@@ -54,5 +55,27 @@ export default class PlayerTank extends BattleTank {
     //     console.log("[PlayerTank]SetMove tankName:",this._tankName , ",move:", bMove, ",direction:", nDirection);
     //     super.setMove(bMove, nDirection);
     // }
+
+    lateUpdate() {
+        super.lateUpdate();
+
+        //
+        let directions = this.getAvailableMoveDirections();
+        let textInfo = {
+            [GameDef.DIRECTION_UP]: "上",
+            [GameDef.DIRECTION_DOWN]: "下",
+            [GameDef.DIRECTION_LEFT]: "左",
+            [GameDef.DIRECTION_RIGHT]: "右",
+        };
+
+        let info = "可移动方向\n";
+        for (let it of directions) {
+            info += textInfo[it];
+        }
+
+        gameController.node.emit(EventDef.EV_GAME_SHOW_DEBUG_TEXT, info);
+    }
+
+
 }
  

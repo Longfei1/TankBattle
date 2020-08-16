@@ -8,6 +8,8 @@
         }
     ],
     "DifficultyData": [
-
+        {
+            "EnemyAliveNum": 4
+        }
     ]
 }

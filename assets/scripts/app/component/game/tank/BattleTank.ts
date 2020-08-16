@@ -124,9 +124,8 @@ export default class BattleTank extends BaseTank {
 
     setMove(bMove: boolean, nDirection: number) {
         if (bMove) {
-            if (this.isNeedCorrectPosition(this._moveDirection, nDirection)) {
-                this.correctPosition(nDirection);
-            }
+            this.correctPosition(this._moveDirection, nDirection);
+
             this.setMoveDirction(nDirection);
             this._isMove = true;
         }
@@ -146,7 +145,8 @@ export default class BattleTank extends BaseTank {
     }
 
     updateMove(dt) {
-        if (!GameDataModel._gamePause) {
+        if (!GameDataModel._gamePause
+            && this.isTankVisible()) {
             this._moveDiff = this.calcMove(this._speedMove * dt);
             if (this._moveDiff > 0) {
                 let curPos = this.node.getPosition();
@@ -386,45 +386,127 @@ export default class BattleTank extends BaseTank {
     }
 
     //矫正坐标，转向时设置坐标为最近的行列坐标值
-    correctPosition(direction: number) {
-        let pos = this.node.getPosition();
-        if (direction === GameDef.DIRECTION_UP || direction === GameDef.DIRECTION_DOWN) {
-            let minValue = GameDataModel.getMapUnit().width * GameDef.SCENERY_CONTAINS_RC; //保持x坐标为布景节点宽度的倍数
-            let col = Math.floor(pos.x / minValue);
-            let diff = pos.x % minValue;
-            if (diff >/*>=*/ minValue/ 2) {
-                col++;
-            }
-            this.node.x = col * minValue;
-            this.savePositon();
-        }
-        else if (direction === GameDef.DIRECTION_LEFT || direction === GameDef.DIRECTION_RIGHT) {
-            let minValue = GameDataModel.getMapUnit().height * GameDef.SCENERY_CONTAINS_RC; //保持y坐标为布景节点宽度的倍数
-            let row = Math.floor(pos.y / minValue);
-            let diff = pos.y % minValue;
-            if (diff >/*>=*/ minValue/ 2) {
-                row++;
-            }
-            this.node.y = row * minValue;
+    correctPosition(oldDirection: number, newDirection: number) {
+        if (this.isNeedCorrectPosition(oldDirection, newDirection)) {
+            this.node.position = this.getCorrectPosition(this.node.getPosition(), oldDirection, newDirection);
             this.savePositon();
         }
     }
 
     //改变成垂直与水平方向时才需要矫正
     isNeedCorrectPosition(oldDirection: number, newDirection: number): boolean {
-        //let vertical = false;
-        //let horizontal = false;
-        if (oldDirection === GameDef.DIRECTION_UP || oldDirection === GameDef.DIRECTION_DOWN) {
-            if (newDirection === GameDef.DIRECTION_LEFT ||newDirection === GameDef.DIRECTION_RIGHT) {
-                return true;
-            }
+        if (oldDirection === newDirection || newDirection === GameDataModel.getOppositeDirection(oldDirection)) {
+            return false;
         }
-        else if (oldDirection === GameDef.DIRECTION_LEFT ||oldDirection === GameDef.DIRECTION_RIGHT) {
+        
+        return true;
+    }
+
+    getCorrectPosition(pos: cc.Vec2, oldDirection: number, newDirection: number):cc.Vec2 {
+        let ret = cc.v2(pos.x, pos.y);
+
+        if (this.isNeedCorrectPosition(oldDirection, newDirection)) {
             if (newDirection === GameDef.DIRECTION_UP || newDirection === GameDef.DIRECTION_DOWN) {
-                return true;
+                let minValue = GameDataModel.getSceneryWidth(); //保持x坐标为布景节点宽度的倍数
+                let col = Math.floor(pos.x / minValue);
+                let offset = pos.x % minValue;
+                if (offset >= minValue/2) {
+                    if (offset !== minValue/2 || oldDirection !== GameDef.DIRECTION_RIGHT) { //原来方向向右时，如果与右边障碍相切时也可能出现等于minValue/2的情况，此时不能向右纠正
+                        col++;
+                    }
+                }
+                ret.x = col * minValue;
+            }
+            else if (newDirection === GameDef.DIRECTION_LEFT || newDirection === GameDef.DIRECTION_RIGHT) {
+                let minValue = GameDataModel.getSceneryWidth(); //保持y坐标为布景节点宽度的倍数
+                let row = Math.floor(pos.y / minValue);
+                let offset = pos.y % minValue;
+                if (offset >= minValue/2) {
+                    if (offset !== minValue/2 || oldDirection !== GameDef.DIRECTION_UP) { //原来方向向上时，如果与上边障碍相切时也可能出现等于minValue/2的情况，此时不能向上纠正
+                        row++;
+                    }
+                }
+                ret.y = row * minValue;
             }
         }
+
+        return ret;
+    }
+
+    //给定起点(锚点)、方向和距离，判断是否可以移动
+    canMoveFromAToB(src: cc.Vec2, dir: number, distance: number) {
+        let moveAreaRect: cc.Rect;
+        let width = GameDataModel.getTankWidth();
+        if (dir === GameDef.DIRECTION_UP) {
+            moveAreaRect = cc.rect(src.x, src.y + width, width, distance);
+        }
+        else if (dir === GameDef.DIRECTION_DOWN) {
+            moveAreaRect = cc.rect(src.x, src.y - distance, width, distance);
+        }
+        else if (dir === GameDef.DIRECTION_LEFT) {
+            moveAreaRect = cc.rect(src.x - distance, src.y, distance, width);
+        }
+        else if (dir === GameDef.DIRECTION_RIGHT) {
+            moveAreaRect = cc.rect(src.x + width, src.y, distance, width);
+        }
+
+        if (moveAreaRect) {
+            //是否超出边界
+            if (!GameDataModel.isValidRect(moveAreaRect)) {
+                return false;
+            }
+
+            //是否包含基地
+            {
+                let homeBaseRect = GameDataModel.getHomeBaseRect();
+
+                let interRect = cc.rect();
+                moveAreaRect.intersection(interRect, homeBaseRect);
+        
+                if (interRect.width > 0 && interRect.height > 0) {
+                    return false;
+                }
+            }
+
+            //是否包含不可穿越的布景
+            let sceneryNodes = GameDataModel.getSceneryNodesInRect(moveAreaRect);
+            if (sceneryNodes) {
+                for (let node of sceneryNodes) {
+                    let sceneryType = node.getComponent(Scenery).getType();
+                    if (sceneryType !== GameDef.SceneryType.GRASS) {
+                        return false;
+                    }
+                }
+            }
+
+            //是否包含其他坦克
+
+
+            return true;
+        }
+
         return false;
+    }
+
+    //获取坦克当前可移动的方向
+    getAvailableMoveDirections(): number[] {
+        let moveDirections = [GameDef.DIRECTION_UP, GameDef.DIRECTION_LEFT, GameDef.DIRECTION_DOWN, GameDef.DIRECTION_RIGHT];
+        let directions: number[] = []
+
+        let nowPos = this.node.getPosition();
+        let nowDirction = this._moveDirection;
+
+        for (let dir of moveDirections) {
+            let correctPos = this.getCorrectPosition(nowPos, nowDirction, dir);//向dirction方向移动时，矫正后的位置坐标
+
+            let moveDistance = this._speedMove*(1/GameDef.GAME_FPS);
+
+            if (this.canMoveFromAToB(correctPos, dir, moveDistance)) {
+                directions.push(dir);
+            }
+        }
+
+        return directions;
     }
 
     savePositon() {

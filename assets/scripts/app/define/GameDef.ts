@@ -22,6 +22,9 @@ export namespace GameDef {
     export const BORN_PLACE_PLAYER1             = new GameStruct.RcInfo(42, 0); //玩家出生坐标
     export const BORN_PLACE_PLAYER2             = new GameStruct.RcInfo(58, 0); //玩家出生坐标
     export const PLACE_HOMEBASE                 = new GameStruct.RcInfo(50, 0); //基地所在坐标
+    export const BORN_PLACE_ENAMY1              = new GameStruct.RcInfo(0, 60); //敌军出生坐标1
+    export const BORN_PLACE_ENAMY2              = new GameStruct.RcInfo(50, 60); //敌军出生坐标2
+    export const BORN_PLACE_ENAMY3              = new GameStruct.RcInfo(100, 60); //敌军出生坐标3
 
     //节点分组
     export const GROUP_NAME_TANK                = "tank";

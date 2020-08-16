@@ -23,12 +23,4 @@ export namespace PlayerDef {
         SAVE: cc.macro.KEY.space,
     };
 
-    export const PLAYER_DATA = {
-        ["player1"]: {
-            
-        },
-        ["player2"]: {
-
-        },
-    }
 }

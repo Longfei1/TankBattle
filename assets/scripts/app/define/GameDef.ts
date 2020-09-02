@@ -26,6 +26,8 @@ export namespace GameDef {
     export const BORN_PLACE_ENAMY2              = new GameStruct.RcInfo(50, 60); //敌军出生坐标2
     export const BORN_PLACE_ENAMY3              = new GameStruct.RcInfo(100, 60); //敌军出生坐标3
 
+    export const ENEMY_BORN_PLACE_COUNT         = 3; //敌军出生位置数量
+
     //节点分组
     export const GROUP_NAME_TANK                = "tank";
     export const GROUP_NAME_SCENERY             = "scenery";

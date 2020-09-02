@@ -7,7 +7,7 @@
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.8
     },
     "player2": {
         "name": "player2",
@@ -17,46 +17,46 @@
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.8
     },
-    "enemy1": {
-        "name": "enemy1",
+    "LightTank": {
+        "name": "LightTank",
         "tankName": "enemy1",
-        "team": 0,
-        "maxLevel": 4,
-        "moveSpeed": 120,
+        "team": 1,
+        "maxLevel": 1,
+        "moveSpeed": 140,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.8
     },
-    "enemy2": {
-        "name": "enemy2",
+    "RapidMoveTank": {
+        "name": "RapidMoveTank",
         "tankName": "enemy2",
-        "team": 0,
-        "maxLevel": 4,
-        "moveSpeed": 120,
+        "team": 1,
+        "maxLevel": 1,
+        "moveSpeed": 180,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.8
     },
-    "enemy3": {
-        "name": "enemy3",
+    "RapidFireTank": {
+        "name": "RapidFireTank",
         "tankName": "enemy3",
-        "team": 0,
-        "maxLevel": 4,
+        "team": 1,
+        "maxLevel": 1,
         "moveSpeed": 120,
-        "bulletSpeed": 360,
+        "bulletSpeed": 400,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.5
     },
-    "enemy4": {
-        "name": "enemy4",
+    "HeavyTank": {
+        "name": "HeavyTank",
         "tankName": "enemy4",
-        "team": 0,
+        "team": 1,
         "maxLevel": 4,
-        "moveSpeed": 120,
+        "moveSpeed": 80,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCooltime": 0.8
+        "shootCoolTime": 0.8
     }
 }

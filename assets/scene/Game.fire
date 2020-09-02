@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.73514404296875,
-      "y": 0.73514404296875,
+      "x": 0.14755840608967574,
+      "y": 0.14755840608967574,
       "z": 1
     },
     "_quat": {
@@ -1524,7 +1524,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 0,
     "_N$fontFamily": "Arial",
@@ -1619,7 +1618,9 @@
     "panelGame": {
       "__id__": 26
     },
-    "pfbEnemy": null,
+    "pfbEnemy": {
+      "__uuid__": "82876bf4-3a94-4ffd-81a1-c9c34c79e2a4"
+    },
     "_id": "3157xmjTFPO7rqEAUge2om"
   },
   {

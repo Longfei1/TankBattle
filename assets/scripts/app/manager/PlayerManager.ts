@@ -10,6 +10,7 @@ import { GameStruct } from "../define/GameStruct";
 import CommonFunc from "../common/CommonFunc";
 import AudioModel from "../model/AudioModel";
 import GameConfigModel from "../model/GameConfigModel";
+import NodePool from "../common/NodePool";
 
 const {ccclass, property} = cc._decorator;
 
@@ -27,14 +28,14 @@ export default class PlayerManager extends cc.Component {
 
     _operateHandlerMap = {};
 
-    _mapUnit = null;
-    _players: PlayerTank[] = [];
+    _players: { [no: number]: PlayerTank } = {};
     _mapEditer: MapEditTank = null;
+
+    _playerPool: NodePool = null;
 
     onLoad() {
         this.initListener();
-
-        this.initPlyaers();
+        this._playerPool = new NodePool(this.pfbPlayer, PlayerTank);
     }
 
     onDestroy() {
@@ -50,15 +51,15 @@ export default class PlayerManager extends cc.Component {
         }
 
         gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
+        gameController.node.on(EventDef.EV_PLAYER_DEAD, this.evPlayerDead, this);
+        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
     }
 
     removeListener() {
         GameInputModel.removeInputListenerByContext(this);
     }
 
-    initPlyaers() {
-        this._mapUnit = GameDataModel.getMapUnit();
-
+    initPlayers() {
         if (GameDataModel.isModeEditMap()) {
             let mapEditer = cc.instantiate(this.pfbMapEditer);
             if (mapEditer) {
@@ -73,36 +74,53 @@ export default class PlayerManager extends cc.Component {
             let tankData = GameConfigModel.tankData;
             if (!tankData) { return; }
 
-            let player1 = cc.instantiate(this.pfbPlayer);
-            this.panelGame.addChild(player1);
-            let playerCom1 = player1.getComponent(PlayerTank);
-            playerCom1.setAttributes(tankData["player1"]);
-            playerCom1.setTankLevel(1);
-            playerCom1.setPosition(GameDef.BORN_PLACE_PLAYER1);
-            playerCom1.setMoveDirction(GameDef.DIRECTION_UP);
-            this._players[0] = playerCom1;
+            this.createPlayer(0, tankData["player1"], GameDef.BORN_PLACE_PLAYER1);
             if (GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
-                let player2 = cc.instantiate(this.pfbPlayer);
-                this.panelGame.addChild(player2);
-                let playerCom2 = player2.getComponent(PlayerTank);
-                playerCom2.setAttributes(tankData["player2"]);
-                playerCom2.setTankLevel(1);
-                playerCom2.setPosition(GameDef.BORN_PLACE_PLAYER2);
-                playerCom2.setMoveDirction(GameDef.DIRECTION_UP);
-                this._players[1] = playerCom2;
+                this.createPlayer(0, tankData["player2"], GameDef.BORN_PLACE_PLAYER2);
             }
         }
-
         gameController.node.emit(EventDef.EV_PLAYER_INIT_FINISHED);
     }
 
     resetPlayer() {
-        for (let player of this._players) {
-            if(cc.isValid(player.node)) {
-                player.node.destroy();
+        CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
+            if (cc.isValid(player.node)) {
+                this._playerPool.putNode(player.node);
             }
+        });
+
+        this._players = {};
+        GameDataModel.clearPlayerTank();
+
+        if (cc.isValid(this._mapEditer)) {
+            this._mapEditer.node.destroy();
+            this._mapEditer = null;
         }
-        this._players = [];
+    }
+
+    createPlayer(no: number, attr: GameStruct.TankAttributes, bornPos: GameStruct.RcInfo) {
+        let player = this._playerPool.getNode();
+        this.panelGame.addChild(player);
+        let playerCom = player.getComponent(PlayerTank);
+        playerCom.reset();
+        playerCom.playerNo = no;
+        playerCom.setAttributes(attr);
+        playerCom.setTankLevel(1);
+        playerCom.setPosition(bornPos);
+        playerCom.setMoveDirction(GameDef.DIRECTION_UP);
+
+        this._players[no] = playerCom;
+        GameDataModel.setPlayerTank(player);
+
+        playerCom.born();
+    }
+
+    destroyPlayer(no: number) {
+        if (this._players[no]) {
+            this._playerPool.putNode(this._players[no].node);
+            delete this._players[no];
+            GameDataModel.removePlayerTank(no);
+        }
     }
 
     update() {
@@ -260,10 +278,19 @@ export default class PlayerManager extends cc.Component {
     }
 
     evGameStarted() {
-        for(let player of this._players) {
+        CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
             if (cc.isValid(player.node)) {
                 player.onGetShieldStatus(GameDef.BORN_INVINCIBLE_TIME);
             }
-        }
+        });
+    }
+
+    evPlayerDead(no: number) {
+        this.destroyPlayer(no);
+    }
+
+    evPrepareGame() {
+        this.resetPlayer();
+        this.initPlayers();
     }
 }

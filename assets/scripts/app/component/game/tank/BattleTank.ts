@@ -29,16 +29,16 @@ export default class BattleTank extends BaseTank {
     _team: number = -1;
     _speedMove: number = 0;
     _speedBullet: number = 0;
-    _shootCooltime: number = 0;
+    _shootCoolTime: number = 0;
     _bulletType: number = -1;
 
     //状态
     _isMove: boolean = false;
     _moveDirection: number = -1;
     _isCollision: boolean = false;
-    _canMove: boolean = true;
-    _moveDiff: number = 0;
-    _lastPosition: cc.Vec2 = null;
+    //_canMove: boolean = true;
+    //_moveDiff: number = 0;
+    //_lastPosition: cc.Vec2 = null;
     _lastShootTime: number = 0;
     _imgLoopFrame: number = 0;
     _imgShowFrame: number = 1;
@@ -60,10 +60,24 @@ export default class BattleTank extends BaseTank {
 
     reset() {
         super.reset();
+
+        this.setTankVisible(false); //初始时不可见
+
+        //属性
+        this._tankName = "";
+        this._tankLevel = 1;
+        this._tankMaxLevel = 0;
+        this._team = -1;
+        this._speedMove = 0;
+        this._speedBullet = 0;
+        this._shootCoolTime = 0;
+        this._bulletType = -1;
+
+        //状态
         this._isMove = false;
         this._isCollision = false;
-        this._canMove = true;
-        this._lastPosition = null;
+        //this._canMove = true;
+        //this._lastPosition = null;
         this._lastShootTime = 0;
         this._imgLoopFrame = 0;
         this._imgShowFrame = 1;
@@ -78,7 +92,7 @@ export default class BattleTank extends BaseTank {
 
         this._tankMaxLevel = attributes.maxLevel;
         this._bulletType = attributes.bulletType;
-        this._shootCooltime = attributes.shootCooltime;
+        this._shootCoolTime = attributes.shootCoolTime;
     }
 
     setTankTeam(team: number) {
@@ -147,29 +161,61 @@ export default class BattleTank extends BaseTank {
     updateMove(dt) {
         if (!GameDataModel._gamePause
             && this.isTankVisible()) {
-            this._moveDiff = this.calcMove(this._speedMove * dt);
-            if (this._moveDiff > 0) {
-                let curPos = this.node.getPosition();
-                let nextPox = curPos;
+            // this._moveDiff = this.calcMove(this._speedMove * dt);
+            // if (this._moveDiff > 0) {
+            //     let curPos = this.node.getPosition();
+            //     let nextPox = curPos;
 
-                switch (this._moveDirection) {
-                    case GameDef.DIRECTION_UP:
-                        nextPox = cc.v2(curPos.x, curPos.y + this._moveDiff);
-                        break;
-                    case GameDef.DIRECTION_LEFT:
-                        nextPox = cc.v2(curPos.x - this._moveDiff, curPos.y);
-                        break;
-                    case GameDef.DIRECTION_DOWN:
-                        nextPox = cc.v2(curPos.x, curPos.y - this._moveDiff);
-                        break;
-                    case GameDef.DIRECTION_RIGHT:
-                        nextPox = cc.v2(curPos.x + this._moveDiff, curPos.y);
-                        break;
-                    default:
-                        break;
+            //     switch (this._moveDirection) {
+            //         case GameDef.DIRECTION_UP:
+            //             nextPox = cc.v2(curPos.x, curPos.y + this._moveDiff);
+            //             break;
+            //         case GameDef.DIRECTION_LEFT:
+            //             nextPox = cc.v2(curPos.x - this._moveDiff, curPos.y);
+            //             break;
+            //         case GameDef.DIRECTION_DOWN:
+            //             nextPox = cc.v2(curPos.x, curPos.y - this._moveDiff);
+            //             break;
+            //         case GameDef.DIRECTION_RIGHT:
+            //             nextPox = cc.v2(curPos.x + this._moveDiff, curPos.y);
+            //             break;
+            //         default:
+            //             break;
+            //     }
+            //     this.node.setPosition(nextPox);
+            //     this.validateMove();
+
+            //     this.addImgLoopFrame();
+            //     this.updateTankImg();
+            // }
+
+            //改为不使用碰撞检测的方式判断
+            let moveDiff = this.calcMove(this._speedMove * dt);
+            if (moveDiff > 0) {
+                let curPos = this.node.getPosition();
+                if (this.canMoveFromAToB(curPos, this._moveDirection, moveDiff)) {
+                    let nextPox = curPos;
+                    switch (this._moveDirection) {
+                        case GameDef.DIRECTION_UP:
+                            nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
+                            break;
+                        case GameDef.DIRECTION_LEFT:
+                            nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
+                            break;
+                        case GameDef.DIRECTION_DOWN:
+                            nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
+                            break;
+                        case GameDef.DIRECTION_RIGHT:
+                            nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
+                            break;
+                        default:
+                            break;
+                    }
+                    this.node.setPosition(nextPox);
                 }
-                this.node.setPosition(nextPox);
-                this.validateMove();
+                else {
+                    this.onMoveFailed();
+                }
 
                 this.addImgLoopFrame();
                 this.updateTankImg();
@@ -180,41 +226,6 @@ export default class BattleTank extends BaseTank {
     calcMove(diff) {
         let moveDiff = 0;
         let minMoveDiff = GameDef.TANK_MOVE_MIN_VALUE;
-
-        //需要矫正移动时，先按当前方向矫正位置
-        // if (this._isNeedCorrectMove) {
-        //     if (this._totalMoveDiff % minMoveDiff != 0) {
-        //         this._totalMoveDiff = this._totalMoveDiff % minMoveDiff;
-        //         moveDiff = diff;
-        //         if (this._totalMoveDiff + moveDiff > minMoveDiff) {
-        //             //moveDiff = minMoveDiff - this._totalMoveDiff;
-
-        //             //确保静止时的坐标为整数值
-        //             let pos = this.node.getPosition();
-        //             if (pos.x % minMoveDiff != 0) {
-        //                 if (this._moveDirection === GameDef.DIRECTION_LEFT) {
-        //                     moveDiff = pos.x - (Math.floor(pos.x / minMoveDiff) * minMoveDiff);
-        //                 }
-        //                 else if (this._moveDirection === GameDef.DIRECTION_RIGHT) {
-        //                     moveDiff = (Math.ceil(pos.x / minMoveDiff) * minMoveDiff) - pos.x;
-        //                 }
-        //             }
-
-        //             if (pos.y % minMoveDiff != 0) {
-        //                 if (this._moveDirection === GameDef.DIRECTION_UP) {
-        //                     moveDiff = (Math.ceil(pos.y / minMoveDiff) * minMoveDiff) - pos.y;
-        //                 }
-        //                 else if (this._moveDirection === GameDef.DIRECTION_DOWN) {
-        //                     moveDiff = pos.y - (Math.floor(pos.y / minMoveDiff) * minMoveDiff);
-        //                 }
-        //             }
-        //         }
-        //         return moveDiff;
-        //     }
-        //     else {
-        //         this.cleanCorrectMoveStatus();
-        //     }
-        // }
         
         if (this._isMove) {
             moveDiff = diff;
@@ -242,74 +253,74 @@ export default class BattleTank extends BaseTank {
     setPosition(pos: any) {
         super.setPosition(pos);
         if (pos) {
-            this._lastPosition = this.node.getPosition();
+            //this._lastPosition = this.node.getPosition();
         }
     }
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
-        if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
-            let sceneryType = other.node.getComponent(Scenery).getType();
-            if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
-        else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
-            if (this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
-        else if (other.node.group === GameDef.GROUP_NAME_TANK) {
-            if (this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
-        else if (other.node.group === GameDef.GROUP_NAME_BULLET) {
+        // if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
+        //     let sceneryType = other.node.getComponent(Scenery).getType();
+        //     if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
+        // else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
+        //     if (this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
+        // else if (other.node.group === GameDef.GROUP_NAME_TANK) {
+        //     if (this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
+        if (other.node.group === GameDef.GROUP_NAME_BULLET) {
             let shooterTeam = other.node.getComponent(Bullet)._team;
             let destroyed = other.node.getComponent(Bullet)._destroyed;
             if (!destroyed && this._team !== shooterTeam) {
                 //被击中
-                this.dead(null);
+                this.dead();
             }
         }
     }
 
     onCollisionStay(other: cc.Collider, self: cc.Collider) {
-        if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
-            let sceneryType = other.node.getComponent(Scenery).getType();
-            if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
-        else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
-            if (this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
-        else if (other.node.group === GameDef.GROUP_NAME_TANK) {
-            if (this.isValidCollision(other, self)) {
-                this._canMove = false;
-            }
-        }
+        // if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
+        //     let sceneryType = other.node.getComponent(Scenery).getType();
+        //     if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
+        // else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
+        //     if (this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
+        // else if (other.node.group === GameDef.GROUP_NAME_TANK) {
+        //     if (this.isValidCollision(other, self)) {
+        //         this._canMove = false;
+        //     }
+        // }
     }
 
-    lateUpdate() {
-        if (this._moveDiff > 0) {
-            if (this._canMove) {
-                this.savePositon();
-            }
-            else {
-                if (this._lastPosition) {
-                    this.node.setPosition(this._lastPosition);
-                    this._canMove = true;
-                    //this.cleanCorrectMoveStatus();
-                }
-            }
-        }
-    }
+    // lateUpdate() {
+    //     if (this._moveDiff > 0) {
+    //         if (this._canMove) {
+    //             this.savePositon();
+    //         }
+    //         else {
+    //             if (this._lastPosition) {
+    //                 this.node.setPosition(this._lastPosition);
+    //                 this._canMove = true;
+    //                 //this.cleanCorrectMoveStatus();
+    //             }
+    //         }
+    //     }
+    // }
 
     shoot() {
         let currTime = new Date().getTime();
-        if (currTime - this._shootCooltime * 1000 > this._lastShootTime) {
+        if (currTime - this._shootCoolTime * 1000 > this._lastShootTime) {
             let shootInfo = this.getShootInfo();
             if (shootInfo) {
                 this._lastShootTime = currTime;
@@ -320,9 +331,9 @@ export default class BattleTank extends BaseTank {
         return false;
     }
 
-    born(callback: Function) {
+    born(callback?: Function) {
         gameController.playUnitAniOnce(AniDef.UnitAniType.BORN, this.getNodeAni(), () => {
-            this.setTankVisible(false);
+            //this.setTankVisible(false);
         }, () => {
             this.setTankVisible(true);
             
@@ -332,13 +343,13 @@ export default class BattleTank extends BaseTank {
         });
     }
 
-    dead(callback: Function) {
+    dead(callback?: Function) {
         this._isMove = false;
 
         gameController.playUnitAniOnce(AniDef.UnitAniType.BLAST, this.getNodeAni(), () => {
             this.setTankVisible(false);
         }, () => {
-            this.node.destroy();
+            this.destroyNode();
 
             if (typeof callback === "function") {
                 callback();
@@ -354,6 +365,10 @@ export default class BattleTank extends BaseTank {
         for(let collider of colliders) {
             collider.enabled = visible;//根据显隐决定碰撞组件的启用
         }
+    }
+
+    destroyNode() {
+        this.node.destroy();
     }
 
     addImgLoopFrame() {
@@ -375,10 +390,7 @@ export default class BattleTank extends BaseTank {
         let rect1 = self.world.aabb;
         let rect2 = other.world.aabb;
 
-        let interRect = cc.rect();
-        rect1.intersection(interRect, rect2);
-
-        if (interRect.width > 0 && interRect.height > 0) {
+        if (GameDataModel.isRectOverlap(rect1, rect2)) {
             return true;
         }
 
@@ -451,38 +463,9 @@ export default class BattleTank extends BaseTank {
         }
 
         if (moveAreaRect) {
-            //是否超出边界
-            if (!GameDataModel.isValidRect(moveAreaRect)) {
-                return false;
+            if (GameDataModel.canTankMoveInRect(moveAreaRect, this.node)) {
+                return true;
             }
-
-            //是否包含基地
-            {
-                let homeBaseRect = GameDataModel.getHomeBaseRect();
-
-                let interRect = cc.rect();
-                moveAreaRect.intersection(interRect, homeBaseRect);
-        
-                if (interRect.width > 0 && interRect.height > 0) {
-                    return false;
-                }
-            }
-
-            //是否包含不可穿越的布景
-            let sceneryNodes = GameDataModel.getSceneryNodesInRect(moveAreaRect);
-            if (sceneryNodes) {
-                for (let node of sceneryNodes) {
-                    let sceneryType = node.getComponent(Scenery).getType();
-                    if (sceneryType !== GameDef.SceneryType.GRASS) {
-                        return false;
-                    }
-                }
-            }
-
-            //是否包含其他坦克
-
-
-            return true;
         }
 
         return false;
@@ -510,7 +493,7 @@ export default class BattleTank extends BaseTank {
     }
 
     savePositon() {
-        this._lastPosition = this.node.getPosition();
+        //this._lastPosition = this.node.getPosition();
     }
 
     getBulletPowerLevel(): number {
@@ -518,7 +501,7 @@ export default class BattleTank extends BaseTank {
     }
 
     getShootCoolTime() : number {
-        return this._shootCooltime;
+        return this._shootCoolTime;
     }
 
     getShootInfo(): GameStruct.ShootInfo {
@@ -536,5 +519,10 @@ export default class BattleTank extends BaseTank {
             return shootInfo;
         }
         return null;
+    }
+
+    //移动更新失败时触发
+    onMoveFailed() {
+        
     }
 }

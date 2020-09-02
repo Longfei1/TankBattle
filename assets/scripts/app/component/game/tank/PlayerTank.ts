@@ -4,12 +4,23 @@ import { gameController } from "../Game";
 import { AniDef } from "../../../define/AniDef";
 import { GameDef } from "../../../define/GameDef";
 import { EventDef } from "../../../define/EventDef";
+import GameDataModel from "../../../model/GameDataModel";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PlayerTank extends BattleTank {
     _buffStatus = 0;
+
+    private _playerNo: number = -1; //玩家编号
+
+    set playerNo(no: number) {
+        this._playerNo = no;
+    }
+
+    get playerNo(): number {
+        return this._playerNo;
+    }
 
     shoot() {
         if (super.shoot()) {
@@ -19,7 +30,7 @@ export default class PlayerTank extends BattleTank {
         return false;
     }
 
-    born(callback: Function) {
+    born(callback?: Function) {
         //出生后，有几秒的护盾时间
         let afterBorn = () => {
             this.onGetShieldStatus(GameDef.BORN_INVINCIBLE_TIME);
@@ -30,6 +41,10 @@ export default class PlayerTank extends BattleTank {
         
         //播放出生动画
         super.born(afterBorn);
+    }
+
+    destroyNode() {
+        gameController.node.emit(EventDef.EV_PLAYER_DEAD, this.playerNo);
     }
 
     onGetShieldStatus(time: number) {
@@ -57,23 +72,25 @@ export default class PlayerTank extends BattleTank {
     // }
 
     lateUpdate() {
-        super.lateUpdate();
+        //super.lateUpdate();
 
         //
-        let directions = this.getAvailableMoveDirections();
-        let textInfo = {
-            [GameDef.DIRECTION_UP]: "上",
-            [GameDef.DIRECTION_DOWN]: "下",
-            [GameDef.DIRECTION_LEFT]: "左",
-            [GameDef.DIRECTION_RIGHT]: "右",
-        };
+        if (GameDataModel.isGameDebugMode()) {
+            let directions = this.getAvailableMoveDirections();
+            let textInfo = {
+                [GameDef.DIRECTION_UP]: "上",
+                [GameDef.DIRECTION_DOWN]: "下",
+                [GameDef.DIRECTION_LEFT]: "左",
+                [GameDef.DIRECTION_RIGHT]: "右",
+            };
 
-        let info = "可移动方向\n";
-        for (let it of directions) {
-            info += textInfo[it];
+            let info = "可移动方向\n";
+            for (let it of directions) {
+                info += textInfo[it];
+            }
+
+            gameController.node.emit(EventDef.EV_GAME_SHOW_DEBUG_TEXT, info);
         }
-
-        gameController.node.emit(EventDef.EV_GAME_SHOW_DEBUG_TEXT, info);
     }
 
 

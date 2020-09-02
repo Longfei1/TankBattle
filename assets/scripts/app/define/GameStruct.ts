@@ -39,6 +39,7 @@ export namespace GameStruct {
         }
     }
 
+    //坦克属性，对应TankData.json配置
     export class TankAttributes {
         name: string;
         tankName: string; 
@@ -47,7 +48,7 @@ export namespace GameStruct {
         moveSpeed: number;
         bulletSpeed: number;
         bulletType: number;
-        shootCooltime: number;
+        shootCoolTime: number;
     }
 
     export class ShootInfo {

@@ -169,9 +169,8 @@ export default class Scenery extends cc.Component {
                 if (img.node.active) {
                     let pos = gameController.worldToGameScenePosition(img.node.convertToWorldSpace(cc.v2(0, 0)));
                     let imgRect = cc.rect(pos.x, pos.y, img.node.width, img.node.height)
-                    let intersectionRect = cc.rect();
-                    rect.intersection(intersectionRect, imgRect);
-                    if (intersectionRect.width > 0 && intersectionRect.height > 0) {//两个矩形有重合，相交不算
+                    
+                    if (GameDataModel.isRectOverlap(rect, imgRect)) {//两个矩形有重合，相交不算
                         return true;
                     }
                 }

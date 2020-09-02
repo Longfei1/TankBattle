@@ -47,6 +47,7 @@ export default class GameMapManager extends cc.Component {
         gameController.node.on(EventDef.EV_MAP_EDIT_FINISHED, this.evMapEditFinished, this);
         gameController.node.on(EventDef.EV_MAP_DESTROY_SCENERY, this.evDestroyScenery, this);
         gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
+        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
 
         GameInputModel.addKeyDownOnceListener(() => {
             this.saveMapData();
@@ -60,7 +61,7 @@ export default class GameMapManager extends cc.Component {
 
         this.initListenner();
 
-        this.initGameMap();
+        //this.initGameMap();
     }
 
     bindGameModeData() {
@@ -76,6 +77,7 @@ export default class GameMapManager extends cc.Component {
                 this.createGameMap(GameDataModel._gameMapData);
 
                 GameDataModel._useCustomMap = false;
+                GameDataModel.clearGameMapData();
             }
             else {
                 let stage = GameDataModel._currStage;
@@ -95,8 +97,6 @@ export default class GameMapManager extends cc.Component {
     }
 
     resetGameMap() {
-        //GameDataModel.clearGameMapData();
-
         for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
             this._scenerys[i] = this._scenerys[i] ? this._scenerys[i] : [];
             for (let j = 0; j < GameDef.SCENERYS_NODE_ROW_NUM; j++) {
@@ -144,7 +144,9 @@ export default class GameMapManager extends cc.Component {
             if (type !== GameDef.SceneryType.NULL) {
                 let scenery = this._sceneryPool.getNode();
                 this.panelScenery.addChild(scenery);
-                scenery.getComponent(Scenery).setType(type);
+                let com = scenery.getComponent(Scenery);
+                com.reset();
+                com.setType(type);
                 scenery.setPosition(GameDataModel.matrixToScenePosition(GameDataModel.sceneryToMatrixPosition(sceneryPos)));
                 this._scenerys[sceneryPos.col][sceneryPos.row] = scenery;
             }
@@ -193,6 +195,10 @@ export default class GameMapManager extends cc.Component {
     }
 
     saveMapData() {
+        if (!GameDataModel.isModeEditMap() || !GameDataModel.isGameDebugMode()) {
+            return;
+        }
+
         if (jsb != undefined) {
             //转化场景数据到数组中
             let mapData = {
@@ -258,7 +264,7 @@ export default class GameMapManager extends cc.Component {
     //基地所在位置，不能存在其他布景元素
     checkHomeBase() {
         if (this._homeBase) {
-            this.destorySceneryAround(this.getHomeBaseSceneryPosition());
+            this.destroySceneryAround(this.getHomeBaseSceneryPosition());
         }
     }
 
@@ -275,7 +281,7 @@ export default class GameMapManager extends cc.Component {
 
         for (let pos of placeInfos) {
             let sceneryPos = GameDataModel.matrixToSceneryPosition(pos);
-            this.destorySceneryAround(sceneryPos);
+            this.destroySceneryAround(sceneryPos);
         }
     }
 
@@ -284,7 +290,7 @@ export default class GameMapManager extends cc.Component {
         return GameDataModel.matrixToSceneryPosition(matrixPox);
     }
 
-    destorySceneryAround(sceneryPos: GameStruct.RcInfo) {
+    destroySceneryAround(sceneryPos: GameStruct.RcInfo) {
         if (sceneryPos) {
             let posAry = GameDataModel.getMapUnitContainSceneryPosition(sceneryPos);
             for (let pos of posAry) {
@@ -308,5 +314,9 @@ export default class GameMapManager extends cc.Component {
             }
         }
         return false;
+    }
+
+    evPrepareGame() {
+        this.initGameMap();
     }
 }

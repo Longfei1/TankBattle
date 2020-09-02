@@ -5,10 +5,13 @@ import { GameStruct } from "../define/GameStruct";
 import CommonFunc from "../common/CommonFunc";
 import Scenery from "../component/game/Scenery";
 import { GameConfig } from "../GameConfig";
+import EnemyTank from "../component/game/tank/EnemyTank";
+import PlayerTank from "../component/game/tank/PlayerTank";
 
 class GameDataModel extends BaseModel {
     _playMode: number = -1;
     _gamePause: boolean = false;
+    _gameRunning: boolean = false;
     _enableOperate: boolean = false;
     _gameMapData:  number[][] =  [];
     _mapUnit = {width: 0, height: 0};
@@ -16,6 +19,8 @@ class GameDataModel extends BaseModel {
     _currStage: number = 0;
 
     private _scenerys: cc.Node[][] = [];
+    private _enemys: { [id: number] : cc.Node } = {};
+    private _players: { [id: number]: cc.Node } = {};
     
     initModel() {
         super.initModel();
@@ -34,11 +39,16 @@ class GameDataModel extends BaseModel {
 
     resetGameData() {
         this._gamePause = false;
-        this._enableOperate = false;
-        this._useCustomMap = false;
+        this._gameRunning = false;
+        //this._useCustomMap = false;
         this._currStage = 0;
+        this._enableOperate = false;
 
         this.clearGameMapData();
+
+        this._scenerys = [];
+        this.clearEnemyTank();
+        this.clearPlayerTank();
     }
 
     createMapData() {
@@ -90,9 +100,49 @@ class GameDataModel extends BaseModel {
     //根据行列信息获取布景节点
     getSceneryNode(sceneryPos: GameStruct.RcInfo): cc.Node {
         if (sceneryPos && this.isValidSceneryPos(sceneryPos)) {
-            return this._scenerys[sceneryPos.col][sceneryPos.row];
+            if (this._scenerys[sceneryPos.col]) {
+                return this._scenerys[sceneryPos.col][sceneryPos.row];
+            }
         }
         return null;
+    }
+
+    setEnemyTank(node: cc.Node) {
+        if (cc.isValid(node)) {
+            let com = node.getComponent(EnemyTank);
+            if (com) {
+                this._enemys[com.id] = node;
+            }
+        }
+    }
+
+    removeEnemyTank(id: number) {
+        if (this._enemys[id]) {
+            delete this._enemys[id];
+        }
+    }
+
+    clearEnemyTank() {
+        this._enemys = {};
+    }
+
+    setPlayerTank(node: cc.Node) {
+        if (cc.isValid(node)) {
+            let com = node.getComponent(PlayerTank);
+            if (com) {
+                this._players[com.playerNo] = node;
+            }
+        }
+    }
+
+    removePlayerTank(no: number) {
+        if (this._players[no]) {
+            delete this._players[no];
+        }
+    }
+
+    clearPlayerTank() {
+        this._players = {};
     }
 
     /**
@@ -273,10 +323,93 @@ class GameDataModel extends BaseModel {
         return ret;
     }
 
+    //坦克是否能在给定区域移动
+    canTankMoveInRect(moveAreaRect: cc.Rect, excludeTankNode: cc.Node = null): boolean {
+        //是否超出边界
+        if (!this.isValidRect(moveAreaRect)) {
+            return false;
+        }
+
+        //是否包含基地
+        {
+            let homeBaseRect = this.getHomeBaseRect();
+
+            if (this.isRectOverlap(moveAreaRect, homeBaseRect)) {
+                return false;
+            }
+        }
+
+        //是否包含不可穿越的布景
+        {
+            let sceneryNodes = this.getSceneryNodesInRect(moveAreaRect);
+            if (sceneryNodes) {
+                for (let node of sceneryNodes) {
+                    let sceneryType = node.getComponent(Scenery).getType();
+                    if (sceneryType !== GameDef.SceneryType.GRASS) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        //是否包含其他坦克
+        {
+            if (this.hasTankInRect(moveAreaRect, excludeTankNode)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    hasTankInRect(areaRect: cc.Rect, excludeTankNode: cc.Node = null): boolean {
+        let bHave = false;
+        //玩家
+        CommonFunc.travelMap(this._players, (no: number, node: cc.Node) => {
+            if (node !== excludeTankNode) {
+                let pos = node.getPosition()
+                let tankWidth = this.getTankWidth();
+                let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                if (this.isRectOverlap(areaRect, tankRect)) {
+                    bHave = true;
+                    return true;
+                }
+            }
+        });
+
+        //敌军
+        if (!bHave) {
+            CommonFunc.travelMap(this._enemys, (id: number, node: cc.Node) => {
+                if (node !== excludeTankNode) {
+                    let pos = node.getPosition()
+                    let tankWidth = this.getTankWidth();
+                    let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                    if (this.isRectOverlap(areaRect, tankRect)) {
+                        bHave = true;
+                        return true;
+                    }
+                }
+            });
+        }
+
+        return bHave;
+    }
+
     isGameDebugMode(): boolean {
         if (GameConfig.debugMode > 0) {
             return true;
         }
+        return false;
+    }
+
+    isRectOverlap(rect1: cc.Rect, rect2: cc.Rect): boolean {
+        let interRect = cc.rect();
+        rect1.intersection(interRect, rect2);
+
+        if (interRect.width > 0 && interRect.height > 0) {
+            return true;
+        }
+
         return false;
     }
 }

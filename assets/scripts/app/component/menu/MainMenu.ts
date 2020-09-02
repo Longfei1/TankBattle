@@ -117,6 +117,7 @@ export default class MainMenu extends cc.Component {
                 case MenuItemIdex.MAP_EDIT:
                     //地图编辑场景
                     GameDataModel._playMode = GameDef.GAMEMODE_MAP_EDIT;
+                    GameDataModel._useCustomMap = false;
                     this.onStartGame();
                     console.log("开始地图编辑");
                     break;

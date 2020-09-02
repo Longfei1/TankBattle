@@ -9,7 +9,8 @@
     ],
     "DifficultyData": [
         {
-            "EnemyAliveNum": 4
+            "EnemyMaxAliveNum": 4,
+            "EnemyTotalNum": 20
         }
     ]
 }

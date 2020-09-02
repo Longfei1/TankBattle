@@ -104,6 +104,8 @@ export default class Game extends cc.Component {
         this.playStartGameAni(GameDataModel._currStage, () => {
             this.gameStart();
         });
+
+        gameController.node.emit(EventDef.EV_GAME_PREPARE_GAME);
     }
 
     playStartGameAni(stage: number, callback) {
@@ -120,7 +122,7 @@ export default class Game extends cc.Component {
                 2,
                 {
                     scriptName: "GameStartAni",
-                    params: stage,
+                    params: { ["stage"]: stage},
                 },
                 null,
                 () => {
@@ -132,10 +134,10 @@ export default class Game extends cc.Component {
     }
 
     gameStart() {
-        GameDataModel._enableOperate = true;
-        cc.director.getCollisionManager().enabled = true;
+        this.node.emit(EventDef.EV_GAME_STARTED); //其他模块执行开始逻辑
 
-        this.node.emit(EventDef.EV_GAME_STARTED);
+        GameDataModel._enableOperate = true; //打开控制开关
+        cc.director.getCollisionManager().enabled = true; //打开碰撞检测
     }
 
     getNodeBullet(): cc.Node {

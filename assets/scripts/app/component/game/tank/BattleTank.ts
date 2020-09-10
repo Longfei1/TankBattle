@@ -120,6 +120,11 @@ export default class BattleTank extends BaseTank {
     }
 
     updateTankImg() {
+        let frameName = this.getTankImgName();
+        this.setTankImg(frameName);
+    }
+
+    getTankImgName(): string {
         if (this._tankName === "") {
             return;
         }
@@ -129,7 +134,7 @@ export default class BattleTank extends BaseTank {
         }
 
         let frameName = `${this._tankName}_${this._tankLevel}${DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
-        this.setTankImg(frameName);
+        return frameName;
     }
 
     update(dt) {
@@ -279,7 +284,8 @@ export default class BattleTank extends BaseTank {
             let destroyed = other.node.getComponent(Bullet)._destroyed;
             if (!destroyed && this._team !== shooterTeam) {
                 //被击中
-                this.dead();
+                //this.dead();
+                this.onHited(other.node);
             }
         }
     }
@@ -355,6 +361,11 @@ export default class BattleTank extends BaseTank {
                 callback();
             }
         });
+    }
+
+    //被命中
+    onHited(node: cc.Node) {
+        this.dead();
     }
 
     setTankVisible(bVisible: boolean) {

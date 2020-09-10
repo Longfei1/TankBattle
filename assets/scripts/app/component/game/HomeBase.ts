@@ -1,5 +1,7 @@
 import { GameStruct } from "../../define/GameStruct";
 import GameDataModel from "../../model/GameDataModel";
+import { GameDef } from "../../define/GameDef";
+import Bullet from "./Bullet";
 
 const { ccclass, property } = cc._decorator;
 
@@ -26,6 +28,17 @@ export default class HomeBase extends cc.Component {
             }
             else if (pos.col != null && pos.row != null) {
                 this.node.setPosition(GameDataModel.matrixToScenePosition(pos));
+            }
+        }
+    }
+
+    onCollisionEnter(other: cc.Collider, self: cc.Collider) {
+        if (other.node.group === GameDef.GROUP_NAME_BULLET) {
+            let destroyed = other.node.getComponent(Bullet)._destroyed;
+            if (!destroyed) {
+                this.setAlive(false);
+
+                //游戏失败
             }
         }
     }

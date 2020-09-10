@@ -1,10 +1,11 @@
 import BattleTank from "./BattleTank";
 import AudioModel from "../../../model/AudioModel";
-import { gameController } from "../Game";
+import Game, { gameController } from "../Game";
 import { AniDef } from "../../../define/AniDef";
 import { GameDef } from "../../../define/GameDef";
 import { EventDef } from "../../../define/EventDef";
 import GameDataModel from "../../../model/GameDataModel";
+import CommonFunc from "../../../common/CommonFunc";
 
 const { ccclass, property } = cc._decorator;
 
@@ -93,6 +94,26 @@ export default class PlayerTank extends BattleTank {
         }
     }
 
+    haveBuff(value: number) {
+        if (value != null) {
+            if (CommonFunc.isBitSet(this._buffStatus, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    onHited(node: cc.Node) {
+        if (this.haveBuff(GameDef.BUFF_INVINCIBLE)) {
+            return;
+        }
+
+        if (this._tankLevel >= GameDef.PLAYER_LEVEL_PROTECT_ONCE_DEAD) {
+            this._tankLevel = 1;
+            return;
+        }
+
+        this.dead();
+    }
 }
  

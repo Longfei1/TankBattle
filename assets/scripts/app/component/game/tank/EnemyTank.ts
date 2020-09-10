@@ -7,6 +7,8 @@ const { ccclass, property } = cc._decorator;
 @ccclass
 export default class EnemyTank extends BattleTank {
 
+    _bRed: boolean = false;
+
     private _id: number = -1;
 
     //编号
@@ -18,9 +20,14 @@ export default class EnemyTank extends BattleTank {
         return this._id; 
     }
 
+    setRed(bRed: boolean) {
+        this._bRed = bRed;
+    }
+
     reset() {
         super.reset();
         this._id = -1;
+        this._bRed = false;
     }
 
     born(callback?: Function) {
@@ -33,6 +40,21 @@ export default class EnemyTank extends BattleTank {
         };
 
         super.born(cb);
+    }
+
+    onHited(node: cc.Node) {
+        if (this._bRed) {
+            this.setRed(false);
+
+            return;
+        }
+
+        if (this._tankLevel > 1) {
+            this._tankLevel--;
+            return;
+        }
+
+        this.dead();
     }
 
     //************************

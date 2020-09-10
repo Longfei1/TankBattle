@@ -20,6 +20,9 @@ export namespace EventDef {
     export const EV_MAP_DESTROY_SCENERY                = "evmapdestroyscenery";
     export const EV_MAP_EDIT_FINISHED                  = "evmapeditfinished";
 
+    export const EV_PROP_CREATE                        = "evpropcreate";
+    export const EV_PROP_DESTROY                       = "evpropdestroy";
+
     export const EV_UNITANI_PLAY                       = "evunitaniplay";
     export const EV_SCENEANI_PLAY                      = "evsceneaniplay";
     export const EV_ANI_STOP                           = "evunitanistop";

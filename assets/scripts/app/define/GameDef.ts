@@ -33,13 +33,18 @@ export namespace GameDef {
     export const GROUP_NAME_SCENERY             = "scenery";
     export const GROUP_NAME_BULLET              = "bullet";
     export const GROUP_NAME_BOUNDARY            = "boundary";
+    export const GROUP_HOME_BASE                = "homebase";
+    export const GROUP_NAME_PROP                = "prop";
 
     //坦克增益buff
     export const BUFF_INVINCIBLE                = 0x0001; //无敌
 
     //时效
     export const BORN_INVINCIBLE_TIME           = 3;  //出生无敌时间
-    export const SHIELD_INVINCIBLE_TIME         = 10; //护盾无敌时间
+    export const PROP_SHOW_TIME                 = 15; //道具显示时间
+    export const PROP_SHIELD_INVINCIBLE_TIME    = 20; //护盾无敌时间
+    export const PROP_CLOCK_TIME                = 20; //定时道具持续时长
+    export const PROP_SPADE_TIME                = 20; //铲子道具持续时长
 
     //子弹威力
     export const BULLET_POWER_LEVEL_COMMON      = 1; //普通威力,可击毁一层土墙
@@ -49,6 +54,7 @@ export namespace GameDef {
     export const TANK_MOVE_MIN_VALUE            = 10; //坦克最小移动量（像素）
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数
     export const GAME_FPS                       = 60;
+    export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
 
     export enum SceneryType {
         NULL,   //无
@@ -66,5 +72,14 @@ export namespace GameDef {
     export enum TeamType {
         PLAYER,
         ENEMY,
+    }
+
+    export enum PropType {
+        BOMB,       //炸弹
+        CLOCK,      //定时
+        HELMET,     //头盔
+        SPADE,      //铲子
+        STAR,       //五角心
+        TANK,       //坦克
     }
 }

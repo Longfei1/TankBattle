@@ -140,7 +140,7 @@ export default class Game extends cc.Component {
         cc.director.getCollisionManager().enabled = true; //打开碰撞检测
     }
 
-    getNodeBullet(): cc.Node {
+    getNodeProp(): cc.Node {
         return this._bulletPool.getNode()
     }
 

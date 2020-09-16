@@ -11,18 +11,6 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PlayerTank extends BattleTank {
-    _buffStatus = 0;
-
-    private _playerNo: number = -1; //玩家编号
-
-    set playerNo(no: number) {
-        this._playerNo = no;
-    }
-
-    get playerNo(): number {
-        return this._playerNo;
-    }
-
     shoot() {
         if (super.shoot()) {
             AudioModel.playSound("sound/fire");
@@ -45,17 +33,7 @@ export default class PlayerTank extends BattleTank {
     }
 
     destroyNode() {
-        gameController.node.emit(EventDef.EV_PLAYER_DEAD, this.playerNo);
-    }
-
-    onGetShieldStatus(time: number) {
-        if (time != null) {
-            gameController.playUnitAniInTime(AniDef.UnitAniType.SHIELD, this.nodeAni, time, null, () => {
-                this._buffStatus |= GameDef.BUFF_INVINCIBLE;
-            }, () => {
-                this._buffStatus &= ~GameDef.BUFF_INVINCIBLE;
-            });
-        }
+        gameController.node.emit(EventDef.EV_PLAYER_DEAD, this.id);
     }
 
     getBulletPowerLevel(): number {
@@ -104,7 +82,7 @@ export default class PlayerTank extends BattleTank {
     }
 
     onHited(node: cc.Node) {
-        if (this.haveBuff(GameDef.BUFF_INVINCIBLE)) {
+        if (this.haveBuff(GameDef.TANK_BUFF_INVINCIBLE)) {
             return;
         }
 

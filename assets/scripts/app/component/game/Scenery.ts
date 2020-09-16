@@ -139,26 +139,11 @@ export default class Scenery extends cc.Component {
             gameController.node.emit(EventDef.EV_MAP_DESTROY_SCENERY, this.node);
         }
         else if (sceneryType === GameDef.SceneryType.WALL) {
-            let nodeRcInfo = GameDataModel.sceneToMatrixPosition(this.node.position);
-
-            //求出坐标对应unit的index
-            let unitIndex = null;
-            if (pos.equal(nodeRcInfo)) {
-                unitIndex = 3;
-            }
-            else if (pos.col === nodeRcInfo.col && pos.row === nodeRcInfo.row + 1) {
-                unitIndex = 1;
-            }
-            else if (pos.row === nodeRcInfo.row && pos.col === nodeRcInfo.col + 1) {
-                unitIndex = 4;
-            }
-            else if (pos.col === nodeRcInfo.col + 1 && pos.row === nodeRcInfo.row + 1) {
-                unitIndex = 2;
-            }
+           let unitIndex = this.getUnitIndexByRcInfo(pos);
 
             //销毁unit
-            if (unitIndex) {
-                this.destroyUnit(unitIndex - 1);
+            if (unitIndex >= 0) {
+                this.destroyUnit(unitIndex);
             }
         }
     }
@@ -177,5 +162,57 @@ export default class Scenery extends cc.Component {
             }
         }
         return false;
+    }
+
+    getUnitIndexByRcInfo(pos: GameStruct.RcInfo) {
+        let unitIndex = -1;
+        let nodeRcInfo = GameDataModel.sceneToMatrixPosition(this.node.position);
+        if (pos.equal(nodeRcInfo)) {
+            unitIndex = 2;
+        }
+        else if (pos.col === nodeRcInfo.col && pos.row === nodeRcInfo.row + 1) {
+            unitIndex = 0;
+        }
+        else if (pos.row === nodeRcInfo.row && pos.col === nodeRcInfo.col + 1) {
+            unitIndex = 3;
+        }
+        else if (pos.col === nodeRcInfo.col + 1 && pos.row === nodeRcInfo.row + 1) {
+            unitIndex = 1;
+        }
+
+        return unitIndex;
+    }
+
+    getRcInfoByUnitIndex(index: number): GameStruct.RcInfo{
+        let nodeRcInfo = GameDataModel.sceneToMatrixPosition(this.node.position);
+        let pos = null;
+        if (index == 2) {
+            pos = nodeRcInfo;
+        }
+        else if (index == 0) {
+            pos = new GameStruct.RcInfo(nodeRcInfo.col, nodeRcInfo.row + 1)
+        }
+        else if (index == 3) {
+            pos = new GameStruct.RcInfo(nodeRcInfo.col + 1, nodeRcInfo.row)
+        }
+        else if (index == 1) {
+            pos = new GameStruct.RcInfo(nodeRcInfo.col + 1, nodeRcInfo.row + 1)
+        }
+
+        return pos;
+    }
+
+    getSceneryContainPosAry(): GameStruct.RcInfo[] {
+        let ary: GameStruct.RcInfo[] = [];
+        for (let i = 0; i < this.imgScenerys.length; i++) {
+            if (this.imgScenerys[i] && this.imgScenerys[i].node.active) {
+                let pos = this.getRcInfoByUnitIndex(i);
+                if (pos) {
+                    ary.push(pos);
+                }
+            }
+        }
+
+        return ary;
     }
 }

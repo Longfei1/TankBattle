@@ -28,11 +28,11 @@ export default class Bullet extends cc.Component {
     _speedMove: number = 0;
     _moveDirection: number = -1;
     _bulletType: number = -1;
-    _shooterName: string = "";
+    _shooterID: number = -1;
     _team: number = -1;
     _powerLevel: number = -1;
 
-    _destroyed: boolean = false; //击中目标后自己销毁，以免产生两次碰撞
+    _destroyed: boolean = false; //击中目标后自己销毁
 
     onEnable() {
         this._destroyed = false;
@@ -103,7 +103,7 @@ export default class Bullet extends cc.Component {
         }  
         else if (other.node.group === GameDef.GROUP_NAME_TANK) {
             let com = other.node.getComponent(BattleTank);
-            if (this._shooterName === com._tankName) {
+            if (this._shooterID === com.id) {
                 canMove = true;
             }
         }
@@ -111,6 +111,8 @@ export default class Bullet extends cc.Component {
         if (!canMove && !this._destroyed) {
             AudioModel.playSound("sound/hit");
             this._destroyed = true;
+
+            gameController.node.emit(EventDef.EV_GAME_REDUCE_BULLET, this._shooterID);
             gameController.putNodeBullet(this.node);
         }
     }

@@ -37,7 +37,11 @@ export namespace GameDef {
     export const GROUP_NAME_PROP                = "prop";
 
     //坦克增益buff
-    export const BUFF_INVINCIBLE                = 0x0001; //无敌
+    export const TANK_BUFF_INVINCIBLE           = 0x0001; //无敌
+
+    //道具buff
+    export const PROP_BUFF_STATIC               = 0x0001; //静止
+    export const PROP_BUFF_HOME_PROTECT         = 0x0002; //基地保护
 
     //时效
     export const BORN_INVINCIBLE_TIME           = 3;  //出生无敌时间
@@ -55,6 +59,7 @@ export namespace GameDef {
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数
     export const GAME_FPS                       = 60;
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
+    export const PLAYER_LIFE_NUM                = 3; //玩家初始生命数量
 
     export enum SceneryType {
         NULL,   //无

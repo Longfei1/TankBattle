@@ -18,9 +18,14 @@ class GameDataModel extends BaseModel {
     _useCustomMap: boolean = false;
     _currStage: number = 0;
 
+
+    //关卡相关数据
     private _scenerys: cc.Node[][] = [];
     private _enemys: { [id: number] : cc.Node } = {};
     private _players: { [id: number]: cc.Node } = {};
+
+    _propBuff: number = 0;
+    _lifeNum: { [id: number] : number } = {};
     
     initModel() {
         super.initModel();
@@ -44,6 +49,9 @@ class GameDataModel extends BaseModel {
         this._currStage = 0;
         this._enableOperate = false;
 
+        this._propBuff = 0;
+        this.resetPlayerLifeNum()
+
         this.clearGameMapData();
 
         this._scenerys = [];
@@ -52,7 +60,7 @@ class GameDataModel extends BaseModel {
     }
 
     createMapData() {
-        let mapData: number[][] = CommonFunc.createArray(GameDef.GAME_MAP_COL_NUM);
+        let mapData: number[][] = CommonFunc.createArray(GameDef.SCENERYS_NODE_COL_NUM);
         for (let x = 0; x < GameDef.SCENERYS_NODE_COL_NUM; x++) {
             for (let y = 0; y < GameDef.SCENERYS_NODE_ROW_NUM; y++) {
                 mapData[x][y] = GameDef.SceneryType.NULL;
@@ -130,7 +138,7 @@ class GameDataModel extends BaseModel {
         if (cc.isValid(node)) {
             let com = node.getComponent(PlayerTank);
             if (com) {
-                this._players[com.playerNo] = node;
+                this._players[com.id] = node;
             }
         }
     }
@@ -143,6 +151,26 @@ class GameDataModel extends BaseModel {
 
     clearPlayerTank() {
         this._players = {};
+    }
+
+    resetPlayerLifeNum() {
+        this._lifeNum = {[1]: GameDef.PLAYER_LIFE_NUM, [2]:GameDef.PLAYER_LIFE_NUM}
+    }
+
+    addPlayerLifeNum(id: number) {
+        if (this._lifeNum[id] != null) {
+            this._lifeNum[id]++;
+        }
+    }
+
+    reducePlayerLifeNum(id: number) {
+        if (this._lifeNum[id] != null) {
+            this._lifeNum[id]--;
+        }
+    }
+
+    getPlayerLifeNum(id: number) {
+        return this._lifeNum[id];
     }
 
     /**
@@ -258,14 +286,25 @@ class GameDataModel extends BaseModel {
         return this._mapUnit.width * GameDef.SCENERY_CONTAINS_RC * 2;
     }
 
-    //传入一个unit锚点（需要为左下角）所在的位置
-    getMapUnitContainSceneryPosition(sceneryPos: GameStruct.RcInfo): GameStruct.RcInfo[]  {
+    getPropWidth(): number {
+        return this._mapUnit.width * GameDef.SCENERY_CONTAINS_RC * 2;
+    }
+
+    /**
+     * 获取一个矩形所能包含的行列坐标数组
+     * @param pos 矩形左下角行列坐标
+     * @param rowNum 包含行数（矩形高度）
+     * @param colNum 包含列数（矩形宽度）
+     */
+    getRectContainPosArray(pos: GameStruct.RcInfo, rowNum = 0, colNum: number = 0): GameStruct.RcInfo[]  {
         let array:GameStruct.RcInfo[] = [];
-        if (sceneryPos) {
-            array.push(new GameStruct.RcInfo(sceneryPos.col, sceneryPos.row + 1));//左上
-            array.push(sceneryPos);//左下
-            array.push(new GameStruct.RcInfo(sceneryPos.col + 1, sceneryPos.row));//右下
-            array.push(new GameStruct.RcInfo(sceneryPos.col + 1, sceneryPos.row + 1));//右上
+
+        if (pos) {
+            for( let col = 0; col < colNum; col++) {
+                for (let row = 0; row < rowNum; row ++) {
+                    array.push(new GameStruct.RcInfo(pos.col + col, pos.row + row));
+                }
+            }
         }
         return array;
     }
@@ -411,6 +450,93 @@ class GameDataModel extends BaseModel {
         }
 
         return false;
+    }
+
+    /**
+     * 获取满足条件的所有矩阵坐标数组
+     * 条件：以矩形左下角为坐标，rowNum*colNum格子范围内无其他布景、坦克、基地
+     * @param rowNum 
+     * @param colNum 
+     */
+    getEmptyMatrixArray(rowNum, colNum): GameStruct.RcInfo[] {
+        let checkAry: boolean[][] = CommonFunc.createArray(GameDef.GAME_MAP_COL_NUM);
+        for (let col = 0; col < GameDef.SCENERYS_NODE_COL_NUM; col++) {
+            for (let row = 0; row < GameDef.SCENERYS_NODE_ROW_NUM; row++) {
+                checkAry[col][row] = false;
+            }
+        }
+
+        //排除非空位
+        {
+            //排除基地
+            {
+                let homePosAry = this.getRectContainPosArray(GameDef.PLACE_HOMEBASE, 4, 4);
+                for (let pos of homePosAry) {
+                    checkAry[pos.col][pos.row] = true;
+                }
+            }
+
+            //排除布景
+            {
+                for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
+                    for (let j = 0; j < GameDef.SCENERYS_NODE_ROW_NUM; j++) {
+                        if (this._scenerys[i] && this._scenerys[i][j]) {
+                            let com = this._scenerys[i][j].getComponent(Scenery);
+                            let posAry = com.getSceneryContainPosAry();
+                            for (let pos of posAry) {
+                                checkAry[pos.col][pos.row] = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            //排除坦克
+            {
+                CommonFunc.travelMap(this._players, (no: number, node: cc.Node) => {
+                    let com = node.getComponent(PlayerTank);
+                    let posAry = com.getTankContainRcInfoArray();
+                    for (let pos of posAry) {
+                        checkAry[pos.col][pos.row] = true;
+                    }
+                });
+        
+
+                CommonFunc.travelMap(this._enemys, (id: number, node: cc.Node) => {
+                    let com = node.getComponent(EnemyTank);
+                    let posAry = com.getTankContainRcInfoArray();
+                    for (let pos of posAry) {
+                        checkAry[pos.col][pos.row] = true;
+                    }
+                });
+        
+            }
+        }
+
+        let retAry:GameStruct.RcInfo[] = [];
+        let propUnitNum = 4;
+
+        let isEmptyPos = (col: number, row: number): boolean => {
+            for (let i = 0; i < propUnitNum; i++) {
+                for (let j = 0; j < propUnitNum; j++) {
+                    if (checkAry[col + i][row + j]) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        for (let col = 0; col <= GameDef.GAME_MAP_COL_NUM - propUnitNum; col++) {
+            for (let row = 0; row <= GameDef.GAME_MAP_ROW_NUM - propUnitNum; row++) {
+                if (isEmptyPos(col, row)) {
+                    retAry.push(new GameStruct.RcInfo(col, row));
+                }
+            }
+        }
+
+        return retAry;
     }
 }
 export default new GameDataModel();

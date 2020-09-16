@@ -48,12 +48,12 @@ export namespace GameStruct {
         moveSpeed: number;
         bulletSpeed: number;
         bulletType: number;
-        shootCoolTime: number;
+        maxBulletNum: number;
     }
 
     export class ShootInfo {
         type: number;         //子弹类型，对应不同的资源
-        shooterName: string;  //射击者名称
+        shooterID: number;    //射击者编号
         powerLevel: number;   //威力等级
         team: number;         //所属队伍
         pos: cc.Vec2;         //起始位置

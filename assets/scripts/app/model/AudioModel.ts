@@ -9,6 +9,10 @@ class AudioModel extends BaseModel{
         });
     }
 
+    stopMusic() {
+        cc.audioEngine.stopMusic();
+    }
+
     playSound(srcPath: string) {
         cc.loader.loadRes(srcPath, (error, clip) => {
             if (!error) {

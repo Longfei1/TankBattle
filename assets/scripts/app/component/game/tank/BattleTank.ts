@@ -7,15 +7,10 @@ import Scenery from "../Scenery";
 import Bullet from "../Bullet";
 import { AniDef } from "../../../define/AniDef";
 import BaseTank from "./BaseTank";
+import CommonFunc from "../../../common/CommonFunc";
+import AudioModel from "../../../model/AudioModel";
 
 const { ccclass, property } = cc._decorator;
-
-const DirectionSuffix = {
-    0: "U",
-    1: "L",
-    2: "D",
-    3: "R"
-}
 
 @ccclass
 export default class BattleTank extends BaseTank {
@@ -29,7 +24,7 @@ export default class BattleTank extends BaseTank {
     _team: number = -1;
     _speedMove: number = 0;
     _speedBullet: number = 0;
-    _shootCoolTime: number = 0;
+    _maxBulletNum: number = 0;
     _bulletType: number = -1;
 
     //状态
@@ -39,15 +34,36 @@ export default class BattleTank extends BaseTank {
     //_canMove: boolean = true;
     //_moveDiff: number = 0;
     //_lastPosition: cc.Vec2 = null;
-    _lastShootTime: number = 0;
     _imgLoopFrame: number = 0;
     _imgShowFrame: number = 1;
 
-     //地图边界
-     _boundaryLx: number = 0;
-     _boundaryRx: number = 0;
-     _boundaryTy: number = 0;
-     _boundaryBy: number = 0;
+    _buffStatus = 0;
+    _bulletNum = 0;
+
+    //地图边界
+    _boundaryLx: number = 0;
+    _boundaryRx: number = 0;
+    _boundaryTy: number = 0;
+    _boundaryBy: number = 0;
+
+    private _id: number = -1;
+
+    DirectionSuffix = {
+        0: "U",
+        1: "L",
+        2: "D",
+        3: "R"
+    }
+
+    //编号
+    set id(id: number) {
+       this._id = id; 
+    }
+
+    get id(): number {
+        return this._id; 
+    }
+
 
     onLoad() {
         super.onLoad();
@@ -63,6 +79,8 @@ export default class BattleTank extends BaseTank {
 
         this.setTankVisible(false); //初始时不可见
 
+        this._id = -1;
+
         //属性
         this._tankName = "";
         this._tankLevel = 1;
@@ -70,7 +88,7 @@ export default class BattleTank extends BaseTank {
         this._team = -1;
         this._speedMove = 0;
         this._speedBullet = 0;
-        this._shootCoolTime = 0;
+        this._maxBulletNum = 0;
         this._bulletType = -1;
 
         //状态
@@ -78,9 +96,11 @@ export default class BattleTank extends BaseTank {
         this._isCollision = false;
         //this._canMove = true;
         //this._lastPosition = null;
-        this._lastShootTime = 0;
         this._imgLoopFrame = 0;
         this._imgShowFrame = 1;
+
+        this._buffStatus = 0;
+        this._bulletNum = 0;
     }
 
     setAttributes(attributes: GameStruct.TankAttributes) {
@@ -92,7 +112,7 @@ export default class BattleTank extends BaseTank {
 
         this._tankMaxLevel = attributes.maxLevel;
         this._bulletType = attributes.bulletType;
-        this._shootCoolTime = attributes.shootCoolTime;
+        this._maxBulletNum = attributes.maxBulletNum;
     }
 
     setTankTeam(team: number) {
@@ -129,11 +149,11 @@ export default class BattleTank extends BaseTank {
             return;
         }
 
-        if (!DirectionSuffix[this._moveDirection]) {
+        if (!this.DirectionSuffix[this._moveDirection]) {
             return;
         }
 
-        let frameName = `${this._tankName}_${this._tankLevel}${DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
+        let frameName = `${this._tankName}_${this._tankLevel}${this.DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
         return frameName;
     }
 
@@ -195,7 +215,7 @@ export default class BattleTank extends BaseTank {
             // }
 
             //改为不使用碰撞检测的方式判断
-            let moveDiff = this.calcMove(this._speedMove * dt);
+            let moveDiff = this.calcMove(dt);
             if (moveDiff > 0) {
                 let curPos = this.node.getPosition();
                 if (this.canMoveFromAToB(curPos, this._moveDirection, moveDiff)) {
@@ -228,12 +248,11 @@ export default class BattleTank extends BaseTank {
         }
     }
 
-    calcMove(diff) {
+    calcMove(dt) {
         let moveDiff = 0;
-        let minMoveDiff = GameDef.TANK_MOVE_MIN_VALUE;
         
         if (this._isMove) {
-            moveDiff = diff;
+            moveDiff = this._speedMove * dt;
         }
 
         return moveDiff;
@@ -281,8 +300,7 @@ export default class BattleTank extends BaseTank {
         // }
         if (other.node.group === GameDef.GROUP_NAME_BULLET) {
             let shooterTeam = other.node.getComponent(Bullet)._team;
-            let destroyed = other.node.getComponent(Bullet)._destroyed;
-            if (!destroyed && this._team !== shooterTeam) {
+            if (this._team !== shooterTeam) {
                 //被击中
                 //this.dead();
                 this.onHited(other.node);
@@ -325,11 +343,10 @@ export default class BattleTank extends BaseTank {
     // }
 
     shoot() {
-        let currTime = new Date().getTime();
-        if (currTime - this._shootCoolTime * 1000 > this._lastShootTime) {
+        if (this._bulletNum < this._maxBulletNum) {
             let shootInfo = this.getShootInfo();
             if (shootInfo) {
-                this._lastShootTime = currTime;
+                this._bulletNum++;
                 gameController.onTankShoot(shootInfo);
                 return true;
             }    
@@ -338,7 +355,7 @@ export default class BattleTank extends BaseTank {
     }
 
     born(callback?: Function) {
-        gameController.playUnitAniOnce(AniDef.UnitAniType.BORN, this.getNodeAni(), () => {
+        gameController.playUnitAniOnce(AniDef.UnitAniType.BORN, this.getNodeAni(), null, () => {
             //this.setTankVisible(false);
         }, () => {
             this.setTankVisible(true);
@@ -350,9 +367,10 @@ export default class BattleTank extends BaseTank {
     }
 
     dead(callback?: Function) {
-        this._isMove = false;
+        AudioModel.playSound("sound/blast");
 
-        gameController.playUnitAniOnce(AniDef.UnitAniType.BLAST, this.getNodeAni(), () => {
+        this._isMove = false;
+        gameController.playUnitAniOnce(AniDef.UnitAniType.BLAST, this.getNodeAni(), null, () => {
             this.setTankVisible(false);
         }, () => {
             this.destroyNode();
@@ -511,16 +529,12 @@ export default class BattleTank extends BaseTank {
         return GameDef.BULLET_POWER_LEVEL_COMMON; //默认子弹威力不变
     }
 
-    getShootCoolTime() : number {
-        return this._shootCoolTime;
-    }
-
     getShootInfo(): GameStruct.ShootInfo {
         if (this._speedMove > 0 && GameDataModel.isValidDirection(this._moveDirection)) {
             let bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
             let shootInfo: GameStruct.ShootInfo = {
                 type: this._bulletType,
-                shooterName: this._tankName,
+                shooterID: this._id,
                 powerLevel: this.getBulletPowerLevel(),
                 team: this._team,
                 pos: bulletPos,
@@ -535,5 +549,47 @@ export default class BattleTank extends BaseTank {
     //移动更新失败时触发
     onMoveFailed() {
         
+    }
+
+    onGetShieldStatus(time: number) {
+        if (time != null) {
+            gameController.playUnitAniInTime(AniDef.UnitAniType.SHIELD, this.nodeAni, time, null, () => {
+                this._buffStatus |= GameDef.TANK_BUFF_INVINCIBLE;
+            }, () => {
+                this._buffStatus &= ~GameDef.TANK_BUFF_INVINCIBLE;
+            });
+        }
+    }
+
+    onShootHited() {
+        if (this._bulletNum > 0) {
+            this._bulletNum--;
+        }
+    }
+
+    onLevelUp() {
+        if (this._tankLevel < this._tankMaxLevel) {
+            this._tankLevel++;
+        }
+    }
+
+    getTankContainRcInfoArray(): GameStruct.RcInfo[] {
+        let scenePos = this.node.getPosition();
+        let pos = GameDataModel.sceneToMatrixPosition(scenePos);
+
+        let rowNum = 4;
+        let colNum = 4;
+        let unitWidth = GameDataModel.getMapUnit().width;
+
+        if (scenePos.x % unitWidth != 0) {
+            colNum++;
+        }
+
+        if (scenePos.y % unitWidth != 0) {
+            rowNum++;
+        }
+
+        let posAry = GameDataModel.getRectContainPosArray(pos, rowNum, colNum);
+        return posAry;
     }
 }

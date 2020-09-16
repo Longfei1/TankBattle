@@ -29,7 +29,7 @@ export default class EnemyManager extends cc.Component {
     @property({ displayName: "坦克预制体", type: cc.Prefab })
     pfbEnemy: cc.Prefab = null;
 
-    _idGenerator: UniqueIdGenerator = new UniqueIdGenerator(100);
+    _idGenerator: UniqueIdGenerator = new UniqueIdGenerator(100, 11); //10以内的id预留给玩家使用
 
     _enemyTanks: { [id: number]: EnemyTank } = {};
     _enemyPool: NodePool = null;
@@ -54,9 +54,12 @@ export default class EnemyManager extends cc.Component {
         gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
         gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
         gameController.node.on(EventDef.EV_ENEMY_DEAD, this.evEnemyDead, this);
+        gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
 
         gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
         gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+
+        gameController.node.on(EventDef.EV_PROP_BOMB, this.evPropBomb, this);
     }
 
     removeListener() {
@@ -114,12 +117,25 @@ export default class EnemyManager extends cc.Component {
         }
     }
 
+    evReduceBullet(id: number) {
+        if (this._enemyTanks[id]) {
+            this._enemyTanks[id].onShootHited();
+        }
+    }
+
     evGamePause() {
         this.removeTimers();
     }
 
     evGameResume() {
         this.createTimers();
+    }
+
+    evPropBomb() {
+        //销毁全部敌军
+        CommonFunc.travelMap(this._enemyTanks, (id:number, enemy: EnemyTank) => {
+            enemy.dead(); 
+        })
     }
 
     createEnemyTank(name: string, pos: GameStruct.RcInfo) {

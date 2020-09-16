@@ -7,6 +7,7 @@ export namespace EventDef {
     export const EV_GAME_HIT_SCENERY                   = "evgamehitscenery";
     export const EV_GAME_SHOW_DEBUG_TEXT               = "evgameshowdebugtext";
     export const EV_GAME_PREPARE_GAME                  = "evgamepreparegame";
+    export const EV_GAME_REDUCE_BULLET                 = "evgamereducebullet";
 
     export const EV_GAME_PAUSE                         = "evgamepause";
     export const EV_GAME_RESUME                        = "evgameresume";
@@ -22,8 +23,12 @@ export namespace EventDef {
 
     export const EV_PROP_CREATE                        = "evpropcreate";
     export const EV_PROP_DESTROY                       = "evpropdestroy";
+    export const EV_PROP_GAIN                          = "evpropgain";
+    export const EV_PROP_BOMB                          = "evpropbomb";
 
     export const EV_UNITANI_PLAY                       = "evunitaniplay";
     export const EV_SCENEANI_PLAY                      = "evsceneaniplay";
     export const EV_ANI_STOP                           = "evunitanistop";
+
+    export const EV_DISPLAY_REFRESH_PLAYER_LIFE        = "evdisplayrefreshplayerlife";
 }

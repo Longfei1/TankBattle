@@ -3,6 +3,9 @@ import GameDataModel from "../../model/GameDataModel";
 import { GameDef } from "../../define/GameDef";
 import { gameController } from "./Game";
 import { EventDef } from "../../define/EventDef";
+import BattleTank from "./tank/BattleTank";
+import PlayerTank from "./tank/PlayerTank";
+import EnemyTank from "./tank/EnemyTank";
 
 const { ccclass, property } = cc._decorator;
 
@@ -25,6 +28,8 @@ export default class Prop extends cc.Component {
 
     _type: number = -1;
     _destroyed: boolean = false;
+
+    _keepTime: number = 0;
 
     setPosition(pos: cc.Vec2);
     setPosition(rcInfo: GameStruct.RcInfo);
@@ -55,8 +60,11 @@ export default class Prop extends cc.Component {
     }
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
-        if (other.node.group === GameDef.GROUP_NAME_PROP) {
-            if (!this._destroyed) {
+        if (other.node.group === GameDef.GROUP_NAME_TANK) {
+            let com = other.node.getComponent(BattleTank);
+            if (!this._destroyed && com && com._team === GameDef.TeamType.PLAYER) {
+                this._destroyed = true;
+                gameController.node.emit(EventDef.EV_PROP_GAIN, other.node);
                 gameController.node.emit(EventDef.EV_PROP_DESTROY);
             }
         }
@@ -65,7 +73,46 @@ export default class Prop extends cc.Component {
     reset() {
         this._type = -1;
         this._destroyed = false;
+        this._keepTime = 0;
 
-        //this.node.stopAllActions();
+        this.node.stopAllActions();
+        this.unscheduleAllCallbacks();
+    }
+
+    onDestroy() {
+        this.reset();
+    }
+
+    onEnable() {
+        this.playTwinkleAni();
+    }
+
+    onDisable() {
+        this.reset();
+    }
+
+    playTwinkleAni() {
+        let ani = this.getComponent(cc.Animation);
+        if (ani) {
+            ani.play();
+        }
+    }
+
+    setTime(keepTime: number) {
+        this._keepTime = keepTime,
+
+        this.startDisappearTimer(); //开启道具消失的定时器
+    }
+
+    startDisappearTimer() {
+        let time = this._keepTime;
+
+        this.schedule(()=>{
+            time--;
+
+            if (time <= 0) {
+                this.node.removeFromParent(); //时间结束后，从父节点移除
+            }
+        }, 1)
     }
 }

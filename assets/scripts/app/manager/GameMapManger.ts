@@ -292,7 +292,7 @@ export default class GameMapManager extends cc.Component {
 
     destroySceneryAround(sceneryPos: GameStruct.RcInfo) {
         if (sceneryPos) {
-            let posAry = GameDataModel.getMapUnitContainSceneryPosition(sceneryPos);
+            let posAry = GameDataModel.getRectContainPosArray(sceneryPos, 2, 2);
             for (let pos of posAry) {
                 this.destroyScenery(pos);
             }
@@ -306,7 +306,7 @@ export default class GameMapManager extends cc.Component {
     isHomeBasePosition(sceneryPos: GameStruct.RcInfo) {
         if (sceneryPos && this._homeBase) {
             let homeBasePos = this.getHomeBaseSceneryPosition();
-            let posAry = GameDataModel.getMapUnitContainSceneryPosition(homeBasePos);
+            let posAry = GameDataModel.getRectContainPosArray(homeBasePos, 2, 2);
             for (let pos of posAry) {
                 if (pos.equal(sceneryPos)) {
                     return true;

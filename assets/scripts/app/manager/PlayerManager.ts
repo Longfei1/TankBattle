@@ -53,6 +53,7 @@ export default class PlayerManager extends cc.Component {
         gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
         gameController.node.on(EventDef.EV_PLAYER_DEAD, this.evPlayerDead, this);
         gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
+        gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
     }
 
     removeListener() {
@@ -76,7 +77,7 @@ export default class PlayerManager extends cc.Component {
 
             this.createPlayer(0, tankData["player1"], GameDef.BORN_PLACE_PLAYER1);
             if (GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
-                this.createPlayer(0, tankData["player2"], GameDef.BORN_PLACE_PLAYER2);
+                this.createPlayer(1, tankData["player2"], GameDef.BORN_PLACE_PLAYER2);
             }
         }
         gameController.node.emit(EventDef.EV_PLAYER_INIT_FINISHED);
@@ -98,28 +99,28 @@ export default class PlayerManager extends cc.Component {
         }
     }
 
-    createPlayer(no: number, attr: GameStruct.TankAttributes, bornPos: GameStruct.RcInfo) {
+    createPlayer(id: number, attr: GameStruct.TankAttributes, bornPos: GameStruct.RcInfo) {
         let player = this._playerPool.getNode();
         this.panelGame.addChild(player);
         let playerCom = player.getComponent(PlayerTank);
         playerCom.reset();
-        playerCom.playerNo = no;
+        playerCom.id = id;
         playerCom.setAttributes(attr);
         playerCom.setTankLevel(1);
         playerCom.setPosition(bornPos);
         playerCom.setMoveDirction(GameDef.DIRECTION_UP);
 
-        this._players[no] = playerCom;
+        this._players[id] = playerCom;
         GameDataModel.setPlayerTank(player);
 
         playerCom.born();
     }
 
-    destroyPlayer(no: number) {
-        if (this._players[no]) {
-            this._playerPool.putNode(this._players[no].node);
-            delete this._players[no];
-            GameDataModel.removePlayerTank(no);
+    destroyPlayer(id: number) {
+        if (this._players[id]) {
+            this._playerPool.putNode(this._players[id].node);
+            delete this._players[id];
+            GameDataModel.removePlayerTank(id);
         }
     }
 
@@ -292,5 +293,11 @@ export default class PlayerManager extends cc.Component {
     evPrepareGame() {
         this.resetPlayer();
         this.initPlayers();
+    }
+
+    evReduceBullet(id: number) {
+        if (this._players[id]) {
+            this._players[id].onShootHited();
+        }
     }
 }

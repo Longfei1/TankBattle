@@ -7,7 +7,7 @@
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCoolTime": 0.8
+        "maxBulletNum": 1
     },
     "player2": {
         "name": "player2",
@@ -17,7 +17,7 @@
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCoolTime": 0.8
+        "maxBulletNum": 1
     },
     "LightTank": {
         "name": "LightTank",
@@ -27,7 +27,7 @@
         "moveSpeed": 140,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCoolTime": 0.8
+        "maxBulletNum": 1
     },
     "RapidMoveTank": {
         "name": "RapidMoveTank",
@@ -37,7 +37,7 @@
         "moveSpeed": 180,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCoolTime": 0.8
+        "maxBulletNum": 1
     },
     "RapidFireTank": {
         "name": "RapidFireTank",
@@ -47,7 +47,7 @@
         "moveSpeed": 120,
         "bulletSpeed": 400,
         "bulletType": 0,
-        "shootCoolTime": 0.5
+        "maxBulletNum": 2
     },
     "HeavyTank": {
         "name": "HeavyTank",
@@ -57,6 +57,6 @@
         "moveSpeed": 80,
         "bulletSpeed": 360,
         "bulletType": 0,
-        "shootCoolTime": 0.8
+        "maxBulletNum": 1
     }
 }

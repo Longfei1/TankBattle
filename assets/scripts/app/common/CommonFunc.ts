@@ -53,6 +53,10 @@ export default class CommonFunc {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    /**
+     * 随机返回数组中的一个元素
+     * @param ary 数组
+     */
     static getRandomArrayValue(ary: any[]): any {
         let selectIndex = this.getRandomInteger(0, ary.length - 1);
         return ary[selectIndex];

@@ -119,7 +119,7 @@ export default class Game extends cc.Component {
             this.playSceneAni(
                 AniDef.SceneAniType.GAME_START,
                 AniDef.UnitAniMode.TIMELIMIT,
-                2,
+                3,
                 {
                     scriptName: "GameStartAni",
                     params: { ["stage"]: stage},
@@ -134,13 +134,14 @@ export default class Game extends cc.Component {
     }
 
     gameStart() {
+        GameDataModel._gameRunning = true;
         this.node.emit(EventDef.EV_GAME_STARTED); //其他模块执行开始逻辑
 
         GameDataModel._enableOperate = true; //打开控制开关
         cc.director.getCollisionManager().enabled = true; //打开碰撞检测
     }
 
-    getNodeProp(): cc.Node {
+    getNodeBullet(): cc.Node {
         return this._bulletPool.getNode()
     }
 
@@ -156,7 +157,7 @@ export default class Game extends cc.Component {
             bullet.setPosition(this.panelGame.convertToNodeSpace(shootInfo.pos));
             let com = bullet.getComponent(Bullet);
             com.setType(shootInfo.type);
-            com._shooterName = shootInfo.shooterName;
+            com._shooterID = shootInfo.shooterID;
             com._team = shootInfo.team;
             com._powerLevel = shootInfo.powerLevel;
             com.setMove(shootInfo.speed, shootInfo.direction);

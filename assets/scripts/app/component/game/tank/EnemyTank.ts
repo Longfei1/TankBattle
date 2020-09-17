@@ -4,6 +4,7 @@ import CommonFunc from "../../../common/CommonFunc";
 import { gameController } from "../Game";
 import { EventDef } from "../../../define/EventDef";
 import GameDataModel from "../../../model/GameDataModel";
+import Bullet from "../Bullet";
 
 const { ccclass, property } = cc._decorator;
 
@@ -33,17 +34,23 @@ export default class EnemyTank extends BattleTank {
         super.born(cb);
     }
 
-    onHited(node: cc.Node) {
+    onHited(bulletNode: cc.Node) {
+        let bulletLevel = bulletNode.getComponent(Bullet)._powerLevel;
+        let hitCount = bulletLevel == GameDef.BULLET_POWER_LEVEL_STELL ? 2 : 1; //被能击毁钢的子弹打中时，扣两次等级
         if (this._bRed) {
             this.setRed(false);
 
             gameController.node.emit(EventDef.EV_PROP_CREATE); //产生道具
 
-            return;
+            hitCount--;
+
+            if (hitCount === 0) {
+                return;
+            }
         }
 
-        if (this._tankLevel > 1) {
-            this._tankLevel--;
+        if (this._tankLevel > hitCount) {
+            this._tankLevel = this._tankLevel - hitCount;
             return;
         }
 

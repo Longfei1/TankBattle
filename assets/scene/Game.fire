@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.73514404296875,
-      "y": 0.73514404296875,
+      "x": 0.24305555555555555,
+      "y": 0.24305555555555555,
       "z": 1
     },
     "_quat": {
@@ -1618,7 +1618,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 0,
     "_N$fontFamily": "Arial",
@@ -1751,6 +1750,9 @@
       },
       {
         "__uuid__": "5cd002a3-2474-4f2a-9a09-f06076bd6108"
+      },
+      {
+        "__uuid__": "191a47f9-6336-4ee6-b3bf-90ec4f8817c4"
       }
     ],
     "pfbSceneAniArray": [

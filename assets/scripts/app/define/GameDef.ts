@@ -49,6 +49,7 @@ export namespace GameDef {
     export const PROP_SHIELD_INVINCIBLE_TIME    = 20; //护盾无敌时间
     export const PROP_CLOCK_TIME                = 20; //定时道具持续时长
     export const PROP_SPADE_TIME                = 20; //铲子道具持续时长
+    export const PROP_SPADE_EFFECT_DISAPPEAR_TIME = 5;  //铲子道具消失倒计时
 
     //子弹威力
     export const BULLET_POWER_LEVEL_COMMON      = 1; //普通威力,可击毁一层土墙

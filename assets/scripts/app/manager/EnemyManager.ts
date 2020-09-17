@@ -138,7 +138,7 @@ export default class EnemyManager extends cc.Component {
         })
     }
 
-    createEnemyTank(name: string, pos: GameStruct.RcInfo) {
+    createEnemyTank(name: string, pos: GameStruct.RcInfo, bRed = false) {
         let tank = this._enemyPool.getNode();
         this.panelGame.addChild(tank);
         let com = tank.getComponent(EnemyTank);
@@ -146,6 +146,7 @@ export default class EnemyManager extends cc.Component {
         com.reset();
         com.id = this._idGenerator.generateID();
         com.setAttributes(tankData[name]);
+        com.setRed(bRed);
         com.setPosition(pos);
         com.setMoveDirction(GameDef.DIRECTION_DOWN); 
 
@@ -195,6 +196,12 @@ export default class EnemyManager extends cc.Component {
         return null;
     }
 
+    //获取下次生成的坦克是否为红色
+    getNextTankRed(): boolean {
+        //先简单处理，使用随机类型。后续可通过设置关卡难度，设置复杂情况。
+        return CommonFunc.isInProbability(0.3);
+    }
+
     incBornPlaceIndex() {
         this._bornPlaceIndex++;
         if (this._bornPlaceIndex >= GameDef.ENEMY_BORN_PLACE_COUNT) {
@@ -206,9 +213,10 @@ export default class EnemyManager extends cc.Component {
     addOneEnemy() {
         let tankName = this.getNextTankName();
         let pos = this.getNextTankPositon();
+        let bRed = this.getNextTankRed();
 
         if (tankName && pos) {
-            this.createEnemyTank(tankName, pos);
+            this.createEnemyTank(tankName, pos, bRed);
         }
     }
 

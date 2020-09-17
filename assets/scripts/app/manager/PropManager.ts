@@ -36,6 +36,10 @@ export default class EnemyManager extends cc.Component {
         this.unscheduleAllCallbacks();
     }
 
+    onDestroy() {
+        this.unscheduleAllCallbacks();
+    }
+
     initListener() {
         gameController.node.on(EventDef.EV_PROP_CREATE, this.evCreateProp, this);
         gameController.node.on(EventDef.EV_PROP_DESTROY, this.evDestroyProp, this);
@@ -152,10 +156,13 @@ export default class EnemyManager extends cc.Component {
 
             if (CommonFunc.isBitSet(buff, GameDef.PROP_BUFF_HOME_PROTECT)) {
                 if (this._homeProtectTime > 0) {
+                    if (this._homeProtectTime === GameDef.PROP_SPADE_EFFECT_DISAPPEAR_TIME) {
+                        this.onPropSpadeCountDown();
+                    }
                     this._homeProtectTime--;
                 }
                 else {
-                    GameDataModel._propBuff &= ~GameDef.PROP_BUFF_HOME_PROTECT;
+                    this.onPropSpadeStop();
                 }
             }
         }, 1);
@@ -171,10 +178,18 @@ export default class EnemyManager extends cc.Component {
     }
 
     onPropSpadeStart(time: number) {
+        GameDataModel._propBuff |= GameDef.PROP_BUFF_HOME_PROTECT;
+        this._homeProtectTime = time;
 
+        gameController.node.emit(EventDef.EV_PROP_SPADE_START);
+    }
+
+    onPropSpadeCountDown() {
+        gameController.node.emit(EventDef.EV_PROP_SPADE_COUNT_DOWN);
     }
     
     onPropSpadeStop() {
-
+        GameDataModel._propBuff &= ~GameDef.PROP_BUFF_HOME_PROTECT;
+        gameController.node.emit(EventDef.EV_PROP_SPADE_END);
     }
  }

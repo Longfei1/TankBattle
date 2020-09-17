@@ -10,6 +10,7 @@ import GameInputModel from "../model/GameInputModel";
 import { PlayerDef } from "../define/PlayerDef";
 import GameConfigModel from "../model/GameConfigModel";
 import HomeBase from "../component/game/HomeBase";
+import { AniDef } from "../define/AniDef";
 
 const {ccclass, property} = cc._decorator;
 
@@ -30,6 +31,8 @@ export default class GameMapManager extends cc.Component {
     _scenerys: cc.Node[][] = null;
     _homeBase: cc.Node = null;
 
+    _propSpadeEffectDisappearAniID: number = null;
+
     onLoad() {
         this.init();
     }
@@ -48,6 +51,11 @@ export default class GameMapManager extends cc.Component {
         gameController.node.on(EventDef.EV_MAP_DESTROY_SCENERY, this.evDestroyScenery, this);
         gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
         gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
+        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
+
+        gameController.node.on(EventDef.EV_PROP_SPADE_START, this.evPropSpadeStart, this);
+        gameController.node.on(EventDef.EV_PROP_SPADE_COUNT_DOWN, this.evPropSpadeCountDown, this);
+        gameController.node.on(EventDef.EV_PROP_SPADE_END, this.evPropSpadeEnd, this);
 
         GameInputModel.addKeyDownOnceListener(() => {
             this.saveMapData();
@@ -259,6 +267,8 @@ export default class GameMapManager extends cc.Component {
         this._homeBase = cc.instantiate(this.pfbHomeBase);
         this._homeBase.getComponent(HomeBase).setPosition(GameDef.PLACE_HOMEBASE);
         this.panelScenery.addChild(this._homeBase);
+
+        this._homeBase.zIndex = cc.macro.MAX_ZINDEX; //暂时设置一个最大的zindex
     }
 
     //基地所在位置，不能存在其他布景元素
@@ -318,5 +328,69 @@ export default class GameMapManager extends cc.Component {
 
     evPrepareGame() {
         this.initGameMap();
+    }
+
+    evGameEnded() {
+        this.stopPropSpadeEffectDisappearAni();
+    }
+
+    evPropSpadeStart() {
+        //铲子道具效果，产生钢布景围绕基地
+        this.createScenerysAroundHomeBase(GameDef.SceneryType.STEEL);
+    }
+
+    evPropSpadeCountDown() {
+        this.showPropSpadeEffectDisappearAni();
+    }
+
+    evPropSpadeEnd() {
+        this.stopPropSpadeEffectDisappearAni();
+
+        //道具结束后，不管原来周围是什么类型的布景，这里都重新设置为土墙
+        this.createScenerysAroundHomeBase(GameDef.SceneryType.WALL);
+    }
+
+    destroyScenerysAroundHomeBase() {
+        let homePos = GameDataModel.matrixToSceneryPosition(GameDef.PLACE_HOMEBASE);
+
+        //销毁周围的布景
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col - 1, homePos.row));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col - 1, homePos.row + 1));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col - 1, homePos.row + 2));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col, homePos.row + 2));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col + 1, homePos.row + 2));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col + 2, homePos.row + 2));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col + 2, homePos.row + 1));
+        this.destroyScenery(new GameStruct.RcInfo(homePos.col + 2, homePos.row));
+    }
+
+    
+    createScenerysAroundHomeBase(type: number) {
+        this.destroyScenerysAroundHomeBase();//先销毁周围原来的布景
+
+        let homePos = GameDataModel.matrixToSceneryPosition(GameDef.PLACE_HOMEBASE);
+
+        //生成周围的钢布景
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col - 1, homePos.row));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col - 1, homePos.row + 1));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col - 1, homePos.row + 2));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col, homePos.row + 2));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col + 1, homePos.row + 2));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col + 2, homePos.row + 2));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col + 2, homePos.row + 1));
+        this.createScenery(type, new GameStruct.RcInfo(homePos.col + 2, homePos.row));
+    }
+
+    showPropSpadeEffectDisappearAni() {
+        this._propSpadeEffectDisappearAniID = gameController.playUnitAniLoop(AniDef.UnitAniType.SPADE_EFFECT_DISAPPEAR,
+            this._homeBase);
+    }
+
+    stopPropSpadeEffectDisappearAni() {
+        if (this._propSpadeEffectDisappearAniID != null) {
+            gameController.stopAni(this._propSpadeEffectDisappearAniID);
+        }
+
+        this._propSpadeEffectDisappearAniID = null;
     }
 }

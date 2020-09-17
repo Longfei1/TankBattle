@@ -382,7 +382,7 @@ export default class BattleTank extends BaseTank {
     }
 
     //被命中
-    onHited(node: cc.Node) {
+    onHited(bulletNode: cc.Node) {
         this.dead();
     }
 

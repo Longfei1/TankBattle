@@ -25,6 +25,9 @@ export namespace EventDef {
     export const EV_PROP_DESTROY                       = "evpropdestroy";
     export const EV_PROP_GAIN                          = "evpropgain";
     export const EV_PROP_BOMB                          = "evpropbomb";
+    export const EV_PROP_SPADE_START                   = "evpropspadestart";
+    export const EV_PROP_SPADE_COUNT_DOWN              = "evpropspadecountdown";
+    export const EV_PROP_SPADE_END                     = "evpropspadeend";
 
     export const EV_UNITANI_PLAY                       = "evunitaniplay";
     export const EV_SCENEANI_PLAY                      = "evsceneaniplay";

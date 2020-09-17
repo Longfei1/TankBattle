@@ -81,7 +81,7 @@ export default class PlayerTank extends BattleTank {
         return false;
     }
 
-    onHited(node: cc.Node) {
+    onHited(bulletNode: cc.Node) {
         if (this.haveBuff(GameDef.TANK_BUFF_INVINCIBLE)) {
             return;
         }

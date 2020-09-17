@@ -105,6 +105,10 @@ export default class Game extends cc.Component {
             this.gameStart();
         });
 
+        this.prepareGame();
+    }
+
+    prepareGame() {
         gameController.node.emit(EventDef.EV_GAME_PREPARE_GAME);
     }
 
@@ -236,7 +240,7 @@ export default class Game extends cc.Component {
     }
 
     //停止指定id的动画
-    stopAni(aniID) {
+    stopAni(aniID: number) {
         this.node.emit(EventDef.EV_ANI_STOP, aniID);
     }
 

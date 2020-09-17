@@ -9,6 +9,7 @@ export namespace AniDef {
         BORN,     //出生
         SHIELD,   //护罩
         BLAST,    //爆炸
+        SPADE_EFFECT_DISAPPEAR, //铲子效果消失动画
     }
 
     export enum SceneAniType {

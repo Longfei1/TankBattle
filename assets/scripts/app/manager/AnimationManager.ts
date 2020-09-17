@@ -19,7 +19,7 @@ export default class AnimationManager extends cc.Component {
     nodeCenter: cc.Node = null; 
 
     _idGenerator: UniqueIdGenerator = new UniqueIdGenerator()
-    _stopFuntion = {};
+    _stopFunction = {};
 
     onLoad () {
         this.initMembers()
@@ -35,14 +35,14 @@ export default class AnimationManager extends cc.Component {
 
     initMembers() {
         this._idGenerator.reset();
-        this._stopFuntion = {};
+        this._stopFunction = {};
     }
 
     addStopAniFunction(func) {
         if (typeof(func) === "function") {
             let aniID = this._idGenerator.generateID();
             if (aniID != null) {
-                this._stopFuntion[aniID] = func;
+                this._stopFunction[aniID] = func;
                 return aniID;
             }
             else {
@@ -52,8 +52,8 @@ export default class AnimationManager extends cc.Component {
     }
 
     removeStopAniFunction(aniID) {
-        if (this._stopFuntion[aniID]) {
-            this._stopFuntion[aniID] = null;
+        if (this._stopFunction[aniID]) {
+            this._stopFunction[aniID] = null;
         }
         this._idGenerator.returnID(aniID);
     }
@@ -156,8 +156,8 @@ export default class AnimationManager extends cc.Component {
     }
 
     stopAnimation(aniID: number) {
-        if (this._stopFuntion[aniID]) {
-            this._stopFuntion[aniID]();
+        if (this._stopFunction[aniID]) {
+            this._stopFunction[aniID]();
             this.removeStopAniFunction(aniID);
         }
     }

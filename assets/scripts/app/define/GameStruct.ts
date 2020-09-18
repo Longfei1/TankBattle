@@ -41,13 +41,14 @@ export namespace GameStruct {
 
     //坦克属性，对应TankData.json配置
     export class TankAttributes {
-        name: string;
-        tankName: string; 
+        tankName: string;
+        imgName: string; 
         team: number;
         maxLevel: number;
         moveSpeed: number;
         bulletSpeed: number;
         bulletType: number;
+        bulletPower: number;
         maxBulletNum: number;
     }
 

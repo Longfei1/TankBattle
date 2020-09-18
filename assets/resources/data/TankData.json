@@ -1,62 +1,68 @@
 {
     "player1": {
         "name": "player1",
-        "tankName": "p1tank",
+        "imgName": "p1tank",
         "team": 0,
         "maxLevel": 4,
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 1
     },
     "player2": {
         "name": "player2",
-        "tankName": "p2tank",
+        "imgName": "p2tank",
         "team": 0,
         "maxLevel": 4,
         "moveSpeed": 120,
         "bulletSpeed": 360,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 1
     },
     "LightTank": {
         "name": "LightTank",
-        "tankName": "enemy1",
+        "imgName": "enemy1",
         "team": 1,
         "maxLevel": 1,
         "moveSpeed": 140,
         "bulletSpeed": 360,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 1
     },
     "RapidMoveTank": {
         "name": "RapidMoveTank",
-        "tankName": "enemy2",
+        "imgName": "enemy2",
         "team": 1,
         "maxLevel": 1,
         "moveSpeed": 180,
         "bulletSpeed": 360,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 1
     },
     "RapidFireTank": {
         "name": "RapidFireTank",
-        "tankName": "enemy3",
+        "imgName": "enemy3",
         "team": 1,
         "maxLevel": 1,
         "moveSpeed": 120,
         "bulletSpeed": 400,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 2
     },
     "HeavyTank": {
         "name": "HeavyTank",
-        "tankName": "enemy4",
+        "imgName": "enemy4",
         "team": 1,
         "maxLevel": 4,
         "moveSpeed": 80,
         "bulletSpeed": 360,
         "bulletType": 0,
+        "bulletPower": 1,
         "maxBulletNum": 1
     }
 }

@@ -83,7 +83,7 @@ export default class EnemyTank extends BattleTank {
         let moveDiff = 0;
         
         if (this._isMove) {
-            moveDiff = this._speedMove * dt;
+            moveDiff = this._moveSpeed * dt;
         }
 
         if (CommonFunc.isBitSet(GameDataModel._propBuff, GameDef.PROP_BUFF_STATIC)) {
@@ -122,24 +122,94 @@ export default class EnemyTank extends BattleTank {
     }
 
     moveOnBorn() {
-        let directions = this.getAvailableMoveDirections();
-        if (directions.length > 0) {
-            let dir = CommonFunc.getRandomArrayValue(directions);
+        let twoDirs = this.getAllMoveDirectionsCanChoose();
+        this.chooseOneDirctionMove(twoDirs);
+    }
+
+    changeMoveDirection() {
+        let twoDirs = this.getAllMoveDirectionsCanChoose();
+        if (this._isMove) {
+            //筛选出原来的移动方向
+            CommonFunc.filterArray(twoDirs.moveableDirs, [this._moveDirection]);
+            CommonFunc.filterArray(twoDirs.tryDirs, [this._moveDirection]);
+        }
+
+        this.chooseOneDirctionMove(twoDirs);
+    }
+
+    chooseOneDirctionMove(twoDirs) {
+        let movedirs = null;
+        if (twoDirs.moveableDirs.length > 0) {
+            if (twoDirs.tryDirs.length > 0) {
+                //按照概率选择移动方向
+                if (CommonFunc.isInProbability(0.8)) {
+                    movedirs = twoDirs.moveableDirs;
+                }
+                else {
+                    movedirs = twoDirs.tryDirs;
+                }
+            }
+            else {
+                movedirs = twoDirs.moveableDirs;
+            }
+        }
+        else {
+            //没有可移动方向，随机一个方向移动
+            if (twoDirs.tryDirs.length > 0) {
+                movedirs = twoDirs.tryDirs;
+            }
+        }
+
+        if (movedirs) {
+
+
+            let dir = CommonFunc.getRandomArrayValue(movedirs);
             this.setMove(true, dir);
         }
     }
 
-    changeMoveDirection() {
-        let directions = this.getAvailableMoveDirections();
-        if (directions.length > 1 && this._isMove) {
-            //筛选出原来的移动方向
-            CommonFunc.filterArray(directions, [this._moveDirection]);
+    //获取所有可以选择移动的方向(不包括会造成触碰边界的方向)
+    getAllMoveDirectionsCanChoose() {
+        let tryDirections = [GameDef.DIRECTION_UP, GameDef.DIRECTION_LEFT, GameDef.DIRECTION_DOWN, GameDef.DIRECTION_RIGHT];
+        let moveableDirections = this.getAvailableMoveDirections();
+
+        CommonFunc.filterArray(tryDirections, moveableDirections); //筛选可移动的方向
+
+        for (let i = tryDirections.length - 1; i >= 0; i--) {
+            if (this.isOutBoundaryDirction(tryDirections[i])) { //排除会导致越界的方向
+                tryDirections.splice(i, 1);
+            }
         }
 
-        if (directions.length > 0) {
-            let dir = CommonFunc.getRandomArrayValue(directions);
-            this.setMove(true, dir);
+        return {moveableDirs: moveableDirections, tryDirs: tryDirections};//{可移动方向，可尝试的不可移动方向}
+    }
+
+    //该方向是否会导致越界
+    isOutBoundaryDirction(dir: number) {
+        let pos = this.node.getPosition();
+        let distance = this._moveSpeed * (1 / GameDef.GAME_FPS);
+        let moveAreaRect: cc.Rect;
+        let width = GameDataModel.getTankWidth();
+        if (dir === GameDef.DIRECTION_UP) {
+            moveAreaRect = cc.rect(pos.x, pos.y + width, width, distance);
         }
+        else if (dir === GameDef.DIRECTION_DOWN) {
+            moveAreaRect = cc.rect(pos.x, pos.y - distance, width, distance);
+        }
+        else if (dir === GameDef.DIRECTION_LEFT) {
+            moveAreaRect = cc.rect(pos.x - distance, pos.y, distance, width);
+        }
+        else if (dir === GameDef.DIRECTION_RIGHT) {
+            moveAreaRect = cc.rect(pos.x + width, pos.y, distance, width);
+        }
+
+        if (moveAreaRect) {
+            if (GameDataModel.isValidRect(moveAreaRect)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     //行为控制相关

@@ -18,14 +18,18 @@ export default class BattleTank extends BaseTank {
     nodePosBullet: cc.Node[] = [];
 
     //属性
-    _tankName: string = "";
+    _tankName:string = "";
+    _imgName: string = "";
     _tankLevel: number = 1;
     _tankMaxLevel: number = 0;
     _team: number = -1;
-    _speedMove: number = 0;
-    _speedBullet: number = 0;
-    _maxBulletNum: number = 0;
+    _moveSpeed: number = 0;
+    _bulletSpeed: number = 0;
+    _maxBulletNum: number = 1;
     _bulletType: number = -1;
+    _bulletPower: number = 1;
+
+    _shootCoolTime: number = GameDef.TANK_SHOOT_COOLTIME;
 
     //状态
     _isMove: boolean = false;
@@ -39,6 +43,8 @@ export default class BattleTank extends BaseTank {
 
     _buffStatus = 0;
     _bulletNum = 0;
+
+    _lastShootTime: number = 0;
 
     //地图边界
     _boundaryLx: number = 0;
@@ -82,14 +88,15 @@ export default class BattleTank extends BaseTank {
         this._id = -1;
 
         //属性
-        this._tankName = "";
+        this._imgName = "";
         this._tankLevel = 1;
         this._tankMaxLevel = 0;
         this._team = -1;
-        this._speedMove = 0;
-        this._speedBullet = 0;
-        this._maxBulletNum = 0;
+        this._moveSpeed = 0;
+        this._bulletSpeed = 0;
+        this._maxBulletNum = 1;
         this._bulletType = -1;
+        this._bulletPower = 1;
 
         //状态
         this._isMove = false;
@@ -101,14 +108,18 @@ export default class BattleTank extends BaseTank {
 
         this._buffStatus = 0;
         this._bulletNum = 0;
+
+        this._lastShootTime = 0;
     }
 
     setAttributes(attributes: GameStruct.TankAttributes) {
         this.setTankName(attributes.tankName);
+        this.setImgName(attributes.imgName);
         this.setTankLevel(attributes.maxLevel);
         this.setTankTeam(attributes.team);
         this.setMoveSpeed(attributes.moveSpeed);
         this.setBulletSpeed(attributes.bulletSpeed);
+        this.setBulletPower(attributes.bulletPower);
 
         this._tankMaxLevel = attributes.maxLevel;
         this._bulletType = attributes.bulletType;
@@ -123,9 +134,18 @@ export default class BattleTank extends BaseTank {
         this._tankName = name;
     }
 
+    setImgName(name: string) {
+        this._imgName = name;
+    }
+
     setTankLevel(level: number = 0) {
         this._tankLevel = level;
-        this.updateTankImg();
+        
+        this.onLevelUpdated();
+    }
+
+    setBulletPower(power: number) {
+        this._bulletPower = power;
     }
 
     setMoveDirction(nDirection: number) {
@@ -145,7 +165,7 @@ export default class BattleTank extends BaseTank {
     }
 
     getTankImgName(): string {
-        if (this._tankName === "") {
+        if (this._imgName === "") {
             return;
         }
 
@@ -153,7 +173,7 @@ export default class BattleTank extends BaseTank {
             return;
         }
 
-        let frameName = `${this._tankName}_${this._tankLevel}${this.DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
+        let frameName = `${this._imgName}_${this._tankLevel}${this.DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
         return frameName;
     }
 
@@ -176,17 +196,17 @@ export default class BattleTank extends BaseTank {
     }
 
     setMoveSpeed(nSpeed: number) {
-        this._speedMove = nSpeed;
+        this._moveSpeed = nSpeed;
     }
 
     setBulletSpeed(nSpeed: number) {
-        this._speedBullet = nSpeed;
+        this._bulletSpeed = nSpeed;
     }
 
     updateMove(dt) {
         if (!GameDataModel._gamePause
             && this.isTankVisible()) {
-            // this._moveDiff = this.calcMove(this._speedMove * dt);
+            // this._moveDiff = this.calcMove(this._moveSpeed * dt);
             // if (this._moveDiff > 0) {
             //     let curPos = this.node.getPosition();
             //     let nextPox = curPos;
@@ -252,7 +272,7 @@ export default class BattleTank extends BaseTank {
         let moveDiff = 0;
         
         if (this._isMove) {
-            moveDiff = this._speedMove * dt;
+            moveDiff = this._moveSpeed * dt;
         }
 
         return moveDiff;
@@ -343,6 +363,12 @@ export default class BattleTank extends BaseTank {
     // }
 
     shoot() {
+        let time = new Date().getTime();
+        if (time - this._lastShootTime < this._shootCoolTime) {
+            return;
+        }
+        this._lastShootTime = time;
+
         if (this._bulletNum < this._maxBulletNum) {
             let shootInfo = this.getShootInfo();
             if (shootInfo) {
@@ -511,7 +537,7 @@ export default class BattleTank extends BaseTank {
         for (let dir of moveDirections) {
             let correctPos = this.getCorrectPosition(nowPos, nowDirction, dir);//向dirction方向移动时，矫正后的位置坐标
 
-            let moveDistance = this._speedMove*(1/GameDef.GAME_FPS);
+            let moveDistance = this._moveSpeed*(1/GameDef.GAME_FPS);
 
             if (this.canMoveFromAToB(correctPos, dir, moveDistance)) {
                 directions.push(dir);
@@ -526,11 +552,11 @@ export default class BattleTank extends BaseTank {
     }
 
     getBulletPowerLevel(): number {
-        return GameDef.BULLET_POWER_LEVEL_COMMON; //默认子弹威力不变
+        return this._bulletPower;
     }
 
     getShootInfo(): GameStruct.ShootInfo {
-        if (this._speedMove > 0 && GameDataModel.isValidDirection(this._moveDirection)) {
+        if (this._moveSpeed > 0 && GameDataModel.isValidDirection(this._moveDirection)) {
             let bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
             let shootInfo: GameStruct.ShootInfo = {
                 type: this._bulletType,
@@ -539,7 +565,7 @@ export default class BattleTank extends BaseTank {
                 team: this._team,
                 pos: bulletPos,
                 direction: this._moveDirection,
-                speed: this._speedBullet,
+                speed: this._bulletSpeed,
             }
             return shootInfo;
         }
@@ -567,12 +593,6 @@ export default class BattleTank extends BaseTank {
         }
     }
 
-    onLevelUp() {
-        if (this._tankLevel < this._tankMaxLevel) {
-            this._tankLevel++;
-        }
-    }
-
     getTankContainRcInfoArray(): GameStruct.RcInfo[] {
         let scenePos = this.node.getPosition();
         let pos = GameDataModel.sceneToMatrixPosition(scenePos);
@@ -591,5 +611,9 @@ export default class BattleTank extends BaseTank {
 
         let posAry = GameDataModel.getRectContainPosArray(pos, rowNum, colNum);
         return posAry;
+    }
+
+    onLevelUpdated() {
+        this.updateTankImg();
     }
 }

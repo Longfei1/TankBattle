@@ -63,6 +63,27 @@ export default class CommonFunc {
     }
 
     /**
+     * 随机返回数组中的一个元素
+     * @param ary 数组
+     * @param weights 权值
+     */
+    static getRandomArrayValueWithWeight(ary: any[], weights: number[]): any {
+        if (ary.length == weights.length) {
+            let total = this.SumArray(weights);
+            let value = Math.random() * total;
+            
+            let currLine = 0;
+            for (let i = 0; i < weights.length; i++) {
+                currLine += weights[i];
+                if (value < currLine) {
+                    return ary[i];
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * 是否触发给定概率
      * @param rate 0-1的概率
      */
@@ -115,5 +136,19 @@ export default class CommonFunc {
                 }
             }
         }
+    }
+
+    static SumArray(ary: any[]) {
+        let total = null;
+        for (let it of ary) {
+            if (total) {
+                total += it;
+            }
+            else {
+                total = it;
+            }
+        }
+
+        return total;
     }
 }

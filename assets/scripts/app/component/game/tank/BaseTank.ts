@@ -43,6 +43,10 @@ export default class BaseTank extends cc.Component {
         }
     }
 
+    getPosition() {
+        this.node.getPosition();
+    }
+
     getNodeAni() {
         return this.nodeAni;
     }

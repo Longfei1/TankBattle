@@ -6,6 +6,7 @@ import { GameDef } from "../../../define/GameDef";
 import { EventDef } from "../../../define/EventDef";
 import GameDataModel from "../../../model/GameDataModel";
 import CommonFunc from "../../../common/CommonFunc";
+import GameConfigModel from "../../../model/GameConfigModel";
 
 const { ccclass, property } = cc._decorator;
 
@@ -37,6 +38,7 @@ export default class PlayerTank extends BattleTank {
     }
 
     getBulletPowerLevel(): number {
+        //玩家子弹威力和等级绑定
         if (this._tankLevel === 4) {
             return GameDef.BULLET_POWER_LEVEL_STELL;
         }
@@ -87,11 +89,39 @@ export default class PlayerTank extends BattleTank {
         }
 
         if (this._tankLevel >= GameDef.PLAYER_LEVEL_PROTECT_ONCE_DEAD) {
-            this._tankLevel = 1;
+            this.setTankLevel(1);
             return;
         }
 
         this.dead();
+    }
+
+    onLevelUp() {
+        if (this._tankLevel < this._tankMaxLevel) {
+            this.setTankLevel(this._tankLevel + 1);
+        }
+    }
+
+    onLevelUpdated() {
+        super.onLevelUpdated();
+
+        //玩家坦克等级变化时，更新其他属性
+        let atru = GameConfigModel.tankData[this._tankName];
+        if (atru) {
+            if (this._tankLevel >= 2) {
+                this._bulletSpeed = atru.bulletSpeed + 50; //等级大于2后，提升子弹速度
+            }
+            else{
+                this._bulletSpeed = atru.bulletSpeed;
+            }
+        }
+
+        if (this._tankLevel >= 3) {
+            this._maxBulletNum = 2; //等级大于3后，提升共存数量
+        }
+        else {
+            this._maxBulletNum = 1;
+        }
     }
 }
  

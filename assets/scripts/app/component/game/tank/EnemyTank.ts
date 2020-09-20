@@ -8,10 +8,18 @@ import Bullet from "../Bullet";
 
 const { ccclass, property } = cc._decorator;
 
+//遇到障碍后，继续尝试朝该方向移动的时间区间。
+const TRY_MOVE_TIME_MIN = 0.1; 
+const TRY_MOVE_TIME_MAX = 0.8;       
+
 @ccclass
 export default class EnemyTank extends BattleTank {
 
     _bRed: boolean = false;
+
+    _tryMoveTime: number = 0;
+    _tryMoveStartTime: number = 0;
+    _bTryMoving: boolean = false;
 
     setRed(bRed: boolean) {
         this._bRed = bRed;
@@ -20,6 +28,9 @@ export default class EnemyTank extends BattleTank {
     reset() {
         super.reset();
         this._bRed = false;
+
+        this._tryMoveStartTime = 0;
+        this._bTryMoving = false;
     }
 
     born(callback?: Function) {
@@ -62,7 +73,7 @@ export default class EnemyTank extends BattleTank {
     }
 
     getTankImgName(): string {
-        if (this._tankName === "") {
+        if (this._imgName === "") {
             return;
         }
 
@@ -75,7 +86,7 @@ export default class EnemyTank extends BattleTank {
             levelName = "red"
         }
 
-        let frameName = `${this._tankName}_${levelName}${this.DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
+        let frameName = `${this._imgName}_${levelName}${this.DirectionSuffix[this._moveDirection]}_${this._imgShowFrame}`;
         return frameName;
     }
 
@@ -97,15 +108,35 @@ export default class EnemyTank extends BattleTank {
     //************************
     //行为控制相关
 
+    setMove(bMove: boolean, nDirection: number) {
+        if (!bMove || nDirection != this._moveDirection) {
+            this._bTryMoving = false; //停止移动或换方向，重置尝试移动标志
+        }
+
+        super.setMove(bMove, nDirection);
+    }
+
     //当前方向移动失败
     onMoveFailed() {
-        //先随机寻找一个可移动的方向移动
-        let directions = this.getAvailableMoveDirections();
-        if (directions.length > 0) {
-            let dir = CommonFunc.getRandomArrayValue(directions);
-
-            this.setMove(true, dir);
+        let time = CommonFunc.getTimeStamp();
+        //障碍物不是边界时，尝试突破障碍物
+        if (!this._bTryMoving && !this.isOutBoundaryDirction(this._moveDirection)) {
+            if (CommonFunc.isInProbability(0.5)) {
+                this._bTryMoving = true;
+                this._tryMoveStartTime = time;
+                this._tryMoveTime = CommonFunc.getRandomNumber(TRY_MOVE_TIME_MIN, TRY_MOVE_TIME_MAX);
+                this.shoot(); //射击，尝试打破障碍后移动
+                return;
+            }
         }
+
+        if (this._bTryMoving && time - this._tryMoveStartTime < this._tryMoveTime * 1000) {
+            this.shoot(); //射击，尝试打破障碍后移动
+            return;
+        }
+
+        //超过尝试时间, 换方向移动
+        this.changeMoveDirection();
     }
 
     //行为控制定时器
@@ -113,10 +144,10 @@ export default class EnemyTank extends BattleTank {
         if (CommonFunc.isInProbability(0.15)) {
             //给定概率下改变移动方向
 
-            this.changeMoveDirection()
+            this.changeMoveDirectionEx();
         }
 
-        if (CommonFunc.isInProbability(0.4)) {
+        if (CommonFunc.isInProbability(0.5)) {
             this.shoot();
         }
     }
@@ -126,6 +157,7 @@ export default class EnemyTank extends BattleTank {
         this.chooseOneDirctionMove(twoDirs);
     }
 
+    //换方向移动，排除当前移动方向。
     changeMoveDirection() {
         let twoDirs = this.getAllMoveDirectionsCanChoose();
         if (this._isMove) {
@@ -137,12 +169,31 @@ export default class EnemyTank extends BattleTank {
         this.chooseOneDirctionMove(twoDirs);
     }
 
+    //换方向移动，排除当前移动方向，一定概率排除相反的方向。
+    changeMoveDirectionEx() {
+        let twoDirs = this.getAllMoveDirectionsCanChoose();
+        if (this._isMove) {
+            //筛选出原来的移动方向
+            CommonFunc.filterArray(twoDirs.moveableDirs, [this._moveDirection]);
+            CommonFunc.filterArray(twoDirs.tryDirs, [this._moveDirection]);
+
+            if (CommonFunc.isInProbability(0.9)) {
+                //大概率下，不向现在移动的反方向移动
+                let opsiteDirection = GameDataModel.getOppositeDirection(this._moveDirection);
+                CommonFunc.filterArray(twoDirs.moveableDirs, [opsiteDirection]);
+                CommonFunc.filterArray(twoDirs.tryDirs, [opsiteDirection]);
+            }
+        }
+
+        this.chooseOneDirctionMove(twoDirs);
+    }
+
     chooseOneDirctionMove(twoDirs) {
         let movedirs = null;
         if (twoDirs.moveableDirs.length > 0) {
             if (twoDirs.tryDirs.length > 0) {
                 //按照概率选择移动方向
-                if (CommonFunc.isInProbability(0.8)) {
+                if (CommonFunc.isInProbability(0.75)) {
                     movedirs = twoDirs.moveableDirs;
                 }
                 else {
@@ -154,17 +205,17 @@ export default class EnemyTank extends BattleTank {
             }
         }
         else {
-            //没有可移动方向，随机一个方向移动
-            if (twoDirs.tryDirs.length > 0) {
-                movedirs = twoDirs.tryDirs;
-            }
+            //没有可移动方向，尝试不可移动的方向
+            movedirs = twoDirs.tryDirs;
         }
 
-        if (movedirs) {
+        if (movedirs && movedirs.length > 0) {
+            let weights = this.calcMoveDirectionWeight(movedirs);
 
-
-            let dir = CommonFunc.getRandomArrayValue(movedirs);
-            this.setMove(true, dir);
+            let dir = CommonFunc.getRandomArrayValueWithWeight(movedirs, weights);
+            if (dir != null) {
+                this.setMove(true, dir);
+            }
         }
     }
 
@@ -204,9 +255,46 @@ export default class EnemyTank extends BattleTank {
         }
 
         if (moveAreaRect) {
-            if (GameDataModel.isValidRect(moveAreaRect)) {
+            if (!GameDataModel.isValidRect(moveAreaRect)) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    //计算移动方向的选择权重
+    calcMoveDirectionWeight(moveDirctions: number[]): number[] {
+        let defaultValue = 10;
+        let weights: number[] = [];
+        for (let i = 0; i < moveDirctions.length; i++) {
+            let value = defaultValue;//初始权重
+            if (this.isDirectionForwardHomeBase(moveDirctions[i])) {
+                value += 10;
+            }
+
+            weights.push(value);
+        }
+
+        return weights;
+    }
+
+    isDirectionForwardHomeBase(dir: number): boolean {
+        let tankPos = this.node.getPosition();
+        let homeBasePos = GameDataModel.getHomeCenterScenePosition();
+
+        let vertical = GameDef.DIRECTION_UP;
+        if (tankPos.y < homeBasePos.y) {
+            vertical = GameDef.DIRECTION_DOWN;
+        }
+
+        let horizontal = GameDef.DIRECTION_LEFT;
+        if (tankPos.x < homeBasePos.x) {
+            horizontal = GameDef.DIRECTION_RIGHT;
+        }
+
+        if (dir === vertical || dir === horizontal) {
+            return true;
         }
 
         return false;

@@ -52,7 +52,7 @@ export default class BattleTank extends BaseTank {
     _boundaryTy: number = 0;
     _boundaryBy: number = 0;
 
-    private _id: number = -1;
+    private _tankID: number = -1;
 
     DirectionSuffix = {
         0: "U",
@@ -63,11 +63,11 @@ export default class BattleTank extends BaseTank {
 
     //编号
     set id(id: number) {
-       this._id = id; 
+       this._tankID = id; 
     }
 
     get id(): number {
-        return this._id; 
+        return this._tankID; 
     }
 
 
@@ -85,7 +85,7 @@ export default class BattleTank extends BaseTank {
 
         this.setTankVisible(false); //初始时不可见
 
-        this._id = -1;
+        this._tankID = -1;
 
         //属性
         this._imgName = "";
@@ -363,16 +363,16 @@ export default class BattleTank extends BaseTank {
     // }
 
     shoot() {
-        let time = new Date().getTime();
-        if (time - this._lastShootTime < this._shootCoolTime) {
-            return;
+        let time = CommonFunc.getTimeStamp();
+        if (time - this._lastShootTime < this._shootCoolTime * 1000) {
+            return false;
         }
-        this._lastShootTime = time;
 
         if (this._bulletNum < this._maxBulletNum) {
             let shootInfo = this.getShootInfo();
             if (shootInfo) {
                 this._bulletNum++;
+                this._lastShootTime = time;
                 gameController.onTankShoot(shootInfo);
                 return true;
             }    
@@ -560,7 +560,7 @@ export default class BattleTank extends BaseTank {
             let bulletPos = this.nodePosBullet[this._moveDirection].convertToWorldSpaceAR(cc.v2(0, 0));
             let shootInfo: GameStruct.ShootInfo = {
                 type: this._bulletType,
-                shooterID: this._id,
+                shooterID: this._tankID,
                 powerLevel: this.getBulletPowerLevel(),
                 team: this._team,
                 pos: bulletPos,

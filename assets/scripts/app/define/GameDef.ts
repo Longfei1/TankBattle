@@ -50,7 +50,7 @@ export namespace GameDef {
     export const PROP_CLOCK_TIME                = 20; //定时道具持续时长
     export const PROP_SPADE_TIME                = 20; //铲子道具持续时长
     export const PROP_SPADE_EFFECT_DISAPPEAR_TIME = 5;  //铲子道具消失倒计时
-    export const TANK_SHOOT_COOLTIME            = 0.2; //坦克射击冷却时间
+    export const TANK_SHOOT_COOLTIME            = 0.3; //坦克射击冷却时间
 
     //子弹威力
     export const BULLET_POWER_LEVEL_COMMON      = 1; //普通威力,可击毁一层土墙
@@ -59,9 +59,9 @@ export namespace GameDef {
     //其他
     export const TANK_MOVE_MIN_VALUE            = 10; //坦克最小移动量（像素）
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数
-    export const GAME_FPS                       = 60;
+    export const GAME_FPS                       = 90;
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
-    export const PLAYER_LIFE_NUM                = 3; //玩家初始生命数量
+    export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
 
     export enum SceneryType {
         NULL,   //无

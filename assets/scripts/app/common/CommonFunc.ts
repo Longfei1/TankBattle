@@ -50,7 +50,16 @@ export default class CommonFunc {
      * @param max 
      */
     static getRandomInteger(min, max): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+        return Math.floor(this.getRandomNumber(min, max));
+    }
+
+    /**
+     * 生成区间内的随机数，包含上下限
+     * @param min 
+     * @param max 
+     */
+    static getRandomNumber(min, max): number {
+        return Math.random() * (max - min + 1) + min;
     }
 
     /**
@@ -58,8 +67,10 @@ export default class CommonFunc {
      * @param ary 数组
      */
     static getRandomArrayValue(ary: any[]): any {
-        let selectIndex = this.getRandomInteger(0, ary.length - 1);
-        return ary[selectIndex];
+        if (ary.length > 0) {
+            let selectIndex = this.getRandomInteger(0, ary.length - 1);
+            return ary[selectIndex];
+        }
     }
 
     /**
@@ -150,5 +161,9 @@ export default class CommonFunc {
         }
 
         return total;
+    }
+
+    static getTimeStamp(): number {
+        return new Date().getTime();
     }
 }

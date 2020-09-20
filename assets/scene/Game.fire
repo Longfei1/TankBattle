@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.24305555555555555,
-      "y": 0.24305555555555555,
+      "x": 0.73514404296875,
+      "y": 0.73514404296875,
       "z": 1
     },
     "_quat": {
@@ -886,7 +886,7 @@
     "node": {
       "__id__": 8
     },
-    "_enabled": true,
+    "_enabled": false,
     "alignMode": 1,
     "_target": null,
     "_alignFlags": 45,
@@ -1461,7 +1461,7 @@
     "node": {
       "__id__": 22
     },
-    "_enabled": true,
+    "_enabled": false,
     "alignMode": 1,
     "_target": null,
     "_alignFlags": 45,
@@ -1618,6 +1618,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
+    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 0,
     "_N$fontFamily": "Arial",

@@ -72,12 +72,12 @@ export default class PlayerManager extends cc.Component {
             }
         }
         else {
-            let tankData = GameConfigModel.tankData;
-            if (!tankData) { return; }
+            if (GameDataModel._liveStatus[0]) {
+                this.createPlayer(0, this.getTankAttributesById(0), GameDef.BORN_PLACE_PLAYER1);
+            }
 
-            this.createPlayer(0, tankData["player1"], GameDef.BORN_PLACE_PLAYER1);
-            if (GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
-                this.createPlayer(1, tankData["player2"], GameDef.BORN_PLACE_PLAYER2);
+            if (GameDataModel._liveStatus[1] && GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
+                this.createPlayer(1, this.getTankAttributesById(1), GameDef.BORN_PLACE_PLAYER2);
             }
         }
         gameController.node.emit(EventDef.EV_PLAYER_INIT_FINISHED);
@@ -86,7 +86,7 @@ export default class PlayerManager extends cc.Component {
     resetPlayer() {
         CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
             if (cc.isValid(player.node)) {
-                this._playerPool.putNode(player.node);
+                this.destroyPlayer(no);
             }
         });
 
@@ -279,15 +279,22 @@ export default class PlayerManager extends cc.Component {
     }
 
     evGameStarted() {
-        CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
-            if (cc.isValid(player.node)) {
-                player.onGetShieldStatus(GameDef.BORN_INVINCIBLE_TIME);
-            }
-        });
+        // CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
+        //     if (cc.isValid(player.node)) {
+        //         //player.onGetShieldStatus(GameDef.BORN_INVINCIBLE_TIME);
+        //     }
+        // });
     }
 
     evPlayerDead(no: number) {
+        GameDataModel._liveStatus[no] = false;
         this.destroyPlayer(no);
+
+        if (GameDataModel.getPlayerLifeNum(no) > 0) {
+            GameDataModel.reducePlayerLifeNum(no);
+            GameDataModel._liveStatus[no] = true;
+            this.createPlayer(0, this.getTankAttributesById(no), GameDef.BORN_PLACE_PLAYER1);
+        }
     }
 
     evPrepareGame() {
@@ -299,5 +306,11 @@ export default class PlayerManager extends cc.Component {
         if (this._players[id]) {
             this._players[id].onShootHited();
         }
+    }
+
+    getTankAttributesById(id : number): GameStruct.TankAttributes{
+        let idToName = {[0]: "player1", [1]: "player2"};
+        let tankData = GameConfigModel.tankData;
+        return tankData[idToName[id]];
     }
 }

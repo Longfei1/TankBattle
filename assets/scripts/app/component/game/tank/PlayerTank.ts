@@ -109,7 +109,7 @@ export default class PlayerTank extends BattleTank {
         let atru = GameConfigModel.tankData[this._tankName];
         if (atru) {
             if (this._tankLevel >= 2) {
-                this._bulletSpeed = atru.bulletSpeed + 50; //等级大于2后，提升子弹速度
+                this._bulletSpeed = atru.bulletSpeed + 100; //等级大于2后，提升子弹速度
             }
             else{
                 this._bulletSpeed = atru.bulletSpeed;

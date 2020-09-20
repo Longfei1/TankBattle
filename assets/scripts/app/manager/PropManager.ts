@@ -25,6 +25,8 @@ export default class EnemyManager extends cc.Component {
 
     onLoad() {
         this._prop = cc.instantiate(this.pfbProp);
+
+        this.initListener();
     }
 
     reset() {
@@ -126,7 +128,10 @@ export default class EnemyManager extends cc.Component {
     }
 
     getRandomPropPosition(): GameStruct.RcInfo {
-        
+        let posAry = GameDataModel.getEmptyMatrixArray(4, 4);
+        if (posAry.length > 0) {
+            return CommonFunc.getRandomArrayValue(posAry);
+        }
         return null;
     }
 

@@ -38,6 +38,8 @@ export default class MainMenu extends cc.Component {
     _bSelect: boolean = false;
 
     onLoad() {
+        cc.game.setFrameRate(GameDef.GAME_FPS);
+        
         ModelManager.initModels();
 
         this.initCursor();
@@ -104,13 +106,11 @@ export default class MainMenu extends cc.Component {
             switch (this._currChoose) {
                 case MenuItemIdex.SINGLE_PLAY:
                     GameDataModel._playMode = GameDef.GAMEMODE_SINGLE_PLAYER;
-                    GameDataModel._currStage = 1;
                     this.onStartGame();
                     console.log("开始单人游戏");
                     break;
                 case MenuItemIdex.DOUBLE_PLAY:
                     GameDataModel._playMode = GameDef.GAMEMODE_DOUBLE_PLAYER;
-                    GameDataModel._currStage = 1;
                     this.onStartGame();
                     console.log("开始双人游戏");
                     break;

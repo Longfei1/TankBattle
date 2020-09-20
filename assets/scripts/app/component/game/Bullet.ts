@@ -95,6 +95,9 @@ export default class Bullet extends cc.Component {
     }
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
+        if (this._destroyed) {
+            return;
+        }
         let canMove = false;
         if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
             if (!this.onHitScenery(other, self)) {
@@ -107,6 +110,9 @@ export default class Bullet extends cc.Component {
                 canMove = true;
             }
         }
+        else if (other.node.group === GameDef.GROUP_NAME_BULLET) {
+            
+        }
 
         if (!canMove && !this._destroyed) {
             AudioModel.playSound("sound/hit");
@@ -116,6 +122,35 @@ export default class Bullet extends cc.Component {
             gameController.putNodeBullet(this.node);
         }
     }
+
+    // onCollisionStay(other: cc.Collider, self: cc.Collider) {
+    //     if (this._destroyed) {
+    //         return;
+    //     }
+    //     let canMove = false;
+    //     if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
+    //         if (!this.onHitScenery(other, self)) {
+    //             canMove = true;
+    //         }
+    //     }  
+    //     else if (other.node.group === GameDef.GROUP_NAME_TANK) {
+    //         let com = other.node.getComponent(BattleTank);
+    //         if (this._shooterID === com.id) {
+    //             canMove = true;
+    //         }
+    //     }
+    //     else if (other.node.group === GameDef.GROUP_NAME_BULLET) {
+            
+    //     }
+
+    //     if (!canMove && !this._destroyed) {
+    //         AudioModel.playSound("sound/hit");
+    //         this._destroyed = true;
+
+    //         gameController.node.emit(EventDef.EV_GAME_REDUCE_BULLET, this._shooterID);
+    //         gameController.putNodeBullet(this.node);
+    //     }
+    // }
 
     //返回值为true，则代表命中，需销毁子弹
     onHitScenery(scenery: cc.Collider, bullet: cc.Collider): boolean {

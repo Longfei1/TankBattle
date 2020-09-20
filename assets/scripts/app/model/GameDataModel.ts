@@ -17,6 +17,7 @@ class GameDataModel extends BaseModel {
     _mapUnit = {width: 0, height: 0};
     _useCustomMap: boolean = false;
     _currStage: number = 0;
+    _liveStatus: { [id: number] : boolean } = {};
 
 
     //关卡相关数据
@@ -29,13 +30,14 @@ class GameDataModel extends BaseModel {
     
     initModel() {
         super.initModel();
+        this.initGameMapData();
         this.initGameData();
     }
 
     initGameData() {
         this._enableOperate = false;
 
-        this.initGameMapData();
+        this.resetGameData();
     }
 
     initGameMapData() {
@@ -46,8 +48,9 @@ class GameDataModel extends BaseModel {
         this._gamePause = false;
         this._gameRunning = false;
         //this._useCustomMap = false;
-        this._currStage = 0;
+        this._currStage = 1;
         this._enableOperate = false;
+        this._liveStatus = {[0]: true, [1]: true}
 
         this._propBuff = 0;
         this.resetPlayerLifeNum()
@@ -154,7 +157,7 @@ class GameDataModel extends BaseModel {
     }
 
     resetPlayerLifeNum() {
-        this._lifeNum = {[1]: GameDef.PLAYER_LIFE_NUM, [2]:GameDef.PLAYER_LIFE_NUM}
+        this._lifeNum = {[0]: GameDef.PLAYER_LIFE_NUM, [1]:GameDef.PLAYER_LIFE_NUM}
     }
 
     addPlayerLifeNum(id: number) {
@@ -272,6 +275,11 @@ class GameDataModel extends BaseModel {
         let scenePos = this.matrixToScenePosition(GameDef.PLACE_HOMEBASE); 
         let rect = cc.rect(scenePos.x, scenePos.y, this.getHomeBaseWidth(), this.getHomeBaseWidth());
         return rect;
+    }
+
+    getHomeCenterScenePosition(): cc.Vec2 {
+        let scenePos = this.matrixToScenePosition(new GameStruct.RcInfo(GameDef.PLACE_HOMEBASE.col + 2, GameDef.PLACE_HOMEBASE.row + 2)); 
+        return scenePos;
     }
 
     getSceneryWidth(): number {

@@ -9,13 +9,6 @@ import { GameStruct } from "../define/GameStruct";
 import CommonFunc from "../common/CommonFunc";
 import { GameDef } from "../define/GameDef";
 
-const EnemyTankNames = [
-    "LightTank",
-    "RapidMoveTank",
-    "RapidFireTank",
-    "HeavyTank",
-];
-
 const ENEMY_ADD_INTERVAL = 1; //秒
 const ENEMY_BEHAVIOR_INTERVAL = 1; //秒
 
@@ -37,7 +30,6 @@ export default class EnemyManager extends cc.Component {
     _diffcultyData = null;
 
     _bornPlaceIndex: number = 0;
-    _enemyDestroyNum: number = 0;
 
     onLoad() {
         this.initListenner();
@@ -47,6 +39,8 @@ export default class EnemyManager extends cc.Component {
 
     onDestroy() {
         this.removeTimers();
+
+        this._enemyPool.clearNode();
     }
 
     initListenner() {
@@ -70,9 +64,9 @@ export default class EnemyManager extends cc.Component {
         this._idGenerator.reset();
         this._diffcultyData = null;
         this._bornPlaceIndex = 0;
-        this._enemyDestroyNum = 0;
 
         this.resetEnemy();
+        GameDataModel.resetEnemyDeadNum();
     }
 
     resetEnemy() {
@@ -110,6 +104,9 @@ export default class EnemyManager extends cc.Component {
 
     evEnemyDead(id : number) {
         this.destroyEnemyTank(id);
+        if (this._enemyTanks[id]) {
+            GameDataModel.addEnemyDeadNum(this._enemyTanks[id]._tankName);
+        }
 
         //生成新的敌人
         if (this.isNeedCreateEnemy()) {
@@ -161,15 +158,13 @@ export default class EnemyManager extends cc.Component {
             this._enemyPool.putNode(this._enemyTanks[id].node);
             delete this._enemyTanks[id];
             GameDataModel.removeEnemyTank(id);
-
-            this._enemyDestroyNum++;
         }
     }
 
     //获取下次生成的坦克类型
     getNextTankName(): string {
         //先简单处理，使用随机类型。后续可通过设置关卡难度，设置不同坦克的数量。
-        return CommonFunc.getRandomArrayValue(EnemyTankNames);
+        return CommonFunc.getRandomArrayValue(GameDef.EnemyTankNames);
     }
 
     //获取下次生成的坦克位置
@@ -217,18 +212,16 @@ export default class EnemyManager extends cc.Component {
 
         if (tankName && pos) {
             this.createEnemyTank(tankName, pos, bRed);
+
+            gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_ENEMY_LIFE);
         }
     }
 
-    getEnemyAliveNum() {
-        return CommonFunc.getMapSize(this._enemyTanks);
-    }
-
     isNeedCreateEnemy(): boolean {
-        let aliveNum = this.getEnemyAliveNum();
+        let aliveNum = GameDataModel.getEnemyAliveNum();
         if (!GameDataModel._gamePause
             && (aliveNum < this._diffcultyData["EnemyMaxAliveNum"])
-            && (this._enemyDestroyNum + this.getEnemyAliveNum() < this._diffcultyData["EnemyTotalNum"])) {
+            && (GameDataModel.getEnemyDeadTotalNum() + aliveNum < this._diffcultyData["EnemyTotalNum"])) {
             return true;
         }
         return false;

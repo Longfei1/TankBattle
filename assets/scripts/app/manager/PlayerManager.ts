@@ -40,6 +40,8 @@ export default class PlayerManager extends cc.Component {
 
     onDestroy() {
         this.removeListener()
+
+        this._playerPool.clearNode();
     }
 
     initListener() {
@@ -86,7 +88,7 @@ export default class PlayerManager extends cc.Component {
     resetPlayer() {
         CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
             if (cc.isValid(player.node)) {
-                this.destroyPlayer(no);
+                this._playerPool.putNode(player.node);
             }
         });
 
@@ -294,6 +296,8 @@ export default class PlayerManager extends cc.Component {
             GameDataModel.reducePlayerLifeNum(no);
             GameDataModel._liveStatus[no] = true;
             this.createPlayer(0, this.getTankAttributesById(no), GameDef.BORN_PLACE_PLAYER1);
+
+            gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE);
         }
     }
 

@@ -164,6 +164,26 @@ export default class Scenery extends cc.Component {
         return false;
     }
 
+    //获取与指定区域重叠的所有子区域
+    getOverlapRects(rect: cc.Rect): cc.Rect[] {
+        let ret: cc.Rect[] = [];
+
+        if (rect) {
+            for (let img of this.imgScenerys) {
+                if (img.node.active) {
+                    let pos = gameController.worldToGameScenePosition(img.node.convertToWorldSpace(cc.v2(0, 0)));
+                    let imgRect = cc.rect(pos.x, pos.y, img.node.width, img.node.height)
+
+                    if (GameDataModel.isRectOverlap(rect, imgRect)) {//两个矩形有重合，相交不算
+                        ret.push(imgRect);
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
+
     getUnitIndexByRcInfo(pos: GameStruct.RcInfo) {
         let unitIndex = -1;
         let nodeRcInfo = GameDataModel.sceneToMatrixPosition(this.node.position);

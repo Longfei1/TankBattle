@@ -19,6 +19,10 @@ export default class HomeBase extends cc.Component {
         this.imgDestroy.node.active = !bAct;
     }
 
+    isAlive(): boolean {
+        return this.imgAlive.node.active;
+    }
+
     setPosition(pos: cc.Vec2);
     setPosition(rcInfo: GameStruct.RcInfo);
     setPosition(pos: any) {
@@ -34,8 +38,7 @@ export default class HomeBase extends cc.Component {
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
         if (other.node.group === GameDef.GROUP_NAME_BULLET) {
-            let destroyed = other.node.getComponent(Bullet)._destroyed;
-            if (!destroyed) {
+            if (this.isAlive()) {
                 this.setAlive(false);
 
                 //游戏失败

@@ -7,6 +7,7 @@ import Scenery from "../component/game/Scenery";
 import { GameConfig } from "../GameConfig";
 import EnemyTank from "../component/game/tank/EnemyTank";
 import PlayerTank from "../component/game/tank/PlayerTank";
+import GameConfigModel from "./GameConfigModel";
 
 class GameDataModel extends BaseModel {
     _playMode: number = -1;
@@ -26,8 +27,9 @@ class GameDataModel extends BaseModel {
     private _players: { [id: number]: cc.Node } = {};
 
     _propBuff: number = 0;
-    _lifeNum: { [id: number] : number } = {};
-    
+    _playerLifeNum: { [id: number] : number } = {};
+    _enemyDeadNum: {[name: string] : number} = {};
+
     initModel() {
         super.initModel();
         this.initGameMapData();
@@ -53,7 +55,8 @@ class GameDataModel extends BaseModel {
         this._liveStatus = {[0]: true, [1]: true}
 
         this._propBuff = 0;
-        this.resetPlayerLifeNum()
+        this.resetPlayerLifeNum();
+        this.resetEnemyDeadNum();
 
         this.clearGameMapData();
 
@@ -157,23 +160,71 @@ class GameDataModel extends BaseModel {
     }
 
     resetPlayerLifeNum() {
-        this._lifeNum = {[0]: GameDef.PLAYER_LIFE_NUM, [1]:GameDef.PLAYER_LIFE_NUM}
+        this._playerLifeNum = {}
+
+        this.setPlayerLifeNum(0, GameDef.PLAYER_LIFE_NUM);
+        this.setPlayerLifeNum(1, GameDef.PLAYER_LIFE_NUM);
     }
 
     addPlayerLifeNum(id: number) {
-        if (this._lifeNum[id] != null) {
-            this._lifeNum[id]++;
+        if (this._playerLifeNum[id] != null) {
+            this._playerLifeNum[id]++;
         }
     }
 
     reducePlayerLifeNum(id: number) {
-        if (this._lifeNum[id] != null) {
-            this._lifeNum[id]--;
+        if (this._playerLifeNum[id] != null) {
+            this._playerLifeNum[id]--;
         }
     }
 
-    getPlayerLifeNum(id: number) {
-        return this._lifeNum[id];
+    getPlayerLifeNum(id: number): number {
+        return this._playerLifeNum[id];
+    }
+
+    setPlayerLifeNum(id: number, num: number) {
+        this._playerLifeNum[id] = num;
+    }
+
+    resetEnemyDeadNum() {
+        this._enemyDeadNum = {}
+
+        for (let name of GameDef.EnemyTankNames) {
+            this.setEnemyDeadNum(name, 0);
+        }
+    }
+
+    addEnemyDeadNum(name: string) {
+        if (this._enemyDeadNum[name] != null) {
+            this._enemyDeadNum[name]++;
+        }
+    }
+
+    getEnemyDeadNum(name: string): number {
+        return this._enemyDeadNum[name];
+    }
+
+    setEnemyDeadNum(name: string, num: number) {
+        this._enemyDeadNum[name] = num;
+    }
+
+    getEnemyDeadTotalNum(): number {
+        let total = 0;
+        CommonFunc.travelMap(this._enemyDeadNum, (name: string, num: number) => {
+            total += num;
+        })
+        return total;
+    }
+
+    getEnemyAliveNum(): number {
+        return CommonFunc.getMapSize(this._enemys);
+    }
+
+    getEnemyLeftNum(): number {
+        let diffcultyData = GameConfigModel.stageData.DifficultyData[this._currStage - 1];//本关卡难度数据
+        let leftNum = diffcultyData["EnemyTotalNum"] - this.getEnemyDeadTotalNum() - this.getEnemyAliveNum();
+
+        return leftNum;
     }
 
     /**
@@ -440,6 +491,58 @@ class GameDataModel extends BaseModel {
         }
 
         return bHave;
+    }
+
+    //获取子弹在移动时命中的最近的布景区域
+    getBulletShootSceneryRectWhenMove(direction: number, moveRect: cc.Rect): cc.Rect {
+        let retRect: cc.Rect = null;
+        let hitRects: cc.Rect[] = [];
+
+        //获取区域中所有相交的区域
+        let sceneryNodes = this.getSceneryNodesInRect(moveRect);
+        if (sceneryNodes) {
+            for (let node of sceneryNodes) {
+                let com = node.getComponent(Scenery);
+                let sceneryType = com.getType();
+                if (sceneryType !== GameDef.SceneryType.GRASS && sceneryType !== GameDef.SceneryType.WATER) {
+                    let subRects = com.getOverlapRects(moveRect);
+                    for (let it of subRects) {
+                        hitRects.push(it);
+                    }
+                }
+            }
+        }
+
+        //根据移动方向，获取移动区域中最先触碰到的布景区域
+        for (let rect of hitRects) {
+            if (retRect) {
+                if (direction === GameDef.DIRECTION_UP) {
+                    if (rect.yMin < retRect.yMin) {
+                        retRect = rect;
+                    }
+                }
+                else if (direction === GameDef.DIRECTION_DOWN) {
+                    if (rect.yMax > retRect.yMax) {
+                        retRect = rect;
+                    }
+                }
+                else if (direction === GameDef.DIRECTION_LEFT) {
+                    if (rect.xMax > retRect.xMax) {
+                        retRect = rect;
+                    }
+                }
+                else if (direction === GameDef.DIRECTION_RIGHT) {
+                    if (rect.xMin < retRect.xMin) {
+                        retRect = rect;
+                    }
+                }
+            }
+            else {
+                retRect = rect;
+            }
+        }
+
+        return retRect;
     }
 
     isGameDebugMode(): boolean {

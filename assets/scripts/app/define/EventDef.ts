@@ -8,6 +8,9 @@ export namespace EventDef {
     export const EV_GAME_SHOW_DEBUG_TEXT               = "evgameshowdebugtext";
     export const EV_GAME_PREPARE_GAME                  = "evgamepreparegame";
     export const EV_GAME_REDUCE_BULLET                 = "evgamereducebullet";
+    export const EV_GAME_FINISH_STAGE                  = "evgamefinishstage";
+    export const EV_GAME_FAILED                        = "evgamefailed";
+    export const EV_GAME_SUCCESS                       = "evgamesuccess";
 
     export const EV_GAME_PAUSE                         = "evgamepause";
     export const EV_GAME_RESUME                        = "evgameresume";
@@ -33,5 +36,6 @@ export namespace EventDef {
     export const EV_SCENEANI_PLAY                      = "evsceneaniplay";
     export const EV_ANI_STOP                           = "evunitanistop";
 
-    export const EV_DISPLAY_REFRESH_PLAYER_LIFE        = "evdisplayrefreshplayerlife";
+    export const EV_DISPLAY_UPDATE_ENEMY_LIFE         = "evdisplayrefreshenemylife";
+    export const EV_DISPLAY_UPDATE_PLAYER_LIFE        = "evdisplayrefreshplayerlife";
 }

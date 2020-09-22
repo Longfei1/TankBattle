@@ -96,7 +96,7 @@ export default class EnemyManager extends cc.Component {
                     //坦克
                     AudioModel.playSound("sound/prop_2");
                     GameDataModel.addPlayerLifeNum(playerTank.id);
-                    gameController.node.emit(EventDef.EV_DISPLAY_REFRESH_PLAYER_LIFE);
+                    gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE);
                     break;
                 case GameDef.PropType.HELMET:
                     //头盔

@@ -44,23 +44,28 @@ export default class Bullet extends cc.Component {
             let moveDiff = this._speedMove * dt;
             let nextPox = curPos;
 
-            switch (this._moveDirection) {
-                case GameDef.DIRECTION_UP:
-                    nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
-                    break;
-                case GameDef.DIRECTION_LEFT:
-                    nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
-                    break;
-                case GameDef.DIRECTION_DOWN:
-                    nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
-                    break;
-                case GameDef.DIRECTION_RIGHT:
-                    nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
-                    break;
-                default:
-                    break;
+            if (this.onHitSceneryEx(curPos, this._moveDirection, moveDiff)) {
+                this.onHited();
             }
-            this.node.setPosition(nextPox);
+            else{
+                switch (this._moveDirection) {
+                    case GameDef.DIRECTION_UP:
+                        nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
+                        break;
+                    case GameDef.DIRECTION_LEFT:
+                        nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
+                        break;
+                    case GameDef.DIRECTION_DOWN:
+                        nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
+                        break;
+                    case GameDef.DIRECTION_RIGHT:
+                        nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
+                        break;
+                    default:
+                        break;
+                }
+                this.node.setPosition(nextPox);
+            }
         }
     }
 
@@ -100,9 +105,10 @@ export default class Bullet extends cc.Component {
         }
         let canMove = false;
         if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
-            if (!this.onHitScenery(other, self)) {
-                canMove = true;
-            }
+            // 不采用碰撞检测的方式判断命中布景
+            // if (!this.onHitScenery(other, self)) {
+            //     canMove = true;
+            // }
         }  
         else if (other.node.group === GameDef.GROUP_NAME_TANK) {
             let com = other.node.getComponent(BattleTank);
@@ -114,7 +120,13 @@ export default class Bullet extends cc.Component {
             
         }
 
-        if (!canMove && !this._destroyed) {
+        if (!canMove) {
+            this.onHited();
+        }
+    }
+
+    onHited() {
+        if (!this._destroyed) {
             AudioModel.playSound("sound/hit");
             this._destroyed = true;
 
@@ -152,7 +164,7 @@ export default class Bullet extends cc.Component {
     //     }
     // }
 
-    //返回值为true，则代表命中，需销毁子弹
+    //使用碰撞检测判断命中布景，返回值为true，则代表命中，需销毁子弹
     onHitScenery(scenery: cc.Collider, bullet: cc.Collider): boolean {
         if (this._destroyed) {
             return true;
@@ -163,20 +175,50 @@ export default class Bullet extends cc.Component {
             return false;
         }
 
-        //计算碰撞点的中心点位置以及命中范围
-        //目前设定下，射击坐标一定处于行列坐标中(子弹不会命中到土墙内部细分的子结构上)，若不满足这一假设，需调整计算方式。
         let bulletCollider: any = bullet;
         let bulletRect: cc.Rect = bulletCollider.world.aabb;
         let sceneryCollider: any = scenery;
         let SceneryRect: cc.Rect = sceneryCollider.world.aabb;
         let collisionPos = bulletRect.center;//子弹碰撞体中心坐标
+        
+        this.dealHitScenery(collisionPos, this._moveDirection, SceneryRect);
+
+        return true;
+    }
+
+    //使用移动区域判断命中，返回值为true，则代表命中，需销毁子弹
+    //优点：1.只会判断移动区域内的布景，可降低碰撞检测负荷
+    //      2.不会由于子弹速度快而导致碰撞检测穿透现象
+    onHitSceneryEx(src: cc.Vec2, dir: number, distance: number): boolean {
+        if (this._destroyed) {
+            return true;
+        }
+
+        let moveRect = this.getMoveRect(src, dir, distance);
+        if (!moveRect) {
+            return true;
+        }
+        
+        let hitRect = GameDataModel.getBulletShootSceneryRectWhenMove(dir, moveRect);
+        if (!hitRect) {
+            return false; //没有命中布景
+        }
+
+        this.dealHitScenery(src, dir, hitRect);
+
+        return true;
+    }
+
+    dealHitScenery(bulletPos: cc.Vec2, dir: number, sceneryRect: cc.Rect) {
+        //计算碰撞点的中心点位置以及命中范围
+        //目前设定下，射击坐标一定处于行列坐标中(子弹不会命中到土墙内部细分的子结构上)，若不满足这一假设，需调整计算方式。
         let hitInfos: GameStruct.HitInfo[] = [];
-        if (this._moveDirection === GameDef.DIRECTION_UP || this._moveDirection === GameDef.DIRECTION_DOWN) {
-            collisionPos = gameController.getPanelGame().convertToNodeSpace(cc.v2(collisionPos.x, SceneryRect.y));//碰撞的世界坐标转换为游戏界面的局部坐标
+        if (dir === GameDef.DIRECTION_UP || dir === GameDef.DIRECTION_DOWN) {
+            let collisionPos = cc.v2(bulletPos.x, sceneryRect.y);//碰撞的世界坐标转换为游戏界面的局部坐标
             let hitRcInfo = GameDataModel.sceneToMatrixPosition(collisionPos);//命中位置
 
             let leftHitInfo: GameStruct.HitInfo = {
-                pos: new GameStruct.RcInfo(hitRcInfo.col - 1, hitRcInfo.row), 
+                pos: new GameStruct.RcInfo(hitRcInfo.col - 1, hitRcInfo.row),
                 scope: {
                     up: 0,
                     down: 0,
@@ -199,8 +241,8 @@ export default class Bullet extends cc.Component {
             hitInfos.push(leftHitInfo);
             hitInfos.push(rightHitInfo);
         }
-        else if (this._moveDirection === GameDef.DIRECTION_LEFT || this._moveDirection === GameDef.DIRECTION_RIGHT) {
-            collisionPos = gameController.getPanelGame().convertToNodeSpace(cc.v2(SceneryRect.x, collisionPos.y));//碰撞的世界坐标转换为游戏界面的局部坐标
+        else if (dir === GameDef.DIRECTION_LEFT || dir === GameDef.DIRECTION_RIGHT) {
+            let collisionPos = cc.v2(sceneryRect.x, bulletPos.y);//碰撞的世界坐标转换为游戏界面的局部坐标
             let hitRcInfo = GameDataModel.sceneToMatrixPosition(collisionPos);//命中位置，
 
             let upHitInfo: GameStruct.HitInfo = {
@@ -230,7 +272,7 @@ export default class Bullet extends cc.Component {
 
         if (this._powerLevel === GameDef.BULLET_POWER_LEVEL_STELL) {//扩大命中范围
             for (let info of hitInfos) {
-                GameDataModel.addScopeByDirection(info.scope, this._moveDirection, 1);
+                GameDataModel.addScopeByDirection(info.scope, dir, 1);
             }
         }
 
@@ -238,8 +280,6 @@ export default class Bullet extends cc.Component {
             //判断并销毁布景
             this.destroyHitedScenerys(hitInfos);//交由GameMapManager计算命中的布景节点
         }
-
-        return true;
     }
 
     //子弹命中布景节点，根据范围处理相关布景的销毁
@@ -305,5 +345,30 @@ export default class Bullet extends cc.Component {
         for (let info of hitInfos) {
             hitFunc(info);
         }
+    }
+
+    getMoveRect(src: cc.Vec2, dir: number, distance: number): cc.Rect {
+        let moveAreaRect: cc.Rect;
+        let width = this.getBulletWidth();
+
+        //子弹锚点(0.5,0.5)，移动区域加上子弹的一半
+        if (dir === GameDef.DIRECTION_UP) {
+            moveAreaRect = cc.rect(src.x - width / 2, src.y, width, width / 2 + distance);
+        }
+        else if (dir === GameDef.DIRECTION_DOWN) {
+            moveAreaRect = cc.rect(src.x - width / 2, src.y - width / 2 - distance, width, width / 2 + distance);
+        }
+        else if (dir === GameDef.DIRECTION_LEFT) {
+            moveAreaRect = cc.rect(src.x - width / 2 - distance, src.y - width / 2, width / 2 + distance, width);
+        }
+        else if (dir === GameDef.DIRECTION_RIGHT) {
+            moveAreaRect = cc.rect(src.x, src.y - width / 2, width / 2 + distance, width);
+        }
+
+        return moveAreaRect;
+    }
+
+    getBulletWidth() {
+        return this.imgBullet.node.width;
     }
 }

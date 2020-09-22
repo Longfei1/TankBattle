@@ -63,6 +63,14 @@ export namespace GameDef {
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
     export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
 
+    //敌军坦克名字
+    export const EnemyTankNames = [
+        "LightTank",
+        "RapidMoveTank",
+        "RapidFireTank",
+        "HeavyTank",
+    ];
+
     export enum SceneryType {
         NULL,   //无
         WALL,   //土墙

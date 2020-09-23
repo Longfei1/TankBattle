@@ -31,13 +31,10 @@
       },
       {
         "__id__": 13
-      },
-      {
-        "__id__": 14
       }
     ],
     "_prefab": {
-      "__id__": 15
+      "__id__": 14
     },
     "_opacity": 255,
     "_color": {
@@ -434,22 +431,6 @@
     },
     "fileId": "e7FSJXp+9GsJX97K63KRJb",
     "sync": false
-  },
-  {
-    "__type__": "5574atll0RHRa6jEgMHB9Qz",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "imgScenery": {
-      "__id__": 4
-    },
-    "atlasScenery": {
-      "__uuid__": "7dcc31a0-a0e9-4ef1-809e-58505d4c298b"
-    },
-    "_id": ""
   },
   {
     "__type__": "cc.BoxCollider",

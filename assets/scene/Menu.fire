@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.39985195306008164,
-      "y": 0.39985195306008164,
+      "x": 0.37790587758000566,
+      "y": 0.37790587758000566,
       "z": 1
     },
     "_quat": {
@@ -972,6 +972,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
+    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",

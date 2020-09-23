@@ -35,11 +35,11 @@ export default class EnemyManager extends cc.Component {
             this._prop.removeFromParent();
         }
 
-        this.unscheduleAllCallbacks();
+        this.removeTimers();
     }
 
     onDestroy() {
-        this.unscheduleAllCallbacks();
+        //this.removeTimers();
     }
 
     initListener() {
@@ -49,6 +49,10 @@ export default class EnemyManager extends cc.Component {
 
         gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
         gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
+        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
+
+        gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+        gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
     }
 
     evCreateProp() {
@@ -85,7 +89,7 @@ export default class EnemyManager extends cc.Component {
                 case GameDef.PropType.BOMB:
                     //炸弹
                     AudioModel.playSound("sound/prop_1");
-                    gameController.node.emit(EventDef.EV_PROP_BOMB);
+                    gameController.node.emit(EventDef.EV_PROP_BOMB, playerTank.id);
                     break;
                 case GameDef.PropType.STAR:
                     //五角星
@@ -116,6 +120,9 @@ export default class EnemyManager extends cc.Component {
                 default:
                     break;
             }
+
+            GameDataModel.addPlayerPropNum(playerTank.id);
+            gameController.playGainScoreAni(this._prop.getPosition(), GameDef.PROP_BONUS_SCORE);
         }
     }
 
@@ -124,7 +131,11 @@ export default class EnemyManager extends cc.Component {
     }
 
     evGameStarted() {
-        this.startPropStatusTimer();
+        this.startTimers();
+    }
+
+    evGameEnd() {
+        this.removeTimers();
     }
 
     getRandomPropPosition(): GameStruct.RcInfo {
@@ -196,5 +207,21 @@ export default class EnemyManager extends cc.Component {
     onPropSpadeStop() {
         GameDataModel._propBuff &= ~GameDef.PROP_BUFF_HOME_PROTECT;
         gameController.node.emit(EventDef.EV_PROP_SPADE_END);
+    }
+
+    evGamePause() {
+        this.removeTimers();
+    }
+
+    evGameResume() {
+        this.startTimers();
+    }
+
+    startTimers() {
+        this.startPropStatusTimer();
+    }
+
+    removeTimers() {
+        this.unscheduleAllCallbacks();
     }
  }

@@ -30,9 +30,17 @@ export default class Game extends cc.Component {
     @property({ displayName: "调试信息标签", type: cc.Label })
     textDebug: cc.Label = null;
 
+    @property({ displayName: "游戏场景中心", type: cc.Node })
+    nodeCenter: cc.Node = null;
+
+    @property({ displayName: "结算预制体", type: cc.Prefab })
+    pfbResult: cc.Prefab = null;
+
     _currLevel: number = 1;
 
     _bulletPool: NodePool = null;
+
+    _resultPanel: cc.Node = null;
     
     onLoad() {
         this.panelGame.active = false;
@@ -69,24 +77,18 @@ export default class Game extends cc.Component {
     }
 
     initListener() {
-        GameInputModel.addKeyDownIntervalListener(() => {
+        GameInputModel.addKeyDownOnceListener(() => {
             //GameDataModel.resetGameData();
             this.goToMainMenu();
         }, null, this, PlayerDef.KEYMAP_COMMON.BACK);
-        GameInputModel.addKeyDownIntervalListener(() => {
-            if (GameDataModel.isModeEditMap()) {
-                this.node.emit(EventDef.EV_MAP_EDIT_FINISHED);
-                GameDataModel._playMode = -1;
-                GameDataModel._useCustomMap = true;
-                this.goToMainMenu();
-            }
-            else {
-                GameDataModel._gamePause = true;
-            }
+        GameInputModel.addKeyDownOnceListener(() => {
+            this.onBtnStart();
         }, null, this, PlayerDef.KEYMAP_COMMON.START);
-        GameInputModel.addKeyDownIntervalListener(() => {
-            this.onTest();
-        }, null, this, cc.macro.KEY.t);
+        if (GameDataModel.isGameDebugMode) {
+            GameInputModel.addKeyDownOnceListener(() => {
+                this.onTest();
+            }, null, this, cc.macro.KEY.t);
+        }
 
         this.node.on(EventDef.EV_GAME_INIT_FINISHED, this.evInitGameFinished, this)
         this.node.on(EventDef.EV_GAME_SHOW_DEBUG_TEXT, this.onDebugTextOut, this);
@@ -143,6 +145,26 @@ export default class Game extends cc.Component {
 
         GameDataModel._enableOperate = true; //打开控制开关
         cc.director.getCollisionManager().enabled = true; //打开碰撞检测
+    }
+
+    //游戏结束，进入结算
+    gameEnd() {
+        GameDataModel._gameRunning = false;
+        GameDataModel._enableOperate = false; //关闭控制开关
+        cc.director.getCollisionManager().enabled = false; //关闭碰撞检测
+
+        this.node.emit(EventDef.EV_GAME_ENDED);
+
+        this.showGameResult();
+    }
+
+    //游戏结束，失败
+    gameOver() {
+        GameDataModel._gameOver = true;
+
+        this.playUnitAniOnce(AniDef.UnitAniType.GAME_OVER, this.nodeCenter, null, null, () => {
+            this.gameEnd();
+        });
     }
 
     getNodeBullet(): cc.Node {
@@ -263,5 +285,53 @@ export default class Game extends cc.Component {
 
     worldToGameScenePosition(pos: cc.Vec2): cc.Vec2 {
         return this.panelGame.convertToNodeSpace(pos);
+    }
+
+    showGameResult() {
+        this.closeGameResult();
+
+        this._resultPanel = cc.instantiate(this.pfbResult);
+        this.nodeCenter.addChild(this._resultPanel);
+    }
+
+    closeGameResult() {
+        if (this._resultPanel) {
+            this._resultPanel.destroy();
+            this._resultPanel = null;
+        }
+    }
+
+    onBtnStart() {
+        if (GameDataModel.isModeEditMap()) {
+            this.node.emit(EventDef.EV_MAP_EDIT_FINISHED);
+            GameDataModel._playMode = -1;
+            GameDataModel._useCustomMap = true;
+            this.goToMainMenu();
+        }
+        else {
+            if (GameDataModel._gameRunning) {
+                // GameDataModel._gamePause = !GameDataModel._gamePause;
+
+                // if (GameDataModel._gamePause) {
+                //     this.node.emit(EventDef.EV_GAME_PAUSE);
+                // }
+                // else {
+                //     this.node.emit(EventDef.EV_GAME_RESUME);
+                // }
+
+                if (cc.director.isPaused()) {
+                    cc.director.resume();
+                }
+                else {
+                    cc.director.pause();
+                }
+            }
+        }
+    }
+
+    playGainScoreAni(pos: cc.Vec2, score: number) {
+        if (pos && score != null && score > 0) {
+            this.playUnitAniInTime(AniDef.UnitAniType.GAIN_SCORE, this.panelGame, 1, {pos: pos, score: score});
+        }
     }
 }

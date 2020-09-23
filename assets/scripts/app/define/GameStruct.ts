@@ -81,6 +81,12 @@ export namespace GameStruct {
         param: AniParam;          //参数，用于初始动画预制体绑定脚本
     }
 
+    export class AniCallback {
+        stopFunction: Function;   //停止函数
+        pauseFunction: Function;  //暂停函数
+        resumeFunction: Function; //恢复函数
+    }
+
     export class HitScope {
         up: number;
         down: number;

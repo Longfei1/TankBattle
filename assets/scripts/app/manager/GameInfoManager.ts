@@ -71,7 +71,7 @@ export default class GameInfoManager extends cc.Component {
     }
 
     updatePlayerLife() {
-        if (GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
+        if (GameDataModel.isModeDoublePlayer()) {
             this.playerInfos[1].active = true;
         }
         else {

@@ -405,6 +405,8 @@ export default class BattleTank extends BaseTank {
                 callback();
             }
         });
+
+        gameController.playGainScoreAni(this.node.getPosition(), this.getDestroyScore());
     }
 
     //被命中
@@ -615,5 +617,9 @@ export default class BattleTank extends BaseTank {
 
     onLevelUpdated() {
         this.updateTankImg();
+    }
+
+    getDestroyScore(): number {
+        return 0;
     }
 }

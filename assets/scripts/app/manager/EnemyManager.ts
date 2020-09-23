@@ -38,7 +38,7 @@ export default class EnemyManager extends cc.Component {
     }
 
     onDestroy() {
-        this.removeTimers();
+        //this.removeTimers();
 
         this._enemyPool.clearNode();
     }
@@ -66,7 +66,7 @@ export default class EnemyManager extends cc.Component {
         this._bornPlaceIndex = 0;
 
         this.resetEnemy();
-        GameDataModel.resetEnemyDeadNum();
+        GameDataModel.resetPlayerShootNum();
     }
 
     resetEnemy() {
@@ -105,12 +105,16 @@ export default class EnemyManager extends cc.Component {
     evEnemyDead(id : number) {
         this.destroyEnemyTank(id);
         if (this._enemyTanks[id]) {
-            GameDataModel.addEnemyDeadNum(this._enemyTanks[id]._tankName);
+            GameDataModel.addPlayerShootNum(this._enemyTanks[id]._destroyedBy, this._enemyTanks[id]._tankName);
         }
 
         //生成新的敌人
         if (this.isNeedCreateEnemy()) {
             this.addOneEnemy();
+        }
+
+        if (this.isGameEnd()) {
+            gameController.gameEnd();
         }
     }
 
@@ -128,9 +132,10 @@ export default class EnemyManager extends cc.Component {
         this.createTimers();
     }
 
-    evPropBomb() {
+    evPropBomb(playerNO: number) {
         //销毁全部敌军
         CommonFunc.travelMap(this._enemyTanks, (id:number, enemy: EnemyTank) => {
+            enemy._destroyedBy = playerNO;
             enemy.dead(); 
         })
     }
@@ -224,6 +229,14 @@ export default class EnemyManager extends cc.Component {
             && (GameDataModel.getEnemyDeadTotalNum() + aliveNum < this._diffcultyData["EnemyTotalNum"])) {
             return true;
         }
+        return false;
+    }
+
+    isGameEnd() {
+        if (GameDataModel.getEnemyDeadTotalNum() >= this._diffcultyData["EnemyTotalNum"]) {
+            return true;
+        }
+
         return false;
     }
 

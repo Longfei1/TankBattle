@@ -78,7 +78,7 @@ export default class PlayerManager extends cc.Component {
                 this.createPlayer(0, this.getTankAttributesById(0), GameDef.BORN_PLACE_PLAYER1);
             }
 
-            if (GameDataModel._liveStatus[1] && GameDataModel._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
+            if (GameDataModel._liveStatus[1] && GameDataModel.isModeDoublePlayer()) {
                 this.createPlayer(1, this.getTankAttributesById(1), GameDef.BORN_PLACE_PLAYER2);
             }
         }
@@ -299,6 +299,22 @@ export default class PlayerManager extends cc.Component {
 
             gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE);
         }
+
+        {
+            let bGameOver = true;
+
+            if (!this.isPlayerNoLife(0)) {
+                bGameOver = false;
+            }
+
+            if (GameDataModel.isModeDoublePlayer() && !this.isPlayerNoLife(0)) {
+                bGameOver = false;
+            }
+
+            if (bGameOver) {
+                gameController.gameOver(); //玩家没有生命，游戏结束
+            }
+        }
     }
 
     evPrepareGame() {
@@ -316,5 +332,13 @@ export default class PlayerManager extends cc.Component {
         let idToName = {[0]: "player1", [1]: "player2"};
         let tankData = GameConfigModel.tankData;
         return tankData[idToName[id]];
+    }
+
+    isPlayerNoLife(no: number) {
+        //玩家状态为死亡且没有多余的剩余生命
+        if (!GameDataModel._liveStatus[no] && GameDataModel.getPlayerLifeNum(no) <= 0) {
+            return true;
+        }
+        return false;
     }
 }

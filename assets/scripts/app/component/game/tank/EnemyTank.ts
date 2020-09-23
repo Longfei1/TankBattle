@@ -21,6 +21,8 @@ export default class EnemyTank extends BattleTank {
     _tryMoveStartTime: number = 0;
     _bTryMoving: boolean = false;
 
+    _destroyedBy: number;
+
     setRed(bRed: boolean) {
         this._bRed = bRed;
     }
@@ -31,6 +33,7 @@ export default class EnemyTank extends BattleTank {
 
         this._tryMoveStartTime = 0;
         this._bTryMoving = false;
+        this._destroyedBy = -1;
     }
 
     born(callback?: Function) {
@@ -46,7 +49,8 @@ export default class EnemyTank extends BattleTank {
     }
 
     onHited(bulletNode: cc.Node) {
-        let bulletLevel = bulletNode.getComponent(Bullet)._powerLevel;
+        let com = bulletNode.getComponent(Bullet);
+        let bulletLevel = com._powerLevel;
         let hitCount = bulletLevel == GameDef.BULLET_POWER_LEVEL_STELL ? 2 : 1; //被能击毁钢的子弹打中时，扣两次等级
         if (this._bRed) {
             this.setRed(false);
@@ -65,6 +69,7 @@ export default class EnemyTank extends BattleTank {
             return;
         }
 
+        this._destroyedBy = com._shooterID;
         this.dead();
     }
 
@@ -103,6 +108,14 @@ export default class EnemyTank extends BattleTank {
         }
 
         return moveDiff;
+    }
+
+    getDestroyScore() {
+        if (GameDef.EnemyTankScore[this._tankName]) {
+            return GameDef.EnemyTankScore[this._tankName];
+        }
+
+        return 0;
     }
 
     //************************

@@ -4,6 +4,7 @@ import { GameStruct } from "../define/GameStruct";
 import { GameDef } from "../define/GameDef";
 import { AniDef } from "../define/AniDef";
 import UniqueIdGenerator from "../common/UniqueIdGenerator";
+import CommonFunc from "../common/CommonFunc";
 
 const { ccclass, property } = cc._decorator;
 
@@ -19,7 +20,7 @@ export default class AnimationManager extends cc.Component {
     nodeCenter: cc.Node = null; 
 
     _idGenerator: UniqueIdGenerator = new UniqueIdGenerator()
-    _stopFunction = {};
+    _aniCallback: { [id: number]: GameStruct.AniCallback} = {};
 
     onLoad () {
         this.initMembers()
@@ -27,22 +28,30 @@ export default class AnimationManager extends cc.Component {
         gameController.node.on(EventDef.EV_UNITANI_PLAY, this.playUnitAni, this);
         gameController.node.on(EventDef.EV_SCENEANI_PLAY, this.playSceneAni, this);
         gameController.node.on(EventDef.EV_ANI_STOP, this.stopAnimation, this);
+
+        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
+
+        gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+        gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+
+        gameController.node.on(EventDef.EV_ANI_PAUSE, this.evPauseAni, this);
+        gameController.node.on(EventDef.EV_ANI_RESUME, this.evResumeAni, this);
     }
 
     onDestroy() {
-        this.unscheduleAllCallbacks();
+        //this.unscheduleAllCallbacks();
     }
 
     initMembers() {
         this._idGenerator.reset();
-        this._stopFunction = {};
+        this._aniCallback = {};
     }
 
-    addStopAniFunction(func) {
-        if (typeof(func) === "function") {
+    addAniCallback(info: GameStruct.AniCallback) {
+        if (info) {
             let aniID = this._idGenerator.generateID();
             if (aniID != null) {
-                this._stopFunction[aniID] = func;
+                this._aniCallback[aniID] = info;
                 return aniID;
             }
             else {
@@ -51,9 +60,9 @@ export default class AnimationManager extends cc.Component {
         }
     }
 
-    removeStopAniFunction(aniID) {
-        if (this._stopFunction[aniID]) {
-            this._stopFunction[aniID] = null;
+    removeAniCallback(aniID) {
+        if (this._aniCallback[aniID]) {
+            this._aniCallback[aniID] = null;
         }
         this._idGenerator.returnID(aniID);
     }
@@ -101,24 +110,32 @@ export default class AnimationManager extends cc.Component {
         if (animation) {
             let aniID: number;
             let scheduleFunc;
+            let pause = false;
 
-            let stopAni = () => {
-                if (scheduleFunc) {
-                    this.unschedule(scheduleFunc);
-                }
-                this.stopUnitAni(aniID);
-            }
+            aniID = this.addAniCallback({
+                stopFunction: () => {
+                    if (scheduleFunc) {
+                        this.unschedule(scheduleFunc);
+                    }
 
-            aniID = this.addStopAniFunction(() => {
-                if (cc.isValid(nodeAni)) {
-                    nodeAni.stopAllActions();
-                    nodeAni.destroy();
+                    if (cc.isValid(nodeAni)) {
+                        nodeAni.stopAllActions();
+                        nodeAni.destroy();
+                    }
+                },
+                pauseFunction: () => {
+                    pause = true;
+                    animation.pause();
+                },
+                resumeFunction: () => {
+                    pause = false;
+                    animation.resume();
                 }
             });
 
             if (mode === AniDef.UnitAniMode.ONCE) {
                 animation.on("finished", (event) => {
-                    stopAni();
+                    this.stopUnitAni(aniID);
                     if (typeof (endCallback) === "function") {
                         endCallback();
                     }
@@ -134,14 +151,21 @@ export default class AnimationManager extends cc.Component {
                 state.repeatCount = Infinity;
             }
             else if (mode === AniDef.UnitAniMode.TIMELIMIT) {
-                //这个模式下动画用循环播放模式，然后根据时间停止播放
+                //这个模式下动画用循环播放模式，然后根据时间停止播放, 精度0.1s
+                let totalTime = 0; let interval = 0.1;
                 scheduleFunc = () => {
-                    stopAni();
-                    if (typeof (endCallback) === "function") {
-                        endCallback();
+                    if (!pause) {
+                        totalTime += interval;
+                        if (totalTime > time) {
+                            this.stopUnitAni(aniID);
+                            if (typeof (endCallback) === "function") {
+                                endCallback();
+                            }
+                        }
                     }
                 }
-                this.scheduleOnce(scheduleFunc, time ? time : 3);
+
+                this.schedule(scheduleFunc, interval, cc.macro.REPEAT_FOREVER);
                 let state = animation.play();
                 state.wrapMode = cc.WrapMode.Loop;
                 state.repeatCount = Infinity;
@@ -156,9 +180,21 @@ export default class AnimationManager extends cc.Component {
     }
 
     stopAnimation(aniID: number) {
-        if (this._stopFunction[aniID]) {
-            this._stopFunction[aniID]();
-            this.removeStopAniFunction(aniID);
+        if (this._aniCallback[aniID]) {
+            this._aniCallback[aniID].stopFunction();
+            this.removeAniCallback(aniID);
+        }
+    }
+
+    pauseAnimation(aniID: number) {
+        if (this._aniCallback[aniID]) {
+            this._aniCallback[aniID].pauseFunction();
+        }
+    }
+
+    resumeAnimation(aniID: number) {
+        if (this._aniCallback[aniID]) {
+            this._aniCallback[aniID].resumeFunction();
         }
     }
 
@@ -178,5 +214,47 @@ export default class AnimationManager extends cc.Component {
                 info.endCallback
             );
         }
+    }
+
+    stopAllAnimation() {
+        CommonFunc.travelMap(this._aniCallback, (id:number , callbacks: GameStruct.AniCallback) => {
+            callbacks.stopFunction();
+            this._idGenerator.returnID(id);
+        });
+
+        this._aniCallback = {};
+    }
+
+    pauseAllAnimation() {
+        CommonFunc.travelMap(this._aniCallback, (id: number, callbacks: GameStruct.AniCallback) => {
+            callbacks.pauseFunction();
+        });
+    }
+
+    resumeAllAnimation() {
+        CommonFunc.travelMap(this._aniCallback, (id: number, callbacks: GameStruct.AniCallback) => {
+            callbacks.resumeFunction();
+        });
+
+    }
+
+    evGameEnd() {
+        this.stopAllAnimation();
+    }
+
+    evGamePause() {
+        this.pauseAllAnimation();
+    }
+
+    evGameResume() {
+        this.resumeAllAnimation();
+    }
+
+    evPauseAni(aniID: number) {
+        this.pauseAnimation(aniID);
+    }
+
+    evResumeAni(aniID: number) {
+        this.resumeAnimation(aniID);
     }
 }

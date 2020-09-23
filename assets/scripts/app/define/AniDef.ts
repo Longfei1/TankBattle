@@ -6,10 +6,12 @@ export namespace AniDef {
     }
 
     export enum UnitAniType {
-        BORN,     //出生
-        SHIELD,   //护罩
-        BLAST,    //爆炸
+        BORN,                   //出生
+        SHIELD,                 //护罩
+        BLAST,                  //爆炸
         SPADE_EFFECT_DISAPPEAR, //铲子效果消失动画
+        GAME_OVER,              //游戏结束动画
+        GAIN_SCORE,             //得分动画
     }
 
     export enum SceneAniType {

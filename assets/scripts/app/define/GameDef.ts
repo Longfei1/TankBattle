@@ -62,6 +62,7 @@ export namespace GameDef {
     export const GAME_FPS                       = 90;
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
     export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
+    export const PROP_BONUS_SCORE               = 500; //道具奖励得分
 
     //敌军坦克名字
     export const EnemyTankNames = [
@@ -70,6 +71,14 @@ export namespace GameDef {
         "RapidFireTank",
         "HeavyTank",
     ];
+
+    //敌军坦克击毁得分
+    export const EnemyTankScore = {
+        "LightTank": 100,
+        "RapidMoveTank": 200,
+        "RapidFireTank": 200,
+        "HeavyTank":400,
+    };
 
     export enum SceneryType {
         NULL,   //无

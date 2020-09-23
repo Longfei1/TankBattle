@@ -12,7 +12,7 @@ import GameConfigModel from "./GameConfigModel";
 class GameDataModel extends BaseModel {
     _playMode: number = -1;
     _gamePause: boolean = false;
-    _gameRunning: boolean = false;
+    _gameOver: boolean = false;
     _enableOperate: boolean = false;
     _gameMapData:  number[][] =  [];
     _mapUnit = {width: 0, height: 0};
@@ -28,7 +28,10 @@ class GameDataModel extends BaseModel {
 
     _propBuff: number = 0;
     _playerLifeNum: { [id: number] : number } = {};
-    _enemyDeadNum: {[name: string] : number} = {};
+    _playerShootNum: {[no: number]: {[name: string] : number}} = {};
+    _playerPropNum: { [id: number]: number } = {};
+    _playerTotalScore: { [id: number] : number } = {};
+    _gameRunning: boolean = false;
 
     initModel() {
         super.initModel();
@@ -48,7 +51,7 @@ class GameDataModel extends BaseModel {
 
     resetGameData() {
         this._gamePause = false;
-        this._gameRunning = false;
+        this._gameOver = false;
         //this._useCustomMap = false;
         this._currStage = 1;
         this._enableOperate = false;
@@ -56,13 +59,16 @@ class GameDataModel extends BaseModel {
 
         this._propBuff = 0;
         this.resetPlayerLifeNum();
-        this.resetEnemyDeadNum();
+        this.resetPlayerShootNum();
+        this.resetPlayerTotalScore();
+        this.resetPlayerPropNum();
 
         this.clearGameMapData();
 
         this._scenerys = [];
         this.clearEnemyTank();
         this.clearPlayerTank();
+        this._gameRunning = false;
     }
 
     createMapData() {
@@ -92,6 +98,13 @@ class GameDataModel extends BaseModel {
             return true
         }
         return false
+    }
+
+    isModeDoublePlayer(): boolean {
+        if (this._playMode === GameDef.GAMEMODE_DOUBLE_PLAYER) {
+            return true;
+        }
+        return false;
     }
 
     setMapUnit(width: number, height: number) {
@@ -186,31 +199,36 @@ class GameDataModel extends BaseModel {
         this._playerLifeNum[id] = num;
     }
 
-    resetEnemyDeadNum() {
-        this._enemyDeadNum = {}
+    resetPlayerShootNum() {
+        this._playerShootNum = {}
 
+        this.initPlayerShootNum(0);
+        this.initPlayerShootNum(1);
+    }
+
+    addPlayerShootNum(no: number, name: string) {
+        if (this._playerShootNum[no] != null && this._playerShootNum[no][name] != null) {
+            this._playerShootNum[no][name]++;
+        }
+    }
+
+    getPlayerShootNum(no: number, name: string): number {
+        return this._playerShootNum[no][name];
+    }
+
+    initPlayerShootNum(no: number) {
         for (let name of GameDef.EnemyTankNames) {
-            this.setEnemyDeadNum(name, 0);
+            this._playerShootNum[no][name] = 0;
         }
-    }
-
-    addEnemyDeadNum(name: string) {
-        if (this._enemyDeadNum[name] != null) {
-            this._enemyDeadNum[name]++;
-        }
-    }
-
-    getEnemyDeadNum(name: string): number {
-        return this._enemyDeadNum[name];
-    }
-
-    setEnemyDeadNum(name: string, num: number) {
-        this._enemyDeadNum[name] = num;
     }
 
     getEnemyDeadTotalNum(): number {
         let total = 0;
-        CommonFunc.travelMap(this._enemyDeadNum, (name: string, num: number) => {
+        CommonFunc.travelMap(this._playerShootNum[0], (name: string, num: number) => {
+            total += num;
+        })
+
+        CommonFunc.travelMap(this._playerShootNum[1], (name: string, num: number) => {
             total += num;
         })
         return total;
@@ -225,6 +243,44 @@ class GameDataModel extends BaseModel {
         let leftNum = diffcultyData["EnemyTotalNum"] - this.getEnemyDeadTotalNum() - this.getEnemyAliveNum();
 
         return leftNum;
+    }
+
+    resetPlayerTotalScore() {
+        this.setPlayerTotalScore(0, 0);
+        this.setPlayerTotalScore(1, 0);
+    }
+
+    setPlayerTotalScore(no: number, score: number) {
+        this._playerTotalScore[no] = score;
+    }
+
+    getPlayerTotalScore(no: number): number {
+        return this._playerTotalScore[no];
+    }
+
+    addPlayerTotalScore(no: number, score: number) {
+        if (this._playerTotalScore[no]) {
+            this._playerTotalScore[no] += score;
+        }
+    }
+
+    resetPlayerPropNum() {
+        this.setPlayerPropNum(0, 0);
+        this.setPlayerPropNum(1, 0);
+    }
+
+    setPlayerPropNum(no: number, num: number) {
+        this._playerPropNum[no] = num;
+    }
+
+    getPlayerPropNum(no: number): number {
+        return this._playerPropNum[no];
+    }
+
+    addPlayerPropNum(no: number) {
+        if (this._playerPropNum[no]) {
+            this._playerPropNum[no]++;
+        }
     }
 
     /**

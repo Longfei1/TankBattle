@@ -2,6 +2,7 @@ import { GameStruct } from "../../define/GameStruct";
 import GameDataModel from "../../model/GameDataModel";
 import { GameDef } from "../../define/GameDef";
 import Bullet from "./Bullet";
+import { gameController } from "./Game";
 
 const { ccclass, property } = cc._decorator;
 
@@ -42,6 +43,7 @@ export default class HomeBase extends cc.Component {
                 this.setAlive(false);
 
                 //游戏失败
+                gameController.gameOver();
             }
         }
     }

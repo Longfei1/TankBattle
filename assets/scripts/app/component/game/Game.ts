@@ -103,7 +103,12 @@ export default class Game extends cc.Component {
     }
 
     evInitGameFinished() {
-        this.playStartGameAni(GameDataModel._currStage, () => {
+        this.startGameStage(1);//从第一关开始
+    }
+
+    startGameStage(stage: number) {
+        GameDataModel._currStage = stage;
+        this.playStartGameAni(stage, () => {
             this.gameStart();
         });
 
@@ -161,6 +166,7 @@ export default class Game extends cc.Component {
     //游戏结束，失败
     gameOver() {
         GameDataModel._gameOver = true;
+        GameDataModel._enableOperate = false;
 
         this.playUnitAniOnce(AniDef.UnitAniType.GAME_OVER, this.nodeCenter, null, null, () => {
             this.gameEnd();
@@ -332,6 +338,23 @@ export default class Game extends cc.Component {
     playGainScoreAni(pos: cc.Vec2, score: number) {
         if (pos && score != null && score > 0) {
             this.playUnitAniInTime(AniDef.UnitAniType.GAIN_SCORE, this.panelGame, 1, {pos: pos, score: score});
+        }
+    }
+
+    onGameResultShowFinished() {
+        if (GameDataModel._gameOver) {
+            gameController.goToMainMenu(); //回到主菜单
+        }
+        else {
+            if (GameDataModel._currStage < GameConfigModel.getTotalStage()) {
+                //进入下一关
+                this.closeGameResult();
+
+                this.startGameStage(GameDataModel._currStage + 1);
+            }
+            else {
+                //显示通关页面
+            }
         }
     }
 }

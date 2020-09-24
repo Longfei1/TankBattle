@@ -118,10 +118,20 @@ export default class EnemyTank extends BattleTank {
         return 0;
     }
 
+    shoot(): boolean {
+        if (!CommonFunc.isBitSet(GameDataModel._propBuff, GameDef.PROP_BUFF_STATIC)) {
+            return super.shoot();
+        }
+        return false;
+    }
+
     //************************
     //行为控制相关
 
     setMove(bMove: boolean, nDirection: number) {
+        if (CommonFunc.isBitSet(GameDataModel._propBuff, GameDef.PROP_BUFF_STATIC)) {
+            return;
+        }
         if (!bMove || nDirection != this._moveDirection) {
             this._bTryMoving = false; //停止移动或换方向，重置尝试移动标志
         }

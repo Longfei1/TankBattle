@@ -362,7 +362,7 @@ export default class BattleTank extends BaseTank {
     //     }
     // }
 
-    shoot() {
+    shoot(): boolean {
         let time = CommonFunc.getTimeStamp();
         if (time - this._lastShootTime < this._shootCoolTime * 1000) {
             return false;

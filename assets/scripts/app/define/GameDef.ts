@@ -59,7 +59,7 @@ export namespace GameDef {
     //其他
     export const TANK_MOVE_MIN_VALUE            = 10; //坦克最小移动量（像素）
     export const TANK_MOVE_INTERVAL_FRAMES      = 3; //移动图片变化的间隔帧数
-    export const GAME_FPS                       = 90;
+    export const GAME_FPS                       = 60;
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
     export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
     export const PROP_BONUS_SCORE               = 500; //道具奖励得分

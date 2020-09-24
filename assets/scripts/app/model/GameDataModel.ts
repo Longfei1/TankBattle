@@ -32,6 +32,7 @@ class GameDataModel extends BaseModel {
     _playerPropNum: { [id: number]: number } = {};
     _playerTotalScore: { [id: number] : number } = {};
     _gameRunning: boolean = false;
+    _propDestroyEnemyNum: number = 0;
 
     initModel() {
         super.initModel();
@@ -69,6 +70,7 @@ class GameDataModel extends BaseModel {
         this.clearEnemyTank();
         this.clearPlayerTank();
         this._gameRunning = false;
+        this._propDestroyEnemyNum = 0;
     }
 
     createMapData() {
@@ -217,6 +219,7 @@ class GameDataModel extends BaseModel {
     }
 
     initPlayerShootNum(no: number) {
+        this._playerShootNum[no] = {};
         for (let name of GameDef.EnemyTankNames) {
             this._playerShootNum[no][name] = 0;
         }
@@ -704,6 +707,22 @@ class GameDataModel extends BaseModel {
         }
 
         return retAry;
+    }
+
+    getHighScore(): number {
+        let key = "GameHighScore";
+        let value = cc.sys.localStorage.getItem(key);
+
+        if (value) {
+            return Number(value);
+        }
+
+        return 0;
+    }
+
+    setHighScore(score: number) {
+        let key = "GameHighScore";
+        cc.sys.localStorage.setItem(key, score.toString());
     }
 }
 export default new GameDataModel();

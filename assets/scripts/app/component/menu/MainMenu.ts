@@ -5,6 +5,7 @@ import AudioModel from "../../model/AudioModel";
 import ModelManager from "../../manager/ModelManager";
 import GameInputModel from "../../model/GameInputModel";
 import CommonFunc from "../../common/CommonFunc";
+import GameConfigModel from "../../model/GameConfigModel";
 
 const {ccclass, property} = cc._decorator;
 
@@ -33,6 +34,9 @@ export default class MainMenu extends cc.Component {
     @property({ displayName: "光标与选项间隔像素", type: cc.Float })
     cursorShiftPos: number = -50;
 
+    @property({ displayName: "最高分", type: cc.Label })
+    textHighScore: cc.Label = null;
+
     _cursor: cc.Node = null;
     _currChoose: number = MenuItemIdex.SINGLE_PLAY;
     _bSelect: boolean = false;
@@ -42,10 +46,12 @@ export default class MainMenu extends cc.Component {
         
         ModelManager.initModels();
 
+        this.initListener();
+
         this.initCursor();
         this._bSelect = false;
 
-        this.initListener();
+        this.updateHighScore();
     }
 
     initListener() {
@@ -130,5 +136,10 @@ export default class MainMenu extends cc.Component {
     //开始游戏
     onStartGame() {
         cc.director.loadScene("Game");
+    }
+
+    updateHighScore() {
+        let score = GameDataModel.getHighScore();
+        this.textHighScore.string = score.toString();
     }
 }

@@ -343,7 +343,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -389,7 +388,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -443,10 +442,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -543,7 +541,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -589,7 +586,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -643,10 +640,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -833,7 +829,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -859,7 +854,7 @@
       "__id__": 18
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_level": 4,
     "_components": [
       {
@@ -879,7 +874,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -933,10 +928,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -1133,7 +1127,7 @@
       "__id__": 25
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 5,
     "_components": [
       {
@@ -1153,7 +1147,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -1195,7 +1189,7 @@
     "node": {
       "__id__": 29
     },
-    "_enabled": false,
+    "_enabled": true,
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
@@ -1207,10 +1201,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -1307,7 +1300,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -1333,7 +1325,7 @@
       "__id__": 25
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_level": 5,
     "_components": [
       {
@@ -1353,7 +1345,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -1395,7 +1387,7 @@
     "node": {
       "__id__": 35
     },
-    "_enabled": false,
+    "_enabled": true,
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
@@ -1407,10 +1399,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -1638,7 +1629,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -1692,10 +1683,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -1792,7 +1782,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -1838,7 +1827,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -1892,10 +1881,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -2123,7 +2111,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -2177,10 +2165,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -2277,7 +2264,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -2323,7 +2309,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -2377,10 +2363,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -2608,7 +2593,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -2662,10 +2647,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -2762,7 +2746,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -2808,7 +2791,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -2862,10 +2845,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -2919,7 +2901,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -2973,10 +2955,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -3073,7 +3054,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -3173,7 +3153,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -3199,7 +3178,7 @@
       "__id__": 18
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_level": 4,
     "_components": [
       {
@@ -3219,7 +3198,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -3273,10 +3252,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -3980,7 +3958,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -4181,7 +4158,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -4207,7 +4183,7 @@
       "__id__": 114
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_level": 4,
     "_components": [
       {
@@ -4227,7 +4203,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -4281,10 +4257,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -4501,7 +4476,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -4555,10 +4530,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -4655,7 +4629,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -4701,7 +4674,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -4755,10 +4728,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -4986,7 +4958,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -5040,10 +5012,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -5140,7 +5111,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -5186,7 +5156,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -5240,10 +5210,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -5471,7 +5440,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -5525,10 +5494,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -5625,7 +5593,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -5671,7 +5638,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -5725,10 +5692,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -5956,7 +5922,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -6010,10 +5976,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -6110,7 +6075,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -6156,7 +6120,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -6210,10 +6174,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },
@@ -6321,7 +6284,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "黑体",
@@ -6421,7 +6383,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -6521,7 +6482,6 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -6547,7 +6507,7 @@
       "__id__": 114
     },
     "_children": [],
-    "_active": false,
+    "_active": true,
     "_level": 4,
     "_components": [
       {
@@ -6567,7 +6527,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -6621,10 +6581,9 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
-    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": ""
   },

@@ -1,8 +1,6 @@
 {
     "version": "1.4.0",
     "configurations": [
-    
-        
         {
             "name": "Creator Debug: Launch Chrome",
             "type": "chrome",

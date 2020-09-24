@@ -67,6 +67,7 @@ export default class EnemyManager extends cc.Component {
 
         this.resetEnemy();
         GameDataModel.resetPlayerShootNum();
+        GameDataModel._propDestroyEnemyNum = 0;
     }
 
     resetEnemy() {
@@ -104,7 +105,7 @@ export default class EnemyManager extends cc.Component {
 
     evEnemyDead(id : number) {
         this.destroyEnemyTank(id);
-        if (this._enemyTanks[id]) {
+        if (this._enemyTanks[id] && this._enemyTanks[id]._destroyedBy >= 0) {
             GameDataModel.addPlayerShootNum(this._enemyTanks[id]._destroyedBy, this._enemyTanks[id]._tankName);
         }
 
@@ -135,7 +136,7 @@ export default class EnemyManager extends cc.Component {
     evPropBomb(playerNO: number) {
         //销毁全部敌军
         CommonFunc.travelMap(this._enemyTanks, (id:number, enemy: EnemyTank) => {
-            enemy._destroyedBy = playerNO;
+            GameDataModel._propDestroyEnemyNum++;
             enemy.dead(); 
         })
     }

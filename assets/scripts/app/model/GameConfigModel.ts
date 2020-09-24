@@ -52,6 +52,13 @@ class GameConfigModel extends BaseModel {
     get tankData() {
         return this._tankData;
     }
+
+    getTotalStage(): number {
+        if (this._stageData) {
+            return this._stageData["MapData"].length;
+        }
+        return 0;
+    }
 }
 
 export default new GameConfigModel();

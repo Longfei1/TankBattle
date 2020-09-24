@@ -99,4 +99,18 @@ export namespace GameStruct {
         scope: HitScope;      //范围
         power: number;        //威力
     }
+
+    export class PlayerResultInfo {
+        totolScore: number;
+        bonusScore: number;
+        totalTankNum: number;
+        tankNum: number[];
+        tankScore: number[];
+    }
+
+    export class GameResultInfo {
+        stage: number;
+        highScore: number;
+        playerResult: PlayerResultInfo[];
+    }
 }

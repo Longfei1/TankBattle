@@ -21,6 +21,15 @@ export default class Game extends cc.Component {
     @property({ displayName: "游戏层", type: cc.Node })
     panelGame: cc.Node = null;
 
+    @property({ displayName: "布景层", type: cc.Node })
+    panelScenery: cc.Node = null;
+
+    @property({ displayName: "道具层", type: cc.Node })
+    panelProp: cc.Node = null;
+
+    @property({ displayName: "动画层", type: cc.Node })
+    panelAni: cc.Node = null;
+
     @property({ displayName: "游戏地图最小元素单元", type: cc.Node })
     nodeMapUnit: cc.Node = null;
 
@@ -31,16 +40,26 @@ export default class Game extends cc.Component {
     textDebug: cc.Label = null;
 
     @property({ displayName: "游戏场景中心", type: cc.Node })
-    nodeCenter: cc.Node = null;
+    nodeGameCenter: cc.Node = null;
+
+    @property({ displayName: "游戏盒子中心", type: cc.Node })
+    nodeBoxCenter: cc.Node = null;
 
     @property({ displayName: "结算预制体", type: cc.Prefab })
     pfbResult: cc.Prefab = null;
+
+    @property({ displayName: "暂停标记", type: cc.Node })
+    nodePause: cc.Node = null;
+
+    @property({ displayName: "暂停标记", type: cc.Prefab })
+    pfbGameSuccess: cc.Prefab = null;
 
     _currLevel: number = 1;
 
     _bulletPool: NodePool = null;
 
     _resultPanel: cc.Node = null;
+    _gameSuccessPanel: cc.Node = null;
     
     onLoad() {
         this.panelGame.active = false;
@@ -130,7 +149,7 @@ export default class Game extends cc.Component {
             this.playSceneAni(
                 AniDef.SceneAniType.GAME_START,
                 AniDef.UnitAniMode.TIMELIMIT,
-                3,
+                2,
                 {
                     scriptName: "GameStartAni",
                     params: { ["stage"]: stage},
@@ -158,6 +177,8 @@ export default class Game extends cc.Component {
         GameDataModel._enableOperate = false; //关闭控制开关
         cc.director.getCollisionManager().enabled = false; //关闭碰撞检测
 
+        cc.audioEngine.stopAll();
+
         this.node.emit(EventDef.EV_GAME_ENDED);
 
         this.showGameResult();
@@ -168,7 +189,7 @@ export default class Game extends cc.Component {
         GameDataModel._gameOver = true;
         GameDataModel._enableOperate = false;
 
-        this.playUnitAniOnce(AniDef.UnitAniType.GAME_OVER, this.nodeCenter, null, null, () => {
+        this.playUnitAniOnce(AniDef.UnitAniType.GAME_OVER, this.nodeGameCenter, null, null, () => {
             this.gameEnd();
         });
     }
@@ -297,7 +318,7 @@ export default class Game extends cc.Component {
         this.closeGameResult();
 
         this._resultPanel = cc.instantiate(this.pfbResult);
-        this.nodeCenter.addChild(this._resultPanel);
+        this.nodeBoxCenter.addChild(this._resultPanel);
     }
 
     closeGameResult() {
@@ -316,20 +337,21 @@ export default class Game extends cc.Component {
         }
         else {
             if (GameDataModel._gameRunning) {
-                // GameDataModel._gamePause = !GameDataModel._gamePause;
-
-                // if (GameDataModel._gamePause) {
-                //     this.node.emit(EventDef.EV_GAME_PAUSE);
-                // }
-                // else {
-                //     this.node.emit(EventDef.EV_GAME_RESUME);
-                // }
-
-                if (cc.director.isPaused()) {
+                if (GameDataModel.isGamePause()) {
+                    GameDataModel._enableOperate = true;
                     cc.director.resume();
+                    cc.audioEngine.resumeAll();
+
+                    this.node.emit(EventDef.EV_GAME_PAUSE);
+                    this.nodePause.active = false;
                 }
                 else {
+                    GameDataModel._enableOperate = false;
                     cc.director.pause();
+                    cc.audioEngine.pauseAll();
+
+                    this.node.emit(EventDef.EV_GAME_RESUME);
+                    this.nodePause.active = true;
                 }
             }
         }
@@ -337,7 +359,19 @@ export default class Game extends cc.Component {
 
     playGainScoreAni(pos: cc.Vec2, score: number) {
         if (pos && score != null && score > 0) {
-            this.playUnitAniInTime(AniDef.UnitAniType.GAIN_SCORE, this.panelGame, 1, {pos: pos, score: score});
+            this.playUnitAniInTime(AniDef.UnitAniType.GAIN_SCORE, this.panelAni, 0.7, { scriptName: "GainScoreAni", pos: pos, params: {score: score}});
+        }
+    }
+
+    playTankBlastAni(pos: cc.Vec2, startCallback, endCallback) {
+        if (pos) {
+            this.playUnitAniOnce(AniDef.UnitAniType.TANK_BLAST, this.panelAni, { pos: pos}, startCallback, endCallback);
+        }
+    }
+
+    playBulletBlastAni(pos: cc.Vec2) {
+        if (pos) {
+            this.playUnitAniOnce(AniDef.UnitAniType.BULLET_BLAST, this.panelAni, { pos: pos});
         }
     }
 
@@ -354,7 +388,22 @@ export default class Game extends cc.Component {
             }
             else {
                 //显示通关页面
+                this.showGameSuccessDlg();
             }
+        }
+    }
+
+    showGameSuccessDlg() {
+        this.closeGameSuccessDlg();
+
+        this._gameSuccessPanel = cc.instantiate(this.pfbGameSuccess);
+        this.nodeBoxCenter.addChild(this._gameSuccessPanel);
+    }
+
+    closeGameSuccessDlg() {
+        if (this._gameSuccessPanel) {
+            this._gameSuccessPanel.destroy();
+            this._gameSuccessPanel = null;
         }
     }
 }

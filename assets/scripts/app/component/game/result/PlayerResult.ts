@@ -1,5 +1,6 @@
 import { GameDef } from "../../../define/GameDef";
 import { GameStruct } from "../../../define/GameStruct";
+import AudioModel from "../../../model/AudioModel";
 import GameDataModel from "../../../model/GameDataModel";
 
 const { ccclass, property } = cc._decorator;
@@ -27,75 +28,59 @@ export default class PlayerResult extends cc.Component {
     setData(no: number, playerResult: GameStruct.PlayerResultInfo) {
         this._playerNO = no;
         this._resultInfo = playerResult;
+
+        this.showPlayerTotalScore();
+        this.showBonusScore();
     }
 
     onDestroy() {
         this.node.stopAllActions();
     }
 
-    playScoreAni(callback: Function) {
-        this.showPlayerTotalScore();
-        this.showBonusScore();
-
-        this.showTankScoreAni(callback);
-    }
-
     //得分动画
-    showTankScoreAni(callback: Function) {
+    showTankScoreAni(enemyTankNO, callback: Function) {
         let actions = [];
 
         //添加显示一行分数所需的动画
-        let addActionFunc = (enemyTankNO: number) => {
-            let totoalNum = this._resultInfo.tankNum[enemyTankNO];
-            let totoalScore = this._resultInfo.tankScore[enemyTankNO];
+        let totoalNum = this._resultInfo.tankNum[enemyTankNO];
+        let totoalScore = this._resultInfo.tankScore[enemyTankNO];
 
-            let avgScore = totoalScore / totoalNum;
+        let avgScore = totoalScore / totoalNum;
 
-            let showNum = 0;
-            let showScore = 0;
+        let showNum = 0;
+        let showScore = 0;
 
-            let delay = cc.delayTime(0.2);
-            let showScoreFunc = cc.callFunc(() => {
-                this.textTankNum[enemyTankNO].node.active = true;
-                this.textTankScore[enemyTankNO].node.active = true;
+        let delay = cc.delayTime(0.15);
+        let showScoreFunc = cc.callFunc(() => {
+            this.textTankNum[enemyTankNO].node.active = true;
+            this.textTankScore[enemyTankNO].node.active = true;
 
-                this.playScoreSound();
-                this.textTankNum[enemyTankNO].string = showNum.toString();
-                this.textTankScore[enemyTankNO].string = showScore.toString();
-            });
-
-            let addScoreFunc = cc.callFunc(() => {
-                showNum++;
-                showScore += avgScore;
-
-                this.playScoreSound();
-                this.textTankNum[enemyTankNO].string = showNum.toString();
-                this.textTankScore[enemyTankNO].string = showScore.toString();
-            });
-
-            actions.push(delay);
-            actions.push(showScoreFunc);
-            for (let i = 0; i < totoalNum; i++) {
-                actions.push(delay);
-                actions.push(addScoreFunc);
-            }
-        }
-
-        //添加所有击毁坦克的得分动画
-        for (let i = 0; i < this._resultInfo.tankNum.length; i++) {
-            addActionFunc(i);
-        }
-
-        //总击毁数量
-        actions.push(cc.delayTime(0.2));
-        actions.push(() => {
-            this.showTankTotalNum();
+            this.playScoreSound();
+            this.textTankNum[enemyTankNO].string = showNum.toString();
+            this.textTankScore[enemyTankNO].string = showScore.toString();
         });
 
+        let addScoreFunc = cc.callFunc(() => {
+            showNum++;
+            showScore += avgScore;
+
+            this.playScoreSound();
+            this.textTankNum[enemyTankNO].string = showNum.toString();
+            this.textTankScore[enemyTankNO].string = showScore.toString();
+        });
+
+        actions.push(delay);
+        actions.push(showScoreFunc);
+        for (let i = 0; i < totoalNum; i++) {
+            actions.push(delay);
+            actions.push(addScoreFunc);
+        }
+    
         //结束回调
+        actions.push(cc.delayTime(0.5));
         actions.push(cc.callFunc(() => {
             if (typeof callback === "function") {
-                callback();
+                callback(enemyTankNO);
             }
         }));
 
@@ -119,6 +104,6 @@ export default class PlayerResult extends cc.Component {
     }
 
     playScoreSound() {
-
+        AudioModel.playSound("sound/score");
     }
 }

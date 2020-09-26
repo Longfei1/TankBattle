@@ -41,8 +41,8 @@
     },
     "_scale": {
       "__type__": "cc.Vec3",
-      "x": 0.20580615231033597,
-      "y": 0.20580615231033597,
+      "x": 0.73514404296875,
+      "y": 0.73514404296875,
       "z": 1
     },
     "_quat": {
@@ -978,6 +978,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
+    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Arial",
@@ -1094,6 +1095,7 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
+    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
     "_N$fontFamily": "Consolas",
@@ -1156,7 +1158,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 19,
+      "width": 21.13,
       "height": 38
     },
     "_anchorPoint": {
@@ -1210,9 +1212,10 @@
     "_N$file": null,
     "_isSystemFontUsed": true,
     "_spacingX": 0,
+    "_batchAsBitmap": false,
     "_N$horizontalAlign": 1,
     "_N$verticalAlign": 1,
-    "_N$fontFamily": "黑体",
+    "_N$fontFamily": "Arial",
     "_N$overflow": 0,
     "_id": "5flTBdoc1LSJ22+AN8Q6Ho"
   },

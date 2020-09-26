@@ -4,8 +4,8 @@
         "imgName": "p1tank",
         "team": 0,
         "maxLevel": 4,
-        "moveSpeed": 120,
-        "bulletSpeed": 420,
+        "moveSpeed": 140,
+        "bulletSpeed": 480,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 1
@@ -15,8 +15,8 @@
         "imgName": "p2tank",
         "team": 0,
         "maxLevel": 4,
-        "moveSpeed": 120,
-        "bulletSpeed": 420,
+        "moveSpeed": 140,
+        "bulletSpeed": 480,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 1
@@ -26,8 +26,8 @@
         "imgName": "enemy1",
         "team": 1,
         "maxLevel": 1,
-        "moveSpeed": 140,
-        "bulletSpeed": 420,
+        "moveSpeed": 160,
+        "bulletSpeed": 480,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 1
@@ -38,7 +38,7 @@
         "team": 1,
         "maxLevel": 1,
         "moveSpeed": 180,
-        "bulletSpeed": 420,
+        "bulletSpeed": 480,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 1
@@ -48,8 +48,8 @@
         "imgName": "enemy3",
         "team": 1,
         "maxLevel": 1,
-        "moveSpeed": 120,
-        "bulletSpeed": 520,
+        "moveSpeed": 140,
+        "bulletSpeed": 600,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 2
@@ -59,8 +59,8 @@
         "imgName": "enemy4",
         "team": 1,
         "maxLevel": 4,
-        "moveSpeed": 80,
-        "bulletSpeed": 420,
+        "moveSpeed": 100,
+        "bulletSpeed": 480,
         "bulletType": 0,
         "bulletPower": 1,
         "maxBulletNum": 1

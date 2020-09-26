@@ -7,11 +7,15 @@ import { EventDef } from "../../../define/EventDef";
 import GameDataModel from "../../../model/GameDataModel";
 import CommonFunc from "../../../common/CommonFunc";
 import GameConfigModel from "../../../model/GameConfigModel";
+import { GameStruct } from "../../../define/GameStruct";
 
 const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class PlayerTank extends BattleTank {
+
+    _moveAudioInfo: GameStruct.AudioInfo = null;
+
     shoot() {
         if (super.shoot()) {
             AudioModel.playSound("sound/fire");
@@ -47,10 +51,31 @@ export default class PlayerTank extends BattleTank {
         }
     }
 
-    // setMove(bMove: boolean, nDirection: number) {
-    //     console.log("[PlayerTank]SetMove tankName:",this._tankName , ",move:", bMove, ",direction:", nDirection);
-    //     super.setMove(bMove, nDirection);
-    // }
+    setMove(bMove: boolean, nDirection: number) {
+        let lastMove = this._isMove;
+
+        super.setMove(bMove, nDirection);
+
+        if (lastMove != this._isMove) {
+            if (this._isMove) {
+                this.playMoveSound();
+            }
+            else {
+                this.stopMoveSound();
+            }
+        }
+    }
+
+    playMoveSound() {
+        this.stopMoveSound();
+        this._moveAudioInfo = AudioModel.playSound("sound/move", true);
+    }
+
+    stopMoveSound() {
+        if (this._moveAudioInfo != null && this._moveAudioInfo.audioID != null) {
+            AudioModel.stopSound(this._moveAudioInfo);
+        }
+    }
 
     lateUpdate() {
         //super.lateUpdate();
@@ -89,7 +114,7 @@ export default class PlayerTank extends BattleTank {
         }
 
         if (this._tankLevel >= GameDef.PLAYER_LEVEL_PROTECT_ONCE_DEAD) {
-            this.setTankLevel(1);
+            this.setTankLevel(this._tankLevel - 1);
             return;
         }
 
@@ -100,6 +125,10 @@ export default class PlayerTank extends BattleTank {
         if (this._tankLevel < this._tankMaxLevel) {
             this.setTankLevel(this._tankLevel + 1);
         }
+    }
+
+    onMaxLevel() {
+        this.setTankLevel(this._tankMaxLevel);
     }
 
     onLevelUpdated() {

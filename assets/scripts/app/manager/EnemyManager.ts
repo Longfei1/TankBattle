@@ -10,7 +10,7 @@ import CommonFunc from "../common/CommonFunc";
 import { GameDef } from "../define/GameDef";
 
 const ENEMY_ADD_INTERVAL = 1; //秒
-const ENEMY_BEHAVIOR_INTERVAL = 1; //秒
+const ENEMY_BEHAVIOR_INTERVAL = 0.5; //秒
 
 const { ccclass, property } = cc._decorator;
 
@@ -44,16 +44,18 @@ export default class EnemyManager extends cc.Component {
     }
 
     initListenner() {
-        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
-        gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
-        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
-        gameController.node.on(EventDef.EV_ENEMY_DEAD, this.evEnemyDead, this);
-        gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
+        if (!GameDataModel.isModeEditMap()) {
+            gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
+            gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
+            gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
+            gameController.node.on(EventDef.EV_ENEMY_DEAD, this.evEnemyDead, this);
+            gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
 
-        gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
-        gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+            //gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+            //gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
 
-        gameController.node.on(EventDef.EV_PROP_BOMB, this.evPropBomb, this);
+            gameController.node.on(EventDef.EV_PROP_BOMB, this.evPropBomb, this);
+        }
     }
 
     removeListener() {
@@ -104,10 +106,15 @@ export default class EnemyManager extends cc.Component {
     }
 
     evEnemyDead(id : number) {
-        this.destroyEnemyTank(id);
-        if (this._enemyTanks[id] && this._enemyTanks[id]._destroyedBy >= 0) {
-            GameDataModel.addPlayerShootNum(this._enemyTanks[id]._destroyedBy, this._enemyTanks[id]._tankName);
+        if (this._enemyTanks[id]) {
+            if (this._enemyTanks[id]._destroyedBy >= 0) {
+                GameDataModel.addPlayerShootNum(this._enemyTanks[id]._destroyedBy, this._enemyTanks[id]._tankName);
+            }else {
+                GameDataModel._propDestroyEnemyNum++;
+            }
         }
+
+        this.destroyEnemyTank(id);
 
         //生成新的敌人
         if (this.isNeedCreateEnemy()) {
@@ -115,7 +122,9 @@ export default class EnemyManager extends cc.Component {
         }
 
         if (this.isGameEnd()) {
-            gameController.gameEnd();
+            this.scheduleOnce(() => {
+                gameController.gameEnd();
+            }, 3);
         }
     }
 
@@ -136,7 +145,6 @@ export default class EnemyManager extends cc.Component {
     evPropBomb(playerNO: number) {
         //销毁全部敌军
         CommonFunc.travelMap(this._enemyTanks, (id:number, enemy: EnemyTank) => {
-            GameDataModel._propDestroyEnemyNum++;
             enemy.dead(); 
         })
     }
@@ -225,8 +233,7 @@ export default class EnemyManager extends cc.Component {
 
     isNeedCreateEnemy(): boolean {
         let aliveNum = GameDataModel.getEnemyAliveNum();
-        if (!GameDataModel._gamePause
-            && (aliveNum < this._diffcultyData["EnemyMaxAliveNum"])
+        if ((aliveNum < this._diffcultyData["EnemyMaxAliveNum"])
             && (GameDataModel.getEnemyDeadTotalNum() + aliveNum < this._diffcultyData["EnemyTotalNum"])) {
             return true;
         }

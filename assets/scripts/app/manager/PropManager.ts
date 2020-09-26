@@ -51,8 +51,8 @@ export default class EnemyManager extends cc.Component {
         gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
         gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
 
-        gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
-        gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+        //gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+        //gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
     }
 
     evCreateProp() {
@@ -60,7 +60,11 @@ export default class EnemyManager extends cc.Component {
             let type = this.getRandomPropType();
             let pos = this.getRandomPropPosition()
 
-            if (type && pos) {
+            console.log("create prop, pos:", type, "pos:", pos);
+            if (type != null && pos) {
+                AudioModel.playSound("sound/prop_1");
+
+                this._prop.removeFromParent();
                 this.panelProp.addChild(this._prop);
 
                 let com = this._prop.getComponent(Prop);
@@ -117,6 +121,18 @@ export default class EnemyManager extends cc.Component {
                     AudioModel.playSound("sound/prop_2");
                     this.onPropSpadeStart(GameDef.PROP_SPADE_TIME);
                     break;
+                case GameDef.PropType.GUN:
+                    //手枪
+                    AudioModel.playSound("sound/prop_2");
+                    if (playerTank._tankLevel < playerTank._tankMaxLevel) {
+                        playerTank.onMaxLevel();
+                    }
+                    else {
+                        //满级再吃手枪，加生命数量
+                        GameDataModel.addPlayerLifeNum(playerTank.id);
+                        gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE);
+                    }
+                    break;
                 default:
                     break;
             }
@@ -139,7 +155,7 @@ export default class EnemyManager extends cc.Component {
     }
 
     getRandomPropPosition(): GameStruct.RcInfo {
-        let posAry = GameDataModel.getEmptyMatrixArray(4, 4);
+        let posAry = GameDataModel.getEmptyMatrixArray(4, 4, [GameDef.SceneryType.GRASS, GameDef.SceneryType.WALL]);
         if (posAry.length > 0) {
             return CommonFunc.getRandomArrayValue(posAry);
         }
@@ -154,6 +170,7 @@ export default class EnemyManager extends cc.Component {
             GameDef.PropType.SPADE,
             GameDef.PropType.STAR,
             GameDef.PropType.TANK,
+            GameDef.PropType.GUN,
         ];
         return CommonFunc.getRandomArrayValue(propAary);
     }

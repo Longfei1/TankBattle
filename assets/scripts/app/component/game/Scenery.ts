@@ -165,8 +165,8 @@ export default class Scenery extends cc.Component {
     }
 
     //获取与指定区域重叠的所有子区域
-    getOverlapRects(rect: cc.Rect): cc.Rect[] {
-        let ret: cc.Rect[] = [];
+    getOverlapSceneryRects(rect: cc.Rect): GameStruct.SceneryRect[] {
+        let ret: GameStruct.SceneryRect[] = [];
 
         if (rect) {
             for (let img of this.imgScenerys) {
@@ -175,7 +175,7 @@ export default class Scenery extends cc.Component {
                     let imgRect = cc.rect(pos.x, pos.y, img.node.width, img.node.height)
 
                     if (GameDataModel.isRectOverlap(rect, imgRect)) {//两个矩形有重合，相交不算
-                        ret.push(imgRect);
+                        ret.push({sceneryType: this.getType(), rect: imgRect});
                     }
                 }
             }

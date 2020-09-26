@@ -49,13 +49,18 @@ export default class GameMapManager extends cc.Component {
         gameController.node.on(EventDef.EV_MAP_CREATE_SCENERY, this.evMapEditCreateScenery, this);
         gameController.node.on(EventDef.EV_MAP_EDIT_FINISHED, this.evMapEditFinished, this);
         gameController.node.on(EventDef.EV_MAP_DESTROY_SCENERY, this.evDestroyScenery, this);
-        gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
-        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
-        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
 
-        gameController.node.on(EventDef.EV_PROP_SPADE_START, this.evPropSpadeStart, this);
-        gameController.node.on(EventDef.EV_PROP_SPADE_COUNT_DOWN, this.evPropSpadeCountDown, this);
-        gameController.node.on(EventDef.EV_PROP_SPADE_END, this.evPropSpadeEnd, this);
+        gameController.node.on(EventDef.EV_GAME_INIT_FINISHED, this.evGameInitFinished, this);
+
+        if (!GameDataModel.isModeEditMap()) {
+            gameController.node.on(EventDef.EV_PLAYER_INIT_FINISHED, this.evPlayerInitFinished, this);
+            gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
+            gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnded, this);
+
+            gameController.node.on(EventDef.EV_PROP_SPADE_START, this.evPropSpadeStart, this);
+            gameController.node.on(EventDef.EV_PROP_SPADE_COUNT_DOWN, this.evPropSpadeCountDown, this);
+            gameController.node.on(EventDef.EV_PROP_SPADE_END, this.evPropSpadeEnd, this);
+        }
 
         GameInputModel.addKeyDownOnceListener(() => {
             this.saveMapData();
@@ -102,6 +107,7 @@ export default class GameMapManager extends cc.Component {
 
         this.createHomeBase();
         this.checkHomeBase();
+        this.checkBornPlace();
     }
 
     resetGameMap() {
@@ -195,11 +201,8 @@ export default class GameMapManager extends cc.Component {
     }
 
     evDestroyScenery(node: cc.Node) {
-        let rcInfo = GameDataModel.sceneToMatrixPosition(node.getPosition());
-        if (this._scenerys[rcInfo.col][rcInfo.row] === node) {
-            this._scenerys[rcInfo.col][rcInfo.row] = null;
-            this._sceneryPool.putNode(node);
-        }
+        let sceneryPos = GameDataModel.sceneToSceneryPosition(node.getPosition());
+        this.destroyScenery(sceneryPos);
     }
 
     saveMapData() {
@@ -392,5 +395,11 @@ export default class GameMapManager extends cc.Component {
         }
 
         this._propSpadeEffectDisappearAniID = null;
+    }
+
+    evGameInitFinished() {
+        if (GameDataModel.isModeEditMap()) {
+            this.initGameMap();
+        }
     }
 }

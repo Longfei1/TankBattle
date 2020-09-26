@@ -16,6 +16,7 @@ const PropImgName = {
     [GameDef.PropType.SPADE]: "spade",
     [GameDef.PropType.STAR]: "star",
     [GameDef.PropType.TANK]: "tank",
+    [GameDef.PropType.GUN]: "gun",
 }
 
 @ccclass
@@ -60,12 +61,22 @@ export default class Prop extends cc.Component {
     }
 
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
+        this.onClilision(other, self);
+    }
+
+    onCollisionStay(other: cc.Collider, self: cc.Collider) {
+        this.onClilision(other, self);
+    }
+
+    onClilision(other: cc.Collider, self: cc.Collider) {
         if (other.node.group === GameDef.GROUP_NAME_TANK) {
-            let com = other.node.getComponent(BattleTank);
-            if (!this._destroyed && com && com._team === GameDef.TeamType.PLAYER) {
-                this._destroyed = true;
-                gameController.node.emit(EventDef.EV_PROP_GAIN, other.node);
-                gameController.node.emit(EventDef.EV_PROP_DESTROY);
+            if (GameDataModel.isValidCollision(other, self)) {
+                let com = other.node.getComponent(BattleTank);
+                if (!this._destroyed && com && com._team === GameDef.TeamType.PLAYER) {
+                    this._destroyed = true;
+                    gameController.node.emit(EventDef.EV_PROP_GAIN, other.node);
+                    gameController.node.emit(EventDef.EV_PROP_DESTROY);
+                }
             }
         }
     }

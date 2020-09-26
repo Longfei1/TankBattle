@@ -1,0 +1,41 @@
+{
+  "__type__": "cc.AnimationClip",
+  "_name": "ani_bullet_blast",
+  "_objFlags": 0,
+  "_native": "",
+  "_duration": 0.21666666666666667,
+  "sample": 60,
+  "speed": 1,
+  "wrapMode": 1,
+  "curveData": {
+    "paths": {
+      "Img_Show": {
+        "comps": {
+          "cc.Sprite": {
+            "spriteFrame": [
+              {
+                "frame": 0,
+                "value": {
+                  "__uuid__": "cf1f3be1-9506-44e0-b625-bd1b241709eb"
+                }
+              },
+              {
+                "frame": 0.1,
+                "value": {
+                  "__uuid__": "07119bd7-ddaa-4597-9f69-3db95d7d4fc1"
+                }
+              },
+              {
+                "frame": 0.2,
+                "value": {
+                  "__uuid__": "1e4dddb1-e4de-4023-be8a-296dafb12d78"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "events": []
+}

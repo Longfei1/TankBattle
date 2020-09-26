@@ -5,6 +5,7 @@ import { GameDef } from "../define/GameDef";
 import { AniDef } from "../define/AniDef";
 import UniqueIdGenerator from "../common/UniqueIdGenerator";
 import CommonFunc from "../common/CommonFunc";
+import GameDataModel from "../model/GameDataModel";
 
 const { ccclass, property } = cc._decorator;
 
@@ -17,7 +18,7 @@ export default class AnimationManager extends cc.Component {
     pfbSceneAniArray: cc.Prefab[] = [];
 
     @property({ displayName: "场景中心节点", type: cc.Node})
-    nodeCenter: cc.Node = null; 
+    nodeBoxCenter: cc.Node = null; 
 
     _idGenerator: UniqueIdGenerator = new UniqueIdGenerator()
     _aniCallback: { [id: number]: GameStruct.AniCallback} = {};
@@ -25,17 +26,19 @@ export default class AnimationManager extends cc.Component {
     onLoad () {
         this.initMembers()
 
-        gameController.node.on(EventDef.EV_UNITANI_PLAY, this.playUnitAni, this);
-        gameController.node.on(EventDef.EV_SCENEANI_PLAY, this.playSceneAni, this);
-        gameController.node.on(EventDef.EV_ANI_STOP, this.stopAnimation, this);
+        if (!GameDataModel.isModeEditMap()) {
+            gameController.node.on(EventDef.EV_UNITANI_PLAY, this.playUnitAni, this);
+            gameController.node.on(EventDef.EV_SCENEANI_PLAY, this.playSceneAni, this);
+            gameController.node.on(EventDef.EV_ANI_STOP, this.stopAnimation, this);
 
-        gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
+            gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
 
-        gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
-        gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+            //gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+            //gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
 
-        gameController.node.on(EventDef.EV_ANI_PAUSE, this.evPauseAni, this);
-        gameController.node.on(EventDef.EV_ANI_RESUME, this.evResumeAni, this);
+            gameController.node.on(EventDef.EV_ANI_PAUSE, this.evPauseAni, this);
+            gameController.node.on(EventDef.EV_ANI_RESUME, this.evResumeAni, this);
+        }
     }
 
     onDestroy() {
@@ -62,7 +65,7 @@ export default class AnimationManager extends cc.Component {
 
     removeAniCallback(aniID) {
         if (this._aniCallback[aniID]) {
-            this._aniCallback[aniID] = null;
+            delete this._aniCallback[aniID];
         }
         this._idGenerator.returnID(aniID);
     }
@@ -104,8 +107,12 @@ export default class AnimationManager extends cc.Component {
         }
 
         node.addChild(nodeAni);
-        let animation = nodeAni.getComponent(cc.Animation);
 
+        if (param && param.pos) {
+            nodeAni.setPosition(param.pos);
+        }
+
+        let animation = nodeAni.getComponent(cc.Animation);
         //动画需要有默认的clip
         if (animation) {
             let aniID: number;
@@ -205,7 +212,7 @@ export default class AnimationManager extends cc.Component {
 
         if (this.pfbSceneAniArray[info.type]) {
             info.aniID = this.playPrefabAni(
-                this.nodeCenter,
+                this.nodeBoxCenter,
                 this.pfbSceneAniArray[info.type],
                 info.mode,
                 info.time,

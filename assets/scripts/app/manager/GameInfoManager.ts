@@ -8,6 +8,9 @@ const { ccclass, property } = cc._decorator;
 
 @ccclass
 export default class GameInfoManager extends cc.Component {
+    @property({ displayName: "游戏信息节点", type: cc.Node })
+    panelInfo: cc.Node = null;
+
     @property({ displayName: "敌军剩余坦克图标", type: [cc.Node] })
     enemyLifes: cc.Node[] = [];
 
@@ -22,13 +25,23 @@ export default class GameInfoManager extends cc.Component {
 
     onLoad() {
         this.initListener();
+
+        if (!GameDataModel.isModeEditMap()) {
+            this.updateView();
+            this.panelInfo.active = true;
+        }
+        else {
+            this.panelInfo.active = false;
+        }
     }
 
     initListener() {
-        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evGamePrepare, this);
+        if (!GameDataModel.isModeEditMap()) {
+            gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evGamePrepare, this);
 
-        gameController.node.on(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE, this.evPlayerLifeUpdated, this);
-        gameController.node.on(EventDef.EV_DISPLAY_UPDATE_ENEMY_LIFE, this.evEenmyLifeUpdated, this);
+            gameController.node.on(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE, this.evPlayerLifeUpdated, this);
+            gameController.node.on(EventDef.EV_DISPLAY_UPDATE_ENEMY_LIFE, this.evEenmyLifeUpdated, this);
+        }
     }
     
     onDestroy() {

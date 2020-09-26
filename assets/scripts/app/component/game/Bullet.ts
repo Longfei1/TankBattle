@@ -39,33 +39,31 @@ export default class Bullet extends cc.Component {
     }
 
     update(dt) {
-        if (!GameDataModel._gamePause) {
-            let curPos = this.node.getPosition();
-            let moveDiff = this._speedMove * dt;
-            let nextPox = curPos;
+        let curPos = this.node.getPosition();
+        let moveDiff = this._speedMove * dt;
+        let nextPox = curPos;
 
-            if (this.onHitSceneryEx(curPos, this._moveDirection, moveDiff)) {
-                this.onHited();
+        if (this.onHitSceneryEx(curPos, this._moveDirection, moveDiff)) {
+        
+        }
+        else{
+            switch (this._moveDirection) {
+                case GameDef.DIRECTION_UP:
+                    nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
+                    break;
+                case GameDef.DIRECTION_LEFT:
+                    nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
+                    break;
+                case GameDef.DIRECTION_DOWN:
+                    nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
+                    break;
+                case GameDef.DIRECTION_RIGHT:
+                    nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
+                    break;
+                default:
+                    break;
             }
-            else{
-                switch (this._moveDirection) {
-                    case GameDef.DIRECTION_UP:
-                        nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
-                        break;
-                    case GameDef.DIRECTION_LEFT:
-                        nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
-                        break;
-                    case GameDef.DIRECTION_DOWN:
-                        nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
-                        break;
-                    case GameDef.DIRECTION_RIGHT:
-                        nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
-                        break;
-                    default:
-                        break;
-                }
-                this.node.setPosition(nextPox);
-            }
+            this.node.setPosition(nextPox);
         }
     }
 
@@ -121,15 +119,28 @@ export default class Bullet extends cc.Component {
         }
 
         if (!canMove) {
-            this.onHited();
+            this.onHited(other.node.group);
         }
     }
 
-    onHited() {
+    onHited(group: string, type: number = null) {
         if (!this._destroyed) {
-            AudioModel.playSound("sound/hit");
+            if (this._team === GameDef.TeamType.PLAYER) {
+                if (group === GameDef.GROUP_NAME_SCENERY) {
+                    if (type != null && type === GameDef.SceneryType.WALL) {
+                        AudioModel.playSound("sound/hit1");
+                    }
+                    else {
+                        AudioModel.playSound("sound/hit2");
+                    }
+                }
+                else {
+                    AudioModel.playSound("sound/hit2");
+                }
+            }
             this._destroyed = true;
 
+            gameController.playBulletBlastAni(this.node.getPosition());
             gameController.node.emit(EventDef.EV_GAME_REDUCE_BULLET, this._shooterID);
             gameController.putNodeBullet(this.node);
         }
@@ -199,12 +210,13 @@ export default class Bullet extends cc.Component {
             return true;
         }
         
-        let hitRect = GameDataModel.getBulletShootSceneryRectWhenMove(dir, moveRect);
-        if (!hitRect) {
+        let hitSceneryRect = GameDataModel.getBulletShootSceneryRectWhenMove(dir, moveRect);
+        if (!hitSceneryRect) {
             return false; //没有命中布景
         }
 
-        this.dealHitScenery(src, dir, hitRect);
+        this.onHited(GameDef.GROUP_NAME_SCENERY, hitSceneryRect.sceneryType);
+        this.dealHitScenery(src, dir, hitSceneryRect.rect);
 
         return true;
     }

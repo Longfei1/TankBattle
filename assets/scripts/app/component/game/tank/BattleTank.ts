@@ -46,12 +46,6 @@ export default class BattleTank extends BaseTank {
 
     _lastShootTime: number = 0;
 
-    //地图边界
-    _boundaryLx: number = 0;
-    _boundaryRx: number = 0;
-    _boundaryTy: number = 0;
-    _boundaryBy: number = 0;
-
     private _tankID: number = -1;
 
     DirectionSuffix = {
@@ -73,11 +67,6 @@ export default class BattleTank extends BaseTank {
 
     onLoad() {
         super.onLoad();
-
-        this._boundaryLx = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, 0)).x
-        this._boundaryRx = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(GameDef.GAME_MAP_COL_NUM, 0)).x
-        this._boundaryTy = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, GameDef.GAME_MAP_ROW_NUM)).y
-        this._boundaryBy = GameDataModel.matrixToScenePosition(new GameStruct.RcInfo(0, 0)).y
     }
 
     reset() {
@@ -204,8 +193,7 @@ export default class BattleTank extends BaseTank {
     }
 
     updateMove(dt) {
-        if (!GameDataModel._gamePause
-            && this.isTankVisible()) {
+        if (this.isTankVisible()) {
             // this._moveDiff = this.calcMove(this._moveSpeed * dt);
             // if (this._moveDiff > 0) {
             //     let curPos = this.node.getPosition();
@@ -238,25 +226,9 @@ export default class BattleTank extends BaseTank {
             let moveDiff = this.calcMove(dt);
             if (moveDiff > 0) {
                 let curPos = this.node.getPosition();
-                if (this.canMoveFromAToB(curPos, this._moveDirection, moveDiff)) {
-                    let nextPox = curPos;
-                    switch (this._moveDirection) {
-                        case GameDef.DIRECTION_UP:
-                            nextPox = cc.v2(curPos.x, curPos.y + moveDiff);
-                            break;
-                        case GameDef.DIRECTION_LEFT:
-                            nextPox = cc.v2(curPos.x - moveDiff, curPos.y);
-                            break;
-                        case GameDef.DIRECTION_DOWN:
-                            nextPox = cc.v2(curPos.x, curPos.y - moveDiff);
-                            break;
-                        case GameDef.DIRECTION_RIGHT:
-                            nextPox = cc.v2(curPos.x + moveDiff, curPos.y);
-                            break;
-                        default:
-                            break;
-                    }
-                    this.node.setPosition(nextPox);
+                let newPos = this.canMoveFromAToBEx(curPos, this._moveDirection, moveDiff);
+                if (newPos) {
+                    this.node.setPosition(newPos);
                 }
                 else {
                     this.onMoveFailed();
@@ -278,22 +250,6 @@ export default class BattleTank extends BaseTank {
         return moveDiff;
     }
 
-    validateMove() {
-        let pos = this.node.getPosition();
-        if (pos.x < this._boundaryLx) {
-            this.node.x = this._boundaryLx;
-        }
-        else if (pos.x > this._boundaryRx) {
-            this.node.x = this._boundaryRx;
-        }
-        else if (pos.y > this._boundaryTy) {
-            this.node.y = this._boundaryTy;
-        }
-        else if (pos.y < this._boundaryBy) {
-            this.node.y = this._boundaryBy;
-        }
-    }
-
     setPosition(pos: any) {
         super.setPosition(pos);
         if (pos) {
@@ -304,17 +260,17 @@ export default class BattleTank extends BaseTank {
     onCollisionEnter(other: cc.Collider, self: cc.Collider) {
         // if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
         //     let sceneryType = other.node.getComponent(Scenery).getType();
-        //     if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+        //     if (sceneryType !== GameDef.SceneryType.GRASS && GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
         // else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
-        //     if (this.isValidCollision(other, self)) {
+        //     if (GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
         // else if (other.node.group === GameDef.GROUP_NAME_TANK) {
-        //     if (this.isValidCollision(other, self)) {
+        //     if (GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
@@ -331,17 +287,17 @@ export default class BattleTank extends BaseTank {
     onCollisionStay(other: cc.Collider, self: cc.Collider) {
         // if (other.node.group === GameDef.GROUP_NAME_SCENERY) {
         //     let sceneryType = other.node.getComponent(Scenery).getType();
-        //     if (sceneryType !== GameDef.SceneryType.GRASS && this.isValidCollision(other, self)) {
+        //     if (sceneryType !== GameDef.SceneryType.GRASS && GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
         // else if (other.node.group === GameDef.GROUP_NAME_BOUNDARY) {
-        //     if (this.isValidCollision(other, self)) {
+        //     if (GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
         // else if (other.node.group === GameDef.GROUP_NAME_TANK) {
-        //     if (this.isValidCollision(other, self)) {
+        //     if (GameDataModel.isValidCollision(other, self)) {
         //         this._canMove = false;
         //     }
         // }
@@ -396,7 +352,7 @@ export default class BattleTank extends BaseTank {
         AudioModel.playSound("sound/blast");
 
         this._isMove = false;
-        gameController.playUnitAniOnce(AniDef.UnitAniType.BLAST, this.getNodeAni(), null, () => {
+        gameController.playTankBlastAni(this.getCenterPosition(), () => {
             this.setTankVisible(false);
         }, () => {
             this.destroyNode();
@@ -440,18 +396,6 @@ export default class BattleTank extends BaseTank {
 
             this._imgLoopFrame = 0;
         }
-    }
-
-    //判断两个矩形碰撞体是否产生有效碰撞(相交非相切时)
-    isValidCollision(other: any /*cc.Collider*/, self: any /*cc.Collider*/): boolean {
-        let rect1 = self.world.aabb;
-        let rect2 = other.world.aabb;
-
-        if (GameDataModel.isRectOverlap(rect1, rect2)) {
-            return true;
-        }
-
-        return false;
     }
 
     //矫正坐标，转向时设置坐标为最近的行列坐标值
@@ -502,8 +446,32 @@ export default class BattleTank extends BaseTank {
         return ret;
     }
 
+    getMovePosition(src: cc.Vec2, dir: number, distance: number) {
+        let retPos: cc.Vec2 = null;
+
+        switch (dir) {
+            case GameDef.DIRECTION_UP:
+                retPos = cc.v2(src.x, src.y + distance);
+                break;
+            case GameDef.DIRECTION_LEFT:
+                retPos = cc.v2(src.x - distance, src.y);
+                break;
+            case GameDef.DIRECTION_DOWN:
+                retPos = cc.v2(src.x, src.y - distance);
+                break;
+            case GameDef.DIRECTION_RIGHT:
+                retPos = cc.v2(src.x + distance, src.y);
+                break;
+            default:
+                break;
+        }
+
+        return retPos;
+    }
+
     //给定起点(锚点)、方向和距离，判断是否可以移动
-    canMoveFromAToB(src: cc.Vec2, dir: number, distance: number) {
+    canMoveFromAToB(src: cc.Vec2, dir: number, distance: number): cc.Vec2 {
+        let newPos: cc.Vec2 = null;
         let moveAreaRect: cc.Rect;
         let width = GameDataModel.getTankWidth();
         if (dir === GameDef.DIRECTION_UP) {
@@ -521,11 +489,69 @@ export default class BattleTank extends BaseTank {
 
         if (moveAreaRect) {
             if (GameDataModel.canTankMoveInRect(moveAreaRect, this.node)) {
-                return true;
+                newPos = this.getMovePosition(src, dir, distance);
             }
         }
 
-        return false;
+        return newPos;
+    }
+
+    //给定起点(锚点)、方向和距离，判断是否可以移动(当与阻碍物有一定距离时，会贴近阻碍物，并算作可以移动)
+    //返回值为新的坐标
+    canMoveFromAToBEx(src: cc.Vec2, dir: number, distance: number): cc.Vec2 {
+        let newPos: cc.Vec2 = null;
+        let moveAreaRect: cc.Rect;
+        let width = GameDataModel.getTankWidth();
+        if (dir === GameDef.DIRECTION_UP) {
+            moveAreaRect = cc.rect(src.x, src.y + width, width, distance);
+        }
+        else if (dir === GameDef.DIRECTION_DOWN) {
+            moveAreaRect = cc.rect(src.x, src.y - distance, width, distance);
+        }
+        else if (dir === GameDef.DIRECTION_LEFT) {
+            moveAreaRect = cc.rect(src.x - distance, src.y, distance, width);
+        }
+        else if (dir === GameDef.DIRECTION_RIGHT) {
+            moveAreaRect = cc.rect(src.x + width, src.y, distance, width);
+        }
+
+        if (moveAreaRect) {
+            let collisionRect = GameDataModel.getCollisionRectWhenTankMove(dir, moveAreaRect, this.node);
+            if (collisionRect) {
+                //返回一个和障碍物相交的坐标
+                let tankWidth = GameDataModel.getTankWidth();
+                let myRect: cc.Rect = cc.rect(src.x, src.y, tankWidth, tankWidth);
+                switch (dir) {
+                    case GameDef.DIRECTION_UP:
+                        if (myRect.yMax < collisionRect.yMin) {
+                            newPos = cc.v2(myRect.x, collisionRect.yMin - myRect.height);
+                        }
+                        break;
+                    case GameDef.DIRECTION_LEFT:
+                        if (myRect.xMin > collisionRect.xMax) {
+                            newPos = cc.v2(collisionRect.xMax, myRect.y);
+                        }
+                        break;
+                    case GameDef.DIRECTION_DOWN:
+                        if (myRect.yMin > collisionRect.yMax) {
+                            newPos = cc.v2(myRect.x, collisionRect.yMax);
+                        }
+                        break;
+                    case GameDef.DIRECTION_RIGHT:
+                        if (myRect.xMax < collisionRect.xMin) {
+                            newPos = cc.v2(collisionRect.xMin - myRect.width, myRect.y);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else {
+                newPos = this.getMovePosition(src, dir, distance);
+            }
+        }
+
+        return newPos;
     }
 
     //获取坦克当前可移动的方向
@@ -541,7 +567,7 @@ export default class BattleTank extends BaseTank {
 
             let moveDistance = this._moveSpeed*(1/GameDef.GAME_FPS);
 
-            if (this.canMoveFromAToB(correctPos, dir, moveDistance)) {
+            if (this.canMoveFromAToBEx(correctPos, dir, moveDistance)) {
                 directions.push(dir);
             }
         }
@@ -621,5 +647,11 @@ export default class BattleTank extends BaseTank {
 
     getDestroyScore(): number {
         return 0;
+    }
+
+    getCenterPosition() {
+        let pos = this.node.getPosition();
+        let width = GameDataModel.getTankWidth();
+        return cc.v2(pos.x + width / 2, pos.y + width / 2);
     }
 }

@@ -3,8 +3,8 @@
   "_name": "loading",
   "_objFlags": 0,
   "_native": "",
-  "_duration": 1,
-  "sample": 30,
+  "_duration": 2,
+  "sample": 15,
   "speed": 1,
   "wrapMode": 1,
   "curveData": {
@@ -18,7 +18,7 @@
           ]
         },
         {
-          "frame": 1,
+          "frame": 2,
           "value": [
             0,
             0

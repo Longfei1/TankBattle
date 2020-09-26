@@ -6,109 +6,106 @@
         <dict>
             <key>bomb.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,143},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
+                <key>rotated</key>
+                <true/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
                 <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{1,1},{48,45}}</string>
-                <key>textureRotated</key>
-                <false/>
             </dict>
             <key>clock.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{52,96},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{51,1},{48,45}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
+            </dict>
+            <key>gun.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{2,96},{48,45}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
             </dict>
             <key>helmet.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{52,49},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{101,1},{48,45}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
             </dict>
             <key>spade.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,49},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{151,1},{48,45}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
             </dict>
             <key>star.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{52,2},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{201,1},{48,45}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
             </dict>
             <key>tank.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,2},{48,45}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{48,45}</string>
-                <key>spriteSourceSize</key>
-                <string>{48,45}</string>
-                <key>textureRect</key>
-                <string>{{251,1},{48,45}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{48,45}}</string>
+                <key>sourceSize</key>
+                <string>{48,45}</string>
             </dict>
         </dict>
         <key>metadata</key>
         <dict>
             <key>format</key>
-            <integer>3</integer>
-            <key>pixelFormat</key>
-            <string>RGBA8888</string>
-            <key>premultiplyAlpha</key>
-            <false/>
+            <integer>2</integer>
             <key>realTextureFileName</key>
             <string>prop.png</string>
             <key>size</key>
-            <string>{300,47}</string>
+            <string>{128,256}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:83510f50a259df5f0902a110a0388288:8cdb807463e58e6bcdf5fabf0aeab299:f00710e483f99d68c2a3ea567d288b30$</string>
+            <string>$TexturePacker:SmartUpdate:312be86fdbb1cd4815fad7c1cb18e655$</string>
             <key>textureFileName</key>
             <string>prop.png</string>
         </dict>

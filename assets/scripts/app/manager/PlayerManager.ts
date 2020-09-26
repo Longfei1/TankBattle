@@ -20,6 +20,9 @@ export default class PlayerManager extends cc.Component {
     @property({ displayName: "游戏层", type: cc.Node })
     panelGame: cc.Node = null;
 
+    @property({ displayName: "布景层", type: cc.Node })
+    panelScenery: cc.Node = null;
+
     @property({ displayName: "玩家预制体", type: cc.Prefab })
     pfbPlayer: cc.Prefab = null;
 
@@ -52,10 +55,19 @@ export default class PlayerManager extends cc.Component {
             GameInputModel.addKeyDownOnceListener(this.onKeyDown, this.onKeyUp, this);
         }
 
-        gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
-        gameController.node.on(EventDef.EV_PLAYER_DEAD, this.evPlayerDead, this);
-        gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
-        gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
+        gameController.node.on(EventDef.EV_GAME_INIT_FINISHED, this.evGameInitFinished, this);
+
+        if (!GameDataModel.isModeEditMap()) {
+            gameController.node.on(EventDef.EV_GAME_STARTED, this.evGameStarted, this);
+            gameController.node.on(EventDef.EV_PLAYER_DEAD, this.evPlayerDead, this);
+            gameController.node.on(EventDef.EV_GAME_PREPARE_GAME, this.evPrepareGame, this);
+            gameController.node.on(EventDef.EV_GAME_REDUCE_BULLET, this.evReduceBullet, this);
+
+            gameController.node.on(EventDef.EV_GAME_PAUSE, this.evGamePause, this);
+            gameController.node.on(EventDef.EV_GAME_RESUME, this.evGameResume, this);
+
+            gameController.node.on(EventDef.EV_GAME_ENDED, this.evGameEnd, this);
+        }
     }
 
     removeListener() {
@@ -66,7 +78,8 @@ export default class PlayerManager extends cc.Component {
         if (GameDataModel.isModeEditMap()) {
             let mapEditer = cc.instantiate(this.pfbMapEditer);
             if (mapEditer) {
-                this.panelGame.addChild(mapEditer);
+                this.panelScenery.addChild(mapEditer);
+                mapEditer.zIndex = cc.macro.MAX_ZINDEX;
                 let tankCom = mapEditer.getComponent(MapEditTank)
                 tankCom.setEditPosition(GameDef.BORN_PLACE_PLAYER1);
                 //tankCom.setMoveDirction(GameDef.DIRECTION_UP);
@@ -126,15 +139,15 @@ export default class PlayerManager extends cc.Component {
         }
     }
 
-    update() {
-        if (GameDataModel.isGamePause()) {
-            return
-        }
+    // update() {
+    //     if (GameDataModel.isGamePause()) {
+    //         return
+    //     }
 
-        if (GameDataModel.isModeEditMap()) {
-            return
-        }
-    }
+    //     if (GameDataModel.isModeEditMap()) {
+    //         return
+    //     }
+    // }
 
     onKeyDown(event) {
         if (!GameDataModel._enableOperate) {
@@ -295,7 +308,7 @@ export default class PlayerManager extends cc.Component {
         if (GameDataModel.getPlayerLifeNum(no) > 0) {
             GameDataModel.reducePlayerLifeNum(no);
             GameDataModel._liveStatus[no] = true;
-            this.createPlayer(0, this.getTankAttributesById(no), GameDef.BORN_PLACE_PLAYER1);
+            this.createPlayer(no, this.getTankAttributesById(no), this.getBornPlaceById(no));
 
             gameController.node.emit(EventDef.EV_DISPLAY_UPDATE_PLAYER_LIFE);
         }
@@ -334,11 +347,43 @@ export default class PlayerManager extends cc.Component {
         return tankData[idToName[id]];
     }
 
+    getBornPlaceById(id : number): GameStruct.RcInfo{
+        let idToPos = {[0]: GameDef.BORN_PLACE_PLAYER1, [1]: GameDef.BORN_PLACE_PLAYER2};
+        let tankData = GameConfigModel.tankData;
+        return idToPos[id];
+    }
+
     isPlayerNoLife(no: number) {
         //玩家状态为死亡且没有多余的剩余生命
         if (!GameDataModel._liveStatus[no] && GameDataModel.getPlayerLifeNum(no) <= 0) {
             return true;
         }
         return false;
+    }
+
+    evGamePause() {
+       this.stopAllPlayerMove();
+    }
+
+    evGameResume() {
+
+    }
+
+    evGameEnd() {
+        this.stopAllPlayerMove();
+    }
+
+    stopAllPlayerMove() {
+        CommonFunc.travelMap(this._players, (no: number, player: PlayerTank) => {
+            if (cc.isValid(player.node)) {
+                player.setMove(false, player._moveDirection);
+            }
+        });
+    }
+
+    evGameInitFinished() {
+        if (GameDataModel.isModeEditMap()) {
+            this.initPlayers();
+        }
     }
 }

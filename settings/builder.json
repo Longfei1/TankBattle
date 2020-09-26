@@ -7,19 +7,14 @@
     "scheme": "https",
     "skipRecord": false
   },
-  "appKey": "",
-  "appSecret": "",
   "encryptJs": true,
   "excludeScenes": [],
   "fb-instant-games": {},
-  "includeAnySDK": false,
   "includeSDKBox": false,
   "inlineSpriteFrames": true,
   "inlineSpriteFrames_native": true,
-  "jailbreakPlatform": false,
   "md5Cache": false,
   "mergeStartScene": false,
-  "oauthLoginServer": "",
   "optimizeHotUpdate": false,
   "orientation": {
     "landscapeLeft": true,
@@ -28,12 +23,11 @@
     "upsideDown": false
   },
   "packageName": "org.cocos2d.TankBattle",
-  "privateKey": "",
   "qqplay": {
     "REMOTE_SERVER_ROOT": "",
     "orientation": "portrait"
   },
-  "startScene": "f780e108-3089-4e42-8df8-096511dd197d",
+  "startScene": "10114342-4fa0-4b4b-a6f7-eed513bf15a9",
   "title": "TankBattle",
   "webOrientation": "auto",
   "wechatgame": {

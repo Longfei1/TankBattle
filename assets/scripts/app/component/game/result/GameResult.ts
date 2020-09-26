@@ -72,6 +72,7 @@ export default class GameResult extends cc.Component {
             totalTankNum+= num;
         }
 
+        totalScore += bonusScore;
         let result: GameStruct.PlayerResultInfo = {
             totolScore: totalScore,
             bonusScore: bonusScore,
@@ -107,18 +108,47 @@ export default class GameResult extends cc.Component {
     updatePlayerResultView() {
         let com1 = this.panelPlayer[0].getComponent(PlayerResult);
         com1.setData(0, this._resultInfo.playerResult[0]);
-        com1.playScoreAni(this.onScoreAniFinished.bind(this));
 
-        if (GameDataModel.isModeDoublePlayer) {
+        let com2 = this.panelPlayer[1].getComponent(PlayerResult);
+        com2.setData(1, this._resultInfo.playerResult[1]);
+
+        if (GameDataModel.isModeDoublePlayer()) {
             this.panelPlayer[1].active = true;
-
-            let com2 = this.panelPlayer[1].getComponent(PlayerResult);
-            com2.setData(1, this._resultInfo.playerResult[1]);
-            com2.playScoreAni(null);
         }
         else {
             this.panelPlayer[1].active = false;
         }
+
+        //得分动画
+        let totalEnemy = GameDef.EnemyTankNames.length;
+        let aniFinish;
+        let playScoreAni = (enemyNO: number) => {
+            com1.showTankScoreAni(enemyNO, aniFinish);
+            if (GameDataModel.isModeDoublePlayer()) {
+                com2.showTankScoreAni(enemyNO, aniFinish);
+            }
+        };
+
+        let finishNum = {};
+        aniFinish = (enemyNO: number) => {
+            finishNum[enemyNO] = finishNum[enemyNO] == null ? 0 : finishNum[enemyNO];
+            finishNum[enemyNO]++;
+            let needFinishNum = GameDataModel.isModeDoublePlayer() ? 2 : 1;
+            if (finishNum[enemyNO] >= needFinishNum) {
+                if (enemyNO >= totalEnemy - 1) {
+                    com1.playScoreSound();
+                    com1.showTankTotalNum();
+                    com2.showTankTotalNum();
+
+                    this.onScoreAniFinished();
+                }
+                else {
+                    playScoreAni(enemyNO + 1);
+                }
+            }
+        };
+
+        playScoreAni(0);
     }
 
     //得分展示结束
@@ -126,6 +156,6 @@ export default class GameResult extends cc.Component {
         //判断进入下一关或显示通关界面
         this.scheduleOnce(() => {
             gameController.onGameResultShowFinished();
-        }, 2);
+        }, 3);
     }
 }

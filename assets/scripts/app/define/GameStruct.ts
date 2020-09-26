@@ -113,4 +113,13 @@ export namespace GameStruct {
         highScore: number;
         playerResult: PlayerResultInfo[];
     }
+
+    export class AudioInfo {
+        audioID: number;
+    }
+
+    export class SceneryRect {
+        sceneryType: number;
+        rect: cc.Rect;
+    }
 }

@@ -9,8 +9,8 @@ import Bullet from "../Bullet";
 const { ccclass, property } = cc._decorator;
 
 //遇到障碍后，继续尝试朝该方向移动的时间区间。
-const TRY_MOVE_TIME_MIN = 0.1; 
-const TRY_MOVE_TIME_MAX = 0.8;       
+const TRY_MOVE_TIME_MIN = 0.2; 
+const TRY_MOVE_TIME_MAX = 0.6;       
 
 @ccclass
 export default class EnemyTank extends BattleTank {
@@ -25,6 +25,7 @@ export default class EnemyTank extends BattleTank {
 
     setRed(bRed: boolean) {
         this._bRed = bRed;
+        this.updateTankImg();
     }
 
     reset() {
@@ -65,7 +66,7 @@ export default class EnemyTank extends BattleTank {
         }
 
         if (this._tankLevel > hitCount) {
-            this._tankLevel = this._tankLevel - hitCount;
+            this.setTankLevel(this._tankLevel - hitCount);
             return;
         }
 
@@ -141,10 +142,14 @@ export default class EnemyTank extends BattleTank {
 
     //当前方向移动失败
     onMoveFailed() {
+        if (GameDataModel._gameOver) {
+            return;
+        }
+
         let time = CommonFunc.getTimeStamp();
         //障碍物不是边界时，尝试突破障碍物
         if (!this._bTryMoving && !this.isOutBoundaryDirction(this._moveDirection)) {
-            if (CommonFunc.isInProbability(0.5)) {
+            if (CommonFunc.isInProbability(0.8)) {
                 this._bTryMoving = true;
                 this._tryMoveStartTime = time;
                 this._tryMoveTime = CommonFunc.getRandomNumber(TRY_MOVE_TIME_MIN, TRY_MOVE_TIME_MAX);
@@ -159,18 +164,18 @@ export default class EnemyTank extends BattleTank {
         }
 
         //超过尝试时间, 换方向移动
-        this.changeMoveDirection();
+        this.changeMoveDirectionEx(0.3);
     }
 
     //行为控制定时器
     onBehaviorTimer() {
-        if (CommonFunc.isInProbability(0.15)) {
+        if (CommonFunc.isInProbability(0.1)) {
             //给定概率下改变移动方向
 
-            this.changeMoveDirectionEx();
+            this.changeMoveDirectionEx(0.1);
         }
 
-        if (CommonFunc.isInProbability(0.5)) {
+        if (CommonFunc.isInProbability(0.3)) {
             this.shoot();
         }
     }
@@ -193,15 +198,15 @@ export default class EnemyTank extends BattleTank {
     }
 
     //换方向移动，排除当前移动方向，一定概率排除相反的方向。
-    changeMoveDirectionEx() {
+    changeMoveDirectionEx(oppositeProbability: number) {
         let twoDirs = this.getAllMoveDirectionsCanChoose();
         if (this._isMove) {
             //筛选出原来的移动方向
             CommonFunc.filterArray(twoDirs.moveableDirs, [this._moveDirection]);
             CommonFunc.filterArray(twoDirs.tryDirs, [this._moveDirection]);
 
-            if (CommonFunc.isInProbability(0.9)) {
-                //大概率下，不向现在移动的反方向移动
+            if (!CommonFunc.isInProbability(oppositeProbability)) {
+                //概率下，不向现在移动的反方向移动
                 let opsiteDirection = GameDataModel.getOppositeDirection(this._moveDirection);
                 CommonFunc.filterArray(twoDirs.moveableDirs, [opsiteDirection]);
                 CommonFunc.filterArray(twoDirs.tryDirs, [opsiteDirection]);
@@ -293,7 +298,7 @@ export default class EnemyTank extends BattleTank {
         for (let i = 0; i < moveDirctions.length; i++) {
             let value = defaultValue;//初始权重
             if (this.isDirectionForwardHomeBase(moveDirctions[i])) {
-                value += 10;
+                value += 20;
             }
 
             weights.push(value);

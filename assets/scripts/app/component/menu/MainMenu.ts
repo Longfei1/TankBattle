@@ -43,6 +43,7 @@ export default class MainMenu extends cc.Component {
 
     onLoad() {
         cc.game.setFrameRate(GameDef.GAME_FPS);
+        cc.audioEngine.stopAll();
         
         ModelManager.initModels();
 

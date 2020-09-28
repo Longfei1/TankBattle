@@ -8,6 +8,14 @@ import { GameStruct } from "../../define/GameStruct";
 
 const { ccclass, property } = cc._decorator;
 
+const SceneryZIndex = {
+    [GameDef.SceneryType.WALL]: GameDef.ZINDEX_SCENERY_WALL,
+    [GameDef.SceneryType.GRASS]: GameDef.ZINDEX_SCENERY_GRASS,
+    [GameDef.SceneryType.ICE]: GameDef.ZINDEX_SCENERY_ICE,
+    [GameDef.SceneryType.WATER]: GameDef.ZINDEX_SCENERY_WATER,
+    [GameDef.SceneryType.STEEL]: GameDef.ZINDEX_SCENERY_STEEL,
+}
+
 @ccclass
 export default class Scenery extends cc.Component {
 
@@ -38,6 +46,8 @@ export default class Scenery extends cc.Component {
     setType(type: number) {
         this._type = type;
         this.setSceneryImg();
+
+        this.node.zIndex = SceneryZIndex[type];
     }
 
     getType(): number {
@@ -105,6 +115,9 @@ export default class Scenery extends cc.Component {
             case GameDef.SceneryType.STEEL:
                 name = "steel";
                 break;
+            case GameDef.SceneryType.ICE:
+                name = "ice";
+                break;
             default:
                 break;
         }
@@ -127,7 +140,7 @@ export default class Scenery extends cc.Component {
         }
 
         let sceneryType = this.getType();
-        if (sceneryType === GameDef.SceneryType.GRASS || sceneryType === GameDef.SceneryType.WATER) {//水和草暂时不能销毁
+        if (sceneryType === GameDef.SceneryType.GRASS || sceneryType === GameDef.SceneryType.WATER || sceneryType === GameDef.SceneryType.ICE) {//水和草暂时不能销毁
             return;
         }
         else if (sceneryType === GameDef.SceneryType.STEEL) {
@@ -165,8 +178,8 @@ export default class Scenery extends cc.Component {
     }
 
     //获取与指定区域重叠的所有子区域
-    getOverlapSceneryRects(rect: cc.Rect): GameStruct.SceneryRect[] {
-        let ret: GameStruct.SceneryRect[] = [];
+    getOverlapSceneryRects(rect: cc.Rect): GameStruct.GameRectInfo[] {
+        let ret: GameStruct.GameRectInfo[] = [];
 
         if (rect) {
             for (let img of this.imgScenerys) {
@@ -175,7 +188,7 @@ export default class Scenery extends cc.Component {
                     let imgRect = cc.rect(pos.x, pos.y, img.node.width, img.node.height)
 
                     if (GameDataModel.isRectOverlap(rect, imgRect)) {//两个矩形有重合，相交不算
-                        ret.push({sceneryType: this.getType(), rect: imgRect});
+                        ret.push({group: GameDef.GROUP_NAME_SCENERY, type: this.getType(), rect: imgRect});
                     }
                 }
             }

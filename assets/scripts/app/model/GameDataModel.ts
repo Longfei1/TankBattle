@@ -29,6 +29,7 @@ class GameDataModel extends BaseModel {
     _playerShootNum: {[no: number]: {[name: string] : number}} = {};
     _playerPropNum: { [id: number]: number } = {};
     _playerTotalScore: { [id: number] : number } = {};
+    _playerLevel: { [id: number] : number } = {};
     _gameRunning: boolean = false;
     _propDestroyEnemyNum: number = 0;
 
@@ -60,6 +61,7 @@ class GameDataModel extends BaseModel {
         this.resetPlayerShootNum();
         this.resetPlayerTotalScore();
         this.resetPlayerPropNum();
+        this.resetPlayerLevel();
 
         this._scenerys = [];
         this.clearEnemyTank();
@@ -281,6 +283,20 @@ class GameDataModel extends BaseModel {
         }
     }
 
+    resetPlayerLevel() {
+        this.setPlayerLevel(0, 1);
+        this.setPlayerLevel(1, 1);
+    }
+
+    setPlayerLevel(no: number, level: number) {
+        this._playerLevel[no] = level;
+    }
+
+    getPlayerLevel(no: number): number {
+        return this._playerLevel[no];
+    }
+
+
     /**
      * 将地图方格的行列转换为场景中的坐标值
      * @param RcInfo ,col为列，row为行
@@ -497,7 +513,7 @@ class GameDataModel extends BaseModel {
             if (sceneryNodes) {
                 for (let node of sceneryNodes) {
                     let sceneryType = node.getComponent(Scenery).getType();
-                    if (sceneryType !== GameDef.SceneryType.GRASS) {
+                    if (sceneryType !== GameDef.SceneryType.GRASS && sceneryType !== GameDef.SceneryType.ICE) {
                         return false;
                     }
                 }
@@ -519,9 +535,7 @@ class GameDataModel extends BaseModel {
         //玩家
         CommonFunc.travelMap(this._players, (no: number, node: cc.Node) => {
             if (node !== excludeTankNode) {
-                let pos = node.getPosition()
-                let tankWidth = this.getTankWidth();
-                let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                let tankRect: cc.Rect = node.getComponent(PlayerTank).getTankRect();
                 if (this.isRectOverlap(areaRect, tankRect)) {
                     bHave = true;
                     return true;
@@ -533,9 +547,7 @@ class GameDataModel extends BaseModel {
         if (!bHave) {
             CommonFunc.travelMap(this._enemys, (id: number, node: cc.Node) => {
                 if (node !== excludeTankNode) {
-                    let pos = node.getPosition()
-                    let tankWidth = this.getTankWidth();
-                    let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                    let tankRect: cc.Rect = node.getComponent(EnemyTank).getTankRect();
                     if (this.isRectOverlap(areaRect, tankRect)) {
                         bHave = true;
                         return true;
@@ -548,9 +560,8 @@ class GameDataModel extends BaseModel {
     }
 
     //获取子弹在移动时命中的最近的布景区域
-    getBulletShootSceneryRectWhenMove(direction: number, moveRect: cc.Rect): GameStruct.SceneryRect {
-        let retRect: GameStruct.SceneryRect = null;
-        let hitRects: GameStruct.SceneryRect[] = [];
+    getBulletShootSceneryRectWhenMove(direction: number, moveRect: cc.Rect): GameStruct.GameRectInfo {
+        let hitRects: GameStruct.GameRectInfo[] = [];
 
         //获取区域中所有相交的区域
         let sceneryNodes = this.getSceneryNodesInRect(moveRect);
@@ -558,7 +569,7 @@ class GameDataModel extends BaseModel {
             for (let node of sceneryNodes) {
                 let com = node.getComponent(Scenery);
                 let sceneryType = com.getType();
-                if (sceneryType !== GameDef.SceneryType.GRASS && sceneryType !== GameDef.SceneryType.WATER) {
+                if (sceneryType !== GameDef.SceneryType.GRASS && sceneryType !== GameDef.SceneryType.WATER && sceneryType !== GameDef.SceneryType.ICE) {
                     let subRects = com.getOverlapSceneryRects(moveRect);
                     for (let it of subRects) {
                         hitRects.push(it);
@@ -568,7 +579,13 @@ class GameDataModel extends BaseModel {
         }
 
         //根据移动方向，获取移动区域中最先触碰到的布景区域
-        for (let it of hitRects) {
+
+        return this.getNearGameRect(direction, hitRects);
+    }
+
+    getNearGameRect(direction: number, rects: GameStruct.GameRectInfo[]): GameStruct.GameRectInfo {
+        let retRect: GameStruct.GameRectInfo = null;
+        for (let it of rects) {
             if (retRect) {
                 if (direction === GameDef.DIRECTION_UP) {
                     if (it.rect.yMin < retRect.rect.yMin) {
@@ -595,53 +612,19 @@ class GameDataModel extends BaseModel {
                 retRect = it;
             }
         }
-
-        return retRect;
-    }
-
-    getNearRect(direction: number, rects: cc.Rect[]) {
-        let retRect: cc.Rect = null;
-        for (let it of rects) {
-            if (retRect) {
-                if (direction === GameDef.DIRECTION_UP) {
-                    if (it.yMin < retRect.yMin) {
-                        retRect = it;
-                    }
-                }
-                else if (direction === GameDef.DIRECTION_DOWN) {
-                    if (it.yMax > retRect.yMax) {
-                        retRect = it;
-                    }
-                }
-                else if (direction === GameDef.DIRECTION_LEFT) {
-                    if (it.xMax > retRect.xMax) {
-                        retRect = it;
-                    }
-                }
-                else if (direction === GameDef.DIRECTION_RIGHT) {
-                    if (it.xMin < retRect.xMin) {
-                        retRect = it;
-                    }
-                }
-            }
-            else {
-                retRect = it;
-            }
-        }
         return retRect;
     }
 
     //获取坦克在移动时碰撞的最近的区域
-    getCollisionRectWhenTankMove(direction: number, moveAreaRect: cc.Rect, excludeTankNode: cc.Node = null): cc.Rect {
-        let retRect: cc.Rect = null;
-        let hitRects: cc.Rect[] = [];
+    getCollisionRectWhenTankMove(direction: number, moveAreaRect: cc.Rect, excludeTankNode: cc.Node = null): GameStruct.GameRectInfo {
+        let hitRects: GameStruct.GameRectInfo[] = [];
 
         //边界
         {
             let rects = this.getBoundaryRects();
             for (let r of rects) {
                 if (this.isRectOverlap(moveAreaRect, r)) {
-                    hitRects.push(r);
+                    hitRects.push({group: GameDef.GROUP_NAME_BOUNDARY, type: null, rect: r});
                 }
             }
         }
@@ -651,7 +634,7 @@ class GameDataModel extends BaseModel {
             let homeBaseRect = this.getHomeBaseRect();
 
             if (this.isRectOverlap(moveAreaRect, homeBaseRect)) {
-                hitRects.push(homeBaseRect);
+                hitRects.push({group: GameDef.GROUP_HOME_BASE, type: null, rect: homeBaseRect});
             }
         }
 
@@ -662,10 +645,10 @@ class GameDataModel extends BaseModel {
                 for (let node of sceneryNodes) {
                     let com = node.getComponent(Scenery);
                     let sceneryType = com.getType();
-                    if (sceneryType !== GameDef.SceneryType.GRASS) {
+                    if (sceneryType !== GameDef.SceneryType.GRASS && sceneryType !== GameDef.SceneryType.ICE) {
                         let subRects = com.getOverlapSceneryRects(moveAreaRect);
                         for (let it of subRects) {
-                            hitRects.push(it.rect);
+                            hitRects.push(it);
                         }
                     }
                 }
@@ -677,11 +660,9 @@ class GameDataModel extends BaseModel {
              //玩家
             CommonFunc.travelMap(this._players, (no: number, node: cc.Node) => {
                 if (node !== excludeTankNode) {
-                    let pos = node.getPosition()
-                    let tankWidth = this.getTankWidth();
-                    let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                    let tankRect: cc.Rect = node.getComponent(PlayerTank).getTankRect();
                     if (this.isRectOverlap(moveAreaRect, tankRect)) {
-                        hitRects.push(tankRect);
+                        hitRects.push({group: GameDef.GROUP_NAME_TANK, type: null, rect: tankRect});
                     }
                 }
             });
@@ -689,17 +670,15 @@ class GameDataModel extends BaseModel {
             //敌军
             CommonFunc.travelMap(this._enemys, (id: number, node: cc.Node) => {
                 if (node !== excludeTankNode) {
-                    let pos = node.getPosition()
-                    let tankWidth = this.getTankWidth();
-                    let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+                    let tankRect: cc.Rect = node.getComponent(EnemyTank).getTankRect();
                     if (this.isRectOverlap(moveAreaRect, tankRect)) {
-                        hitRects.push(tankRect);
+                        hitRects.push({group: GameDef.GROUP_NAME_TANK, type: null, rect: tankRect});
                     }
                 }
             });
         }
 
-        return this.getNearRect(direction, hitRects);
+        return this.getNearGameRect(direction, hitRects);
     }
 
     isGameDebugMode(): boolean {

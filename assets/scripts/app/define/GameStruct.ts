@@ -118,8 +118,9 @@ export namespace GameStruct {
         audioID: number;
     }
 
-    export class SceneryRect {
-        sceneryType: number;
+    export class GameRectInfo {
+        group: string;
+        type: number;
         rect: cc.Rect;
     }
 }

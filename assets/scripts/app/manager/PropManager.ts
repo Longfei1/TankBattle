@@ -35,6 +35,8 @@ export default class EnemyManager extends cc.Component {
             this._prop.removeFromParent();
         }
 
+        GameDataModel.resetPlayerPropNum();
+
         this.removeTimers();
     }
 
@@ -155,7 +157,7 @@ export default class EnemyManager extends cc.Component {
     }
 
     getRandomPropPosition(): GameStruct.RcInfo {
-        let posAry = GameDataModel.getEmptyMatrixArray(4, 4, [GameDef.SceneryType.GRASS, GameDef.SceneryType.WALL]);
+        let posAry = GameDataModel.getEmptyMatrixArray(4, 4, [GameDef.SceneryType.GRASS, GameDef.SceneryType.WALL, GameDef.SceneryType.ICE]);
         if (posAry.length > 0) {
             return CommonFunc.getRandomArrayValue(posAry);
         }

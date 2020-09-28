@@ -18,7 +18,7 @@ const {ccclass, property} = cc._decorator;
 export default class GameMapManager extends cc.Component {
 
     @property({ displayName: "游戏地图所在平面节点", type: cc.Node })
-    panelScenery: cc.Node = null;
+    panelGame: cc.Node = null;
 
     @property({ displayName: "布景预制体", type: cc.Prefab })
     pfbScenery: cc.Prefab = null;
@@ -157,7 +157,7 @@ export default class GameMapManager extends cc.Component {
 
             if (type !== GameDef.SceneryType.NULL) {
                 let scenery = this._sceneryPool.getNode();
-                this.panelScenery.addChild(scenery);
+                this.panelGame.addChild(scenery);
                 let com = scenery.getComponent(Scenery);
                 com.reset();
                 com.setType(type);
@@ -217,6 +217,7 @@ export default class GameMapManager extends cc.Component {
                 [GameDef.SceneryType.WATER]: [],
                 [GameDef.SceneryType.GRASS]: [],
                 [GameDef.SceneryType.STEEL]: [],
+                [GameDef.SceneryType.ICE]: [],
             };
 
             for (let i = 0; i < GameDef.SCENERYS_NODE_COL_NUM; i++) {
@@ -269,9 +270,9 @@ export default class GameMapManager extends cc.Component {
         this.resetHomeBase();
         this._homeBase = cc.instantiate(this.pfbHomeBase);
         this._homeBase.getComponent(HomeBase).setPosition(GameDef.PLACE_HOMEBASE);
-        this.panelScenery.addChild(this._homeBase);
+        this.panelGame.addChild(this._homeBase);
 
-        this._homeBase.zIndex = cc.macro.MAX_ZINDEX; //暂时设置一个最大的zindex
+        this._homeBase.zIndex = GameDef.ZINDEX_HOMEBASE;
     }
 
     //基地所在位置，不能存在其他布景元素

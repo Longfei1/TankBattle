@@ -38,6 +38,7 @@ export default class PlayerTank extends BattleTank {
     }
 
     destroyNode() {
+        this.stopMoveSound();
         gameController.node.emit(EventDef.EV_PLAYER_DEAD, this.id);
     }
 
@@ -115,6 +116,7 @@ export default class PlayerTank extends BattleTank {
 
         if (this._tankLevel >= GameDef.PLAYER_LEVEL_PROTECT_ONCE_DEAD) {
             this.setTankLevel(this._tankLevel - 1);
+            GameDataModel.setPlayerLevel(this.id, this._tankLevel);
             return;
         }
 
@@ -124,11 +126,13 @@ export default class PlayerTank extends BattleTank {
     onLevelUp() {
         if (this._tankLevel < this._tankMaxLevel) {
             this.setTankLevel(this._tankLevel + 1);
+            GameDataModel.setPlayerLevel(this.id, this._tankLevel);
         }
     }
 
     onMaxLevel() {
         this.setTankLevel(this._tankMaxLevel);
+        GameDataModel.setPlayerLevel(this.id, this._tankLevel);
     }
 
     onLevelUpdated() {
@@ -150,6 +154,13 @@ export default class PlayerTank extends BattleTank {
         }
         else {
             this._maxBulletNum = 1;
+        }
+
+        if (this._tankLevel >= 4) {
+            this._moveSpeed = atru.moveSpeed + 20;
+        }
+        else {
+            this._moveSpeed = atru.moveSpeed;
         }
     }
 }

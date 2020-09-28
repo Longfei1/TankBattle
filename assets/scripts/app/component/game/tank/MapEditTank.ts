@@ -30,6 +30,7 @@ let SceneryRcInfoDiff = {
 let SceneryTypeOrder = [
     GameDef.SceneryType.WALL,
     GameDef.SceneryType.GRASS,
+    GameDef.SceneryType.ICE,
     GameDef.SceneryType.WATER,
     GameDef.SceneryType.STEEL,
 ]
@@ -43,7 +44,7 @@ export default class MapEditTank extends BaseTank {
 
     _editPos: GameStruct.RcInfo = GameDef.BORN_PLACE_PLAYER1;
     _editSceneryType: number = GameDef.SceneryType.WALL;
-    _editMode: number = MapEditMode.UNIT1;
+    _editMode: number = MapEditMode.UNIT0;
 
     onLoad() {
         super.onLoad();
@@ -61,12 +62,15 @@ export default class MapEditTank extends BaseTank {
     }
 
     changeEditMode() {
-        this._editMode = this._editMode + 1;
-        if (this._editMode < MapEditMode.NUM) {
-            
+        if (this._editSceneryType === GameDef.SceneryType.WALL) {
+            if (this._editMode < MapEditMode.NUM - 1) {
+                this._editMode = this._editMode + 1;
+            }
+            else {
+                this.changeSceneryType();
+            }
         }
         else {
-            this._editMode = 0;
             this.changeSceneryType();
         }
 
@@ -77,6 +81,11 @@ export default class MapEditTank extends BaseTank {
     changeSceneryType() {
         let nextOrder = (this.getSceneryTypeOrder(this._editSceneryType) + 1) % SceneryTypeOrder.length;
         this._editSceneryType = SceneryTypeOrder[nextOrder];
+
+        if (this._editSceneryType === GameDef.SceneryType.WALL) {
+            //重置回土墙后，重置模式
+            this._editMode = MapEditMode.UNIT0;
+        }
     }
 
     updateSceneryMap() {

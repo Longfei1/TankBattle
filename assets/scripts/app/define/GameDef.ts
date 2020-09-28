@@ -64,6 +64,17 @@ export namespace GameDef {
     export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
     export const PROP_BONUS_SCORE               = 500; //道具奖励得分
 
+    //游戏元素层级
+    export const ZINDEX_BATTLE_TANK             = 500;
+    export const ZINDEX_HOMEBASE                = cc.macro.MAX_ZINDEX;
+    export const ZINDEX_MAP_EDIT_TANK           = cc.macro.MAX_ZINDEX;
+    export const ZINDEX_BULLET                  = 500;
+    export const ZINDEX_SCENERY_WALL            = 500;
+    export const ZINDEX_SCENERY_WATER           = 400;
+    export const ZINDEX_SCENERY_STEEL           = 500;
+    export const ZINDEX_SCENERY_ICE             = 400;
+    export const ZINDEX_SCENERY_GRASS           = 600;
+
     //敌军坦克名字
     export const EnemyTankNames = [
         "LightTank",
@@ -85,7 +96,8 @@ export namespace GameDef {
         WALL,   //土墙
         WATER,  //水
         GRASS,  //草地
-        STEEL   //钢
+        STEEL,  //钢
+        ICE,    //冰
     } 
 
     //资源原因，现没有特殊子弹

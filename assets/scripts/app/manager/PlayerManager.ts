@@ -20,9 +20,6 @@ export default class PlayerManager extends cc.Component {
     @property({ displayName: "游戏层", type: cc.Node })
     panelGame: cc.Node = null;
 
-    @property({ displayName: "布景层", type: cc.Node })
-    panelScenery: cc.Node = null;
-
     @property({ displayName: "玩家预制体", type: cc.Prefab })
     pfbPlayer: cc.Prefab = null;
 
@@ -78,8 +75,8 @@ export default class PlayerManager extends cc.Component {
         if (GameDataModel.isModeEditMap()) {
             let mapEditer = cc.instantiate(this.pfbMapEditer);
             if (mapEditer) {
-                this.panelScenery.addChild(mapEditer);
-                mapEditer.zIndex = cc.macro.MAX_ZINDEX;
+                this.panelGame.addChild(mapEditer);
+                mapEditer.zIndex = GameDef.ZINDEX_MAP_EDIT_TANK;
                 let tankCom = mapEditer.getComponent(MapEditTank)
                 tankCom.setEditPosition(GameDef.BORN_PLACE_PLAYER1);
                 //tankCom.setMoveDirction(GameDef.DIRECTION_UP);
@@ -121,7 +118,7 @@ export default class PlayerManager extends cc.Component {
         playerCom.reset();
         playerCom.id = id;
         playerCom.setAttributes(attr);
-        playerCom.setTankLevel(1);
+        playerCom.setTankLevel(GameDataModel.getPlayerLevel(id));
         playerCom.setPosition(bornPos);
         playerCom.setMoveDirction(GameDef.DIRECTION_UP);
 
@@ -303,6 +300,7 @@ export default class PlayerManager extends cc.Component {
 
     evPlayerDead(no: number) {
         GameDataModel._liveStatus[no] = false;
+        GameDataModel.setPlayerLevel(no, 1);
         this.destroyPlayer(no);
 
         if (GameDataModel.getPlayerLifeNum(no) > 0) {

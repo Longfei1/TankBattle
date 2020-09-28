@@ -67,6 +67,8 @@ export default class BattleTank extends BaseTank {
 
     onLoad() {
         super.onLoad();
+
+        this.node.zIndex = GameDef.ZINDEX_BATTLE_TANK;
     }
 
     reset() {
@@ -229,6 +231,7 @@ export default class BattleTank extends BaseTank {
                 let newPos = this.canMoveFromAToBEx(curPos, this._moveDirection, moveDiff);
                 if (newPos) {
                     this.node.setPosition(newPos);
+                    this.onMoveSuccess();
                 }
                 else {
                     this.onMoveFailed();
@@ -242,9 +245,14 @@ export default class BattleTank extends BaseTank {
 
     calcMove(dt) {
         let moveDiff = 0;
-        
+
         if (this._isMove) {
-            moveDiff = this._moveSpeed * dt;
+            let speed = this._moveSpeed;
+            if (this.isTankOnIceScenery()) {
+                speed += 20; //冰加移速
+            }
+
+            moveDiff = speed * dt;
         }
 
         return moveDiff;
@@ -516,9 +524,10 @@ export default class BattleTank extends BaseTank {
         }
 
         if (moveAreaRect) {
-            let collisionRect = GameDataModel.getCollisionRectWhenTankMove(dir, moveAreaRect, this.node);
-            if (collisionRect) {
+            let collisionInfo = GameDataModel.getCollisionRectWhenTankMove(dir, moveAreaRect, this.node);
+            if (collisionInfo) {
                 //返回一个和障碍物相交的坐标
+                let collisionRect = collisionInfo.rect;
                 let tankWidth = GameDataModel.getTankWidth();
                 let myRect: cc.Rect = cc.rect(src.x, src.y, tankWidth, tankWidth);
                 switch (dir) {
@@ -605,6 +614,11 @@ export default class BattleTank extends BaseTank {
         
     }
 
+    //移动更新成功时触发
+    onMoveSuccess() {
+
+    }
+
     onGetShieldStatus(time: number) {
         if (time != null) {
             gameController.playUnitAniInTime(AniDef.UnitAniType.SHIELD, this.nodeAni, time, null, () => {
@@ -653,5 +667,28 @@ export default class BattleTank extends BaseTank {
         let pos = this.node.getPosition();
         let width = GameDataModel.getTankWidth();
         return cc.v2(pos.x + width / 2, pos.y + width / 2);
+    }
+
+    getTankRect(): cc.Rect {
+        let pos = this.node.getPosition()
+        let tankWidth = GameDataModel.getTankWidth();
+        let tankRect: cc.Rect = cc.rect(pos.x, pos.y, tankWidth, tankWidth);
+        return tankRect;
+    }
+
+    isTankOnIceScenery(): boolean {
+        let rect = this.getTankRect();
+        let sceneryNodes = GameDataModel.getSceneryNodesInRect(rect);
+        if (sceneryNodes) {
+            for (let node of sceneryNodes) {
+                let com = node.getComponent(Scenery);
+                let sceneryType = com.getType();
+                if (sceneryType === GameDef.SceneryType.ICE) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

@@ -6,259 +6,275 @@
         <dict>
             <key>grass_1.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{70,36},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{1,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>grass_2.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{70,19},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{1,18},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>grass_3.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{87,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{18,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>grass_4.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{70,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{1,35},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
+            </dict>
+            <key>ice_1.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{53,36},{15,15}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
+            </dict>
+            <key>ice_2.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{53,19},{15,15}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
+            </dict>
+            <key>ice_3.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{53,19},{15,15}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
+            </dict>
+            <key>ice_4.png</key>
+            <dict>
+                <key>frame</key>
+                <string>{{53,19},{15,15}}</string>
+                <key>offset</key>
+                <string>{0,0}</string>
+                <key>rotated</key>
+                <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>steel_1.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{53,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{18,18},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>steel_2.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{36,36},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{35,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>steel_3.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{36,19},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{18,35},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>steel_4.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{36,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{35,18},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>wall_1.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{19,36},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{52,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>wall_2.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{19,19},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{35,35},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>wall_3.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{19,19},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{52,18},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>wall_4.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{19,36},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{69,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>water_1.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{19,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{52,35},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>water_2.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,36},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{69,18},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>water_3.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,19},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{86,1},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
             <key>water_4.png</key>
             <dict>
-                <key>aliases</key>
-                <array/>
-                <key>spriteOffset</key>
+                <key>frame</key>
+                <string>{{2,2},{15,15}}</string>
+                <key>offset</key>
                 <string>{0,0}</string>
-                <key>spriteSize</key>
-                <string>{15,15}</string>
-                <key>spriteSourceSize</key>
-                <string>{15,15}</string>
-                <key>textureRect</key>
-                <string>{{69,35},{15,15}}</string>
-                <key>textureRotated</key>
+                <key>rotated</key>
                 <false/>
+                <key>sourceColorRect</key>
+                <string>{{0,0},{15,15}}</string>
+                <key>sourceSize</key>
+                <string>{15,15}</string>
             </dict>
         </dict>
         <key>metadata</key>
         <dict>
             <key>format</key>
-            <integer>3</integer>
-            <key>pixelFormat</key>
-            <string>RGBA8888</string>
-            <key>premultiplyAlpha</key>
-            <false/>
+            <integer>2</integer>
             <key>realTextureFileName</key>
             <string>scenery_s.png</string>
             <key>size</key>
-            <string>{102,51}</string>
+            <string>{104,53}</string>
             <key>smartupdate</key>
-            <string>$TexturePacker:SmartUpdate:3a0d3f401295a4eb61fc7b3d39c735da:5b4524341ead1c42f9d13389d3663a33:823a044faa39b6d6a77ec2438bfb32ce$</string>
+            <string>$TexturePacker:SmartUpdate:bd2b2728fd0f50293e3cb95b12988daf$</string>
             <key>textureFileName</key>
             <string>scenery_s.png</string>
         </dict>

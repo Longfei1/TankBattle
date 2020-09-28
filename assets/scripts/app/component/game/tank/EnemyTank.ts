@@ -20,6 +20,7 @@ export default class EnemyTank extends BattleTank {
     _tryMoveTime: number = 0;
     _tryMoveStartTime: number = 0;
     _bTryMoving: boolean = false;
+    _bTryShoot: boolean = false;
 
     _destroyedBy: number;
 
@@ -34,6 +35,7 @@ export default class EnemyTank extends BattleTank {
 
         this._tryMoveStartTime = 0;
         this._bTryMoving = false;
+        this._bTryShoot = false;
         this._destroyedBy = -1;
     }
 
@@ -100,7 +102,12 @@ export default class EnemyTank extends BattleTank {
         let moveDiff = 0;
         
         if (this._isMove) {
-            moveDiff = this._moveSpeed * dt;
+            let speed = this._moveSpeed;
+            if (this.isTankOnIceScenery()) {
+                speed += 20; //冰加移速
+            }
+
+            moveDiff = speed * dt;
         }
 
         if (CommonFunc.isBitSet(GameDataModel._propBuff, GameDef.PROP_BUFF_STATIC)) {
@@ -135,6 +142,7 @@ export default class EnemyTank extends BattleTank {
         }
         if (!bMove || nDirection != this._moveDirection) {
             this._bTryMoving = false; //停止移动或换方向，重置尝试移动标志
+            this._bTryShoot = false;
         }
 
         super.setMove(bMove, nDirection);
@@ -153,18 +161,25 @@ export default class EnemyTank extends BattleTank {
                 this._bTryMoving = true;
                 this._tryMoveStartTime = time;
                 this._tryMoveTime = CommonFunc.getRandomNumber(TRY_MOVE_TIME_MIN, TRY_MOVE_TIME_MAX);
-                this.shoot(); //射击，尝试打破障碍后移动
+                this._bTryShoot = this.shoot(); //射击，尝试打破障碍后移动
                 return;
             }
         }
 
         if (this._bTryMoving && time - this._tryMoveStartTime < this._tryMoveTime * 1000) {
-            this.shoot(); //射击，尝试打破障碍后移动
+            if (!this._bTryShoot) {
+                this._bTryShoot = this.shoot(); //射击，尝试打破障碍后移动
+            }
             return;
         }
 
         //超过尝试时间, 换方向移动
         this.changeMoveDirectionEx(0.3);
+    }
+
+    onMoveSuccess() {
+        this._bTryMoving = false;
+        this._bTryShoot = false;
     }
 
     //行为控制定时器

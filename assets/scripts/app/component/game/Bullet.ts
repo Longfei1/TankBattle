@@ -34,6 +34,10 @@ export default class Bullet extends cc.Component {
 
     _destroyed: boolean = false; //击中目标后自己销毁
 
+    onLoad() {
+        this.node.zIndex = GameDef.ZINDEX_BULLET;
+    }
+
     onEnable() {
         this._destroyed = false;
     }
@@ -182,17 +186,17 @@ export default class Bullet extends cc.Component {
         }
 
         let sceneryType = scenery.node.getComponent(Scenery).getType();
-        if (sceneryType === GameDef.SceneryType.GRASS || sceneryType === GameDef.SceneryType.WATER) {
+        if (sceneryType === GameDef.SceneryType.GRASS || sceneryType === GameDef.SceneryType.WATER || sceneryType === GameDef.SceneryType.ICE) {
             return false;
         }
 
         let bulletCollider: any = bullet;
         let bulletRect: cc.Rect = bulletCollider.world.aabb;
         let sceneryCollider: any = scenery;
-        let SceneryRect: cc.Rect = sceneryCollider.world.aabb;
+        let sceneryRect: cc.Rect = sceneryCollider.world.aabb;
         let collisionPos = bulletRect.center;//子弹碰撞体中心坐标
         
-        this.dealHitScenery(collisionPos, this._moveDirection, SceneryRect);
+        this.dealHitScenery(collisionPos, this._moveDirection, sceneryRect);
 
         return true;
     }
@@ -210,13 +214,13 @@ export default class Bullet extends cc.Component {
             return true;
         }
         
-        let hitSceneryRect = GameDataModel.getBulletShootSceneryRectWhenMove(dir, moveRect);
-        if (!hitSceneryRect) {
+        let hitRectInfo = GameDataModel.getBulletShootSceneryRectWhenMove(dir, moveRect);
+        if (!hitRectInfo || hitRectInfo.group !== GameDef.GROUP_NAME_SCENERY) {
             return false; //没有命中布景
         }
 
-        this.onHited(GameDef.GROUP_NAME_SCENERY, hitSceneryRect.sceneryType);
-        this.dealHitScenery(src, dir, hitSceneryRect.rect);
+        this.onHited(GameDef.GROUP_NAME_SCENERY, hitRectInfo.type);
+        this.dealHitScenery(src, dir, hitRectInfo.rect);
 
         return true;
     }

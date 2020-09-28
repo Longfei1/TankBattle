@@ -21,9 +21,6 @@ export default class Game extends cc.Component {
     @property({ displayName: "游戏层", type: cc.Node })
     panelGame: cc.Node = null;
 
-    @property({ displayName: "布景层", type: cc.Node })
-    panelScenery: cc.Node = null;
-
     @property({ displayName: "道具层", type: cc.Node })
     panelProp: cc.Node = null;
 
@@ -101,6 +98,7 @@ export default class Game extends cc.Component {
             this.goToMainMenu();
         }, null, this, PlayerDef.KEYMAP_COMMON.BACK);
         GameInputModel.addKeyDownOnceListener(() => {
+            CommonFunc.playButtonSound();
             this.onBtnStart();
         }, null, this, PlayerDef.KEYMAP_COMMON.START);
         if (GameDataModel.isGameDebugMode) {

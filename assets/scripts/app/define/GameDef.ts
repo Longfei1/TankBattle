@@ -44,15 +44,15 @@ export namespace GameDef {
     export const PROP_BUFF_HOME_PROTECT         = 0x0002; //基地保护
 
     //时效
-    export const BORN_INVINCIBLE_TIME           = 3;  //出生无敌时间
+    export const BORN_INVINCIBLE_TIME           = 2; //出生无敌时间
     export const PROP_SHOW_TIME                 = 15; //道具显示时间
-    export const PROP_SHIELD_INVINCIBLE_TIME    = 20; //护盾无敌时间
-    export const PROP_CLOCK_TIME                = 20; //定时道具持续时长
-    export const PROP_SPADE_TIME                = 20; //铲子道具持续时长
+    export const PROP_SHIELD_INVINCIBLE_TIME    = 15; //护盾无敌时间
+    export const PROP_CLOCK_TIME                = 12; //定时道具持续时长
+    export const PROP_SPADE_TIME                = 15; //铲子道具持续时长
     export const PROP_SPADE_EFFECT_DISAPPEAR_TIME = 5;  //铲子道具消失倒计时
     export const TANK_SHOOT_COOLTIME            = 0.2; //坦克射击冷却时间
 
-    //子弹威力
+    //子弹威力\
     export const BULLET_POWER_LEVEL_COMMON      = 1; //普通威力,可击毁一层土墙
     export const BULLET_POWER_LEVEL_STELL       = 2; //可销毁钢墙,两层土墙
 
@@ -63,6 +63,7 @@ export namespace GameDef {
     export const PLAYER_LEVEL_PROTECT_ONCE_DEAD = 4; //玩家坦克可以抵挡一次死亡的等级
     export const PLAYER_LIFE_NUM                = 2; //玩家初始生命数量
     export const PROP_BONUS_SCORE               = 500; //道具奖励得分
+    export const GAME_TOTAL_STAGE               = 20; //总关卡数
 
     //游戏元素层级
     export const ZINDEX_BATTLE_TANK             = 500;

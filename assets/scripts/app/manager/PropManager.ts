@@ -174,7 +174,9 @@ export default class EnemyManager extends cc.Component {
             GameDef.PropType.TANK,
             GameDef.PropType.GUN,
         ];
-        return CommonFunc.getRandomArrayValue(propAary);
+
+        let weights = [8, 8, 10, 10, 10, 8, 5]
+        return CommonFunc.getRandomArrayValueWithWeight(propAary, weights);
     }
 
     startPropStatusTimer() {

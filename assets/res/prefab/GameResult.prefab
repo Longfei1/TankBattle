@@ -783,7 +783,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 158.9,
+      "width": 167.14,
       "height": 38
     },
     "_anchorPoint": {
@@ -829,8 +829,8 @@
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "Ⅰ-PLAYER",
-    "_N$string": "Ⅰ-PLAYER",
+    "_string": "1-PLAYER",
+    "_N$string": "1-PLAYER",
     "_fontSize": 38,
     "_lineHeight": 38,
     "_enableWrapText": true,
@@ -4228,8 +4228,8 @@
     "_srcBlendFactor": 1,
     "_dstBlendFactor": 771,
     "_useOriginalSize": false,
-    "_string": "Ⅰ-PLAYER",
-    "_N$string": "Ⅰ-PLAYER",
+    "_string": "2-PLAYER",
+    "_N$string": "2-PLAYER",
     "_fontSize": 38,
     "_lineHeight": 38,
     "_enableWrapText": true,

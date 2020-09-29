@@ -94,9 +94,9 @@ export default class GameMapManager extends cc.Component {
             }
             else {
                 let stage = GameDataModel._currStage;
-                let stageConfig = GameConfigModel.stageData;
-                if (stageConfig && stageConfig.MapData && stageConfig.MapData[stage - 1]) {
-                    let mapData = this.convertToMapData(stageConfig.MapData[stage - 1]);
+                let mapDataConfig = GameConfigModel.getMapData(stage);
+                if (mapDataConfig) {
+                    let mapData = this.convertToMapData(mapDataConfig);
                     this.createGameMap(mapData);
                 }
                 else {

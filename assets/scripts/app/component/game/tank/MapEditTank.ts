@@ -146,9 +146,9 @@ export default class MapEditTank extends BaseTank {
             //锚点为(0,0)
             //四个边界坐标都合法
             if (GameDataModel.isValidMatrixPos(pos)
-                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col + 2, pos.row))
-                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col, pos.row + 2))
-                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col + 2, pos.row + 2))) {
+                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col + 4, pos.row))
+                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col, pos.row + 4))
+                && GameDataModel.isValidMatrixPos(new GameStruct.RcInfo(pos.col + 4, pos.row + 4))) {
                 return true;
             }
         }

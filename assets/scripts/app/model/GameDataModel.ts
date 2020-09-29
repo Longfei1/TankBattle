@@ -239,7 +239,7 @@ class GameDataModel extends BaseModel {
     }
 
     getEnemyLeftNum(): number {
-        let diffcultyData = GameConfigModel.stageData.DifficultyData[this._currStage - 1];//本关卡难度数据
+        let diffcultyData = GameConfigModel.getDifficultyData(this._currStage);//本关卡难度数据
         let leftNum = diffcultyData["EnemyTotalNum"] - this.getEnemyDeadTotalNum() - this.getEnemyAliveNum();
 
         return leftNum;

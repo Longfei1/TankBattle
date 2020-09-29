@@ -1,0 +1,22 @@
+{ 
+    "1": {"EnemyMaxAliveNum": 4,"EnemyTotalNum": 20},
+    "2": {"EnemyMaxAliveNum": 4,"EnemyTotalNum": 20},
+    "3": {"EnemyMaxAliveNum": 4,"EnemyTotalNum": 20},
+    "4": {"EnemyMaxAliveNum": 4,"EnemyTotalNum": 20},
+    "5": {"EnemyMaxAliveNum": 4,"EnemyTotalNum": 20},
+    "6": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "7": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "8": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "9": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "10": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "11": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "12": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "13": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "14": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "15": {"EnemyMaxAliveNum": 5,"EnemyTotalNum": 20},
+    "16": {"EnemyMaxAliveNum": 6,"EnemyTotalNum": 20},
+    "17": {"EnemyMaxAliveNum": 6,"EnemyTotalNum": 20},
+    "18": {"EnemyMaxAliveNum": 6,"EnemyTotalNum": 20},
+    "19": {"EnemyMaxAliveNum": 6,"EnemyTotalNum": 20},
+    "20": {"EnemyMaxAliveNum": 6,"EnemyTotalNum": 20}
+}

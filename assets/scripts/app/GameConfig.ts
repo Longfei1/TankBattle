@@ -1,4 +1,4 @@
 export let GameConfig = {
-    debugMode: 1,
+    debugMode: 0,
 
 }

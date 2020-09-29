@@ -79,7 +79,7 @@ export default class CommonFunc {
      * @param weights 权值
      */
     static getRandomArrayValueWithWeight(ary: any[], weights: number[]): any {
-        if (ary.length == weights.length) {
+        if (ary.length <= weights.length) {
             let total = this.SumArray(weights);
             let value = Math.random() * total;
             

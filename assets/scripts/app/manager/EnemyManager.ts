@@ -90,7 +90,7 @@ export default class EnemyManager extends cc.Component {
     evGameStarted() {
         let stage = GameDataModel._currStage;
         //读取本关卡难度数据
-        this._diffcultyData = GameConfigModel.stageData.DifficultyData[stage - 1];
+        this._diffcultyData = GameConfigModel.getDifficultyData(stage);
 
         //游戏开始，生成敌方坦克
         let initNum = 3;

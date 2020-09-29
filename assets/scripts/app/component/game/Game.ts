@@ -378,7 +378,7 @@ export default class Game extends cc.Component {
             gameController.goToMainMenu(); //回到主菜单
         }
         else {
-            if (GameDataModel._currStage < GameConfigModel.getTotalStage()) {
+            if (GameDataModel._currStage < GameDef.GAME_TOTAL_STAGE) {
                 //进入下一关
                 this.closeGameResult();
 

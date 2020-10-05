@@ -136,16 +136,6 @@ export default class PlayerManager extends cc.Component {
         }
     }
 
-    // update() {
-    //     if (GameDataModel.isGamePause()) {
-    //         return
-    //     }
-
-    //     if (GameDataModel.isModeEditMap()) {
-    //         return
-    //     }
-    // }
-
     onKeyDown(event) {
         if (!GameDataModel._enableOperate) {
             return;
@@ -164,10 +154,10 @@ export default class PlayerManager extends cc.Component {
                 this.onPlayerMove(0, GameDef.DIRECTION_RIGHT);
                 break;
             case PlayerDef.KEYMAP_PLAYER1.OK:
-                this.onPlayerOkClick(0);
+                this.onPlayerOkClickDown(0);
                 break;
             case PlayerDef.KEYMAP_PLAYER1.CANCEL:
-                this.onPlayerCancelClick(0);
+                this.onPlayerCancelClickDown(0);
                 break;
             case PlayerDef.KEYMAP_PLAYER2.UP:
                 this.onPlayerMove(1, GameDef.DIRECTION_UP);
@@ -182,10 +172,10 @@ export default class PlayerManager extends cc.Component {
                 this.onPlayerMove(1, GameDef.DIRECTION_RIGHT);
                 break;
             case PlayerDef.KEYMAP_PLAYER2.OK:
-                this.onPlayerOkClick(1);
+                this.onPlayerOkClickDown(1);
                 break;
             case PlayerDef.KEYMAP_PLAYER2.CANCEL:
-                this.onPlayerCancelClick(1);
+                this.onPlayerCancelClickDown(1);
                 break;
             default:
                 break;
@@ -220,6 +210,12 @@ export default class PlayerManager extends cc.Component {
                 break;
             case PlayerDef.KEYMAP_PLAYER2.RIGHT:
                 this.onStopMove(1, GameDef.DIRECTION_RIGHT);
+                break;
+            case PlayerDef.KEYMAP_PLAYER1.CANCEL:
+                this.onPlayerCancelClickUp(0);
+                break;
+            case PlayerDef.KEYMAP_PLAYER1.CANCEL:
+                this.onPlayerCancelClickUp(1);
                 break;
             default:
                 break;
@@ -263,7 +259,7 @@ export default class PlayerManager extends cc.Component {
         }
     }
 
-    onPlayerOkClick(playerNo: number) {
+    onPlayerOkClickDown(playerNo: number) {
         if (GameDataModel.isModeEditMap() && playerNo === 0) {
             this.onChangeScenery();
         }
@@ -274,9 +270,22 @@ export default class PlayerManager extends cc.Component {
         }
     }
 
-    onPlayerCancelClick(playerNo: number) {
+    onPlayerCancelClickDown(playerNo: number) {
         if (GameDataModel.isModeEditMap() && playerNo === 0) {
             this.onChangeEditMode();
+        }
+        else {
+            if (this._players[playerNo]) {
+                this._players[playerNo].setShooting(true);
+            }
+        }
+    }
+
+    onPlayerCancelClickUp(playerNo: number) {
+        if (!GameDataModel.isModeEditMap()) {
+            if (this._players[playerNo]) {
+                this._players[playerNo].setShooting(false);
+            }
         }
     }
 

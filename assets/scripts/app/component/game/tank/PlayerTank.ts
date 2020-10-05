@@ -15,6 +15,16 @@ const { ccclass, property } = cc._decorator;
 export default class PlayerTank extends BattleTank {
 
     _moveAudioInfo: GameStruct.AudioInfo = null;
+    _bShooting: boolean = false;
+
+    reset() {
+        super.reset();
+        this._bShooting = false;
+    }
+
+    setShooting(bShoot: boolean) {
+        this._bShooting = bShoot;
+    }
 
     shoot() {
         if (super.shoot()) {
@@ -161,6 +171,13 @@ export default class PlayerTank extends BattleTank {
         }
         else {
             this._moveSpeed = atru.moveSpeed;
+        }
+    }
+
+    update(dt) {
+        super.update(dt);
+        if (this.isTankVisible() && this._bShooting) {
+            this.shoot();
         }
     }
 }

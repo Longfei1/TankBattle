@@ -68,16 +68,6 @@
     "Slider",
     "WebView"
   ],
-  "facebook": {
-    "appID": "",
-    "audience": {
-      "enable": false
-    },
-    "enable": false,
-    "live": {
-      "enable": false
-    }
-  },
   "fit-height": true,
   "fit-width": false,
   "group-list": [
@@ -89,7 +79,6 @@
     "homebase",
     "prop"
   ],
-  "last-module-event-record-time": 1601117112206,
   "simulator-orientation": true,
   "simulator-resolution": {
     "height": 720,
@@ -97,5 +86,10 @@
   },
   "start-scene": "10114342-4fa0-4b4b-a6f7-eed513bf15a9",
   "use-customize-simulator": false,
-  "use-project-simulator-setting": true
+  "use-project-simulator-setting": true,
+  "cocos-analytics": {
+    "enable": false,
+    "appID": "13798",
+    "appSecret": "959b3ac0037d0f3c2fdce94f8421a9b2"
+  }
 }

@@ -157,7 +157,11 @@ export default class EnemyTank extends BattleTank {
         let time = CommonFunc.getTimeStamp();
         //障碍物不是边界时，尝试突破障碍物
         if (!this._bTryMoving && !this.isOutBoundaryDirction(this._moveDirection)) {
-            if (CommonFunc.isInProbability(0.8)) {
+            let tryProbability = 0.6;
+            if (this.isDirectionForwardHomeBase(this._moveDirection)) {
+                tryProbability = 0.85;
+            }
+            if (CommonFunc.isInProbability(tryProbability)) {
                 this._bTryMoving = true;
                 this._tryMoveStartTime = time;
                 this._tryMoveTime = CommonFunc.getRandomNumber(TRY_MOVE_TIME_MIN, TRY_MOVE_TIME_MAX);
@@ -184,7 +188,7 @@ export default class EnemyTank extends BattleTank {
 
     //行为控制定时器
     onBehaviorTimer() {
-        if (CommonFunc.isInProbability(0.1)) {
+        if (CommonFunc.isInProbability(0.15)) {
             //给定概率下改变移动方向
 
             this.changeMoveDirectionEx(0.1);

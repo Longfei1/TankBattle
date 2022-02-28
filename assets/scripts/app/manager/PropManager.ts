@@ -76,6 +76,7 @@ export default class EnemyManager extends cc.Component {
 
                 com.setType(type);
                 com.setPosition(pos);
+                com.setTime(GameDef.PROP_SHOW_TIME);
             }
         }
     }

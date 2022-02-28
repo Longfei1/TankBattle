@@ -327,7 +327,7 @@ export default class PlayerManager extends cc.Component {
                 bGameOver = false;
             }
 
-            if (GameDataModel.isModeDoublePlayer() && !this.isPlayerNoLife(0)) {
+            if (GameDataModel.isModeDoublePlayer() && !this.isPlayerNoLife(1)) {
                 bGameOver = false;
             }
 

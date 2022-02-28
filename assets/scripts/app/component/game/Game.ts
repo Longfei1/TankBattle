@@ -340,7 +340,7 @@ export default class Game extends cc.Component {
                     cc.director.resume();
                     cc.audioEngine.resumeAll();
 
-                    this.node.emit(EventDef.EV_GAME_PAUSE);
+                    this.node.emit(EventDef.EV_GAME_RESUME);
                     this.nodePause.active = false;
                 }
                 else {
@@ -348,7 +348,7 @@ export default class Game extends cc.Component {
                     cc.director.pause();
                     cc.audioEngine.pauseAll();
 
-                    this.node.emit(EventDef.EV_GAME_RESUME);
+                    this.node.emit(EventDef.EV_GAME_PAUSE);
                     this.nodePause.active = true;
                 }
             }

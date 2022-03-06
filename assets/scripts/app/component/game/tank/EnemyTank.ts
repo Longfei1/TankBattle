@@ -330,9 +330,9 @@ export default class EnemyTank extends BattleTank {
         let tankPos = this.node.getPosition();
         let homeBasePos = GameDataModel.getHomeCenterScenePosition();
 
-        let vertical = GameDef.DIRECTION_UP;
+        let vertical = GameDef.DIRECTION_DOWN;
         if (tankPos.y < homeBasePos.y) {
-            vertical = GameDef.DIRECTION_DOWN;
+            vertical = GameDef.DIRECTION_UP;
         }
 
         let horizontal = GameDef.DIRECTION_LEFT;

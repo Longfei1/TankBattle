@@ -399,7 +399,7 @@ class GameDataModel extends BaseModel {
     }
 
     getHomeCenterScenePosition(): cc.Vec2 {
-        let scenePos = this.matrixToScenePosition(new GameStruct.RcInfo(GameDef.PLACE_HOMEBASE.col + 2, GameDef.PLACE_HOMEBASE.row + 2)); 
+        let scenePos = this.matrixToScenePosition(new GameStruct.RcInfo(GameDef.PLACE_HOMEBASE.col + 2, GameDef.PLACE_HOMEBASE.row)); 
         return scenePos;
     }
 
